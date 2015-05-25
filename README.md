@@ -12,6 +12,7 @@ Changing a tile: mouse click
 
 ## Features
 * Layering
+* Scrolling
 * Maps
 * Mapediting
 * Tilesets

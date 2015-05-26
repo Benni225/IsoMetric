@@ -18,10 +18,12 @@ class IsoLayer {
     scrollY: number = 0;
     scrollSpeed: number = 1;
     sprites: IsoSprites;
+    billboards: IsoBillboards;
 
     constructor(Engine: IsoMetric, name: string, width: number, height: number, index: number, tileSizeX: number, tileSizeY: number) {
         this.Engine = Engine;
         this.sprites = new IsoSprites(this.Engine, this);
+        this.billboards = new IsoBillboards(this.Engine, this);
         this.create(name, width, height, index, tileSizeX, tileSizeY);
     }
 
@@ -62,7 +64,7 @@ class IsoLayer {
         return this;
     }
 
-    setScroll(x: number, y: number) {
+    setDeltaScroll(x: number, y: number) {
         this.scrollX = this.scrollX + (this.scrollSpeed * -(x));
         this.scrollY = this.scrollY + (this.scrollSpeed * (y));
         if (this.scrollX > 0) {

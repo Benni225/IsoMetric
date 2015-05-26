@@ -1,30 +1,16 @@
-﻿"use strict";
+﻿///<reference path="IsoImage.ts" />
+///<reference path="IsoCollection.ts" />
+"use strict";
 
-class IsoBaseTileImage {
-    /**
-     * Path to the image
-     */
-    src: string;
-    /**
-     * Name of the object
-     */
-    name: string;
-    /**
-     * HTMLImageObject
-     */
-    image: HTMLImageElement;
-    /**
-     * A callback when the image loaded
-     */
-    loadCallback: Function;
+class IsoBaseTileImage extends IsoImage {
     /**
      * Width of the image
      */
-    width: number;
+    tileWidth: number;
     /**
      * Height of the image
      */
-    height: number;
+    tileHeight: number;
     /**
      * ToDo:
      * maybe deprecated
@@ -49,6 +35,7 @@ class IsoBaseTileImage {
      * @param src Path to the image file
      */
     constructor(Engine: IsoMetric, name?: string, src?: string) {
+        super(name, src);
         this.Engine = Engine;
         if (name !== undefined && src !== undefined) {
             this.create(name, src);
@@ -56,6 +43,7 @@ class IsoBaseTileImage {
     }
     /**
      * Creates a new Tileset.
+     * @override IsoImage.create
      * @param Engine A object of IsoMetric
      * @param name Name of the new tileset
      * @param src Path to the image file
@@ -68,28 +56,22 @@ class IsoBaseTileImage {
     }
     /**
      * Loads the image for further work.
+     * @override IsoImage.load
      * @return Instance of IsoBaseTileImage
      */
     load(): IsoBaseTileImage {
         this.image = new Image;
         this.image.src = this.src;
-        this.image.id = this.prefix + this.name;
         this.image.onload = (event: Event) => this._onLoad(event);
         return this;
     }
     /**
      * Called when the image file was loaded.
+     * @override IsoImage._onLoad
      * @param event The triggerd event
      */
     _onLoad(event: Event) {
-        this.loadCallback.call(this.Engine, event);
-    }
-    /**
-     * Returns the image.
-     * @return The image.
-     */
-    get(): HTMLImageElement {
-        return this.image;
+        this.onLoad.call(this.Engine, event);
     }
     /**
      * Return the offset in pixel of a given tile inside the tileset
@@ -109,11 +91,11 @@ class IsoBaseTileImage {
      * }
      */
     getTileOffset(tileNumber: number) {
-        var column = tileNumber % (this.image.width / this.width),
-            row = Math.floor(tileNumber / (this.image.width / this.width));
+        var column = tileNumber % (this.image.width / this.tileWidth),
+            row = Math.floor(tileNumber / (this.image.width / this.tileWidth));
 
-        var ox = column * this.width,
-            oy = row * this.height;
+        var ox = column * this.tileWidth,
+            oy = row * this.tileHeight;
         return {
             offsetX: ox,
             offsetY: oy
@@ -125,15 +107,9 @@ class IsoBaseTileImage {
      * @param height The height in px
      */
     setTileSize(width: number, height: number): IsoBaseTileImage {
-        this.width = width;
-        this.height = height;
+        this.tileWidth = width;
+        this.tileHeight = height;
         return this;
-    }
-    /**
-     * Deletes the instance
-     */
-    free() {
-        delete (this);
     }
     /**
      * Sets the direction of the tileset.
@@ -150,26 +126,26 @@ class IsoBaseTileImage {
     }
 }
 
-class IsoBaseTileImages {
-    tileImages: Array<IsoBaseTileImage> = new Array();
+class IsoBaseTileImages extends IsoCollection {
+    collection: Array<IsoBaseTileImage> = new Array();
     private loaded: number = 0;
     private onLoaded: Function;
     private onEvery: Function;
     Engine: IsoMetric;
 
     constructor(Engine: IsoMetric) {
-        this.Engine = Engine;
+        super(Engine);
     }
 
     add(name: string, src: string): IsoTileSets {
-        this.tileImages.push(new IsoTileSet(this.Engine, name, src));
+        this.collection.push(new IsoTileSet(this.Engine, name, src));
         return this;
     }
 
     load(): IsoTileSets {
-        for (var i = 0; i < this.tileImages.length; i++) {
-            this.tileImages[i].loadCallback = (event) => this.loadCounter(event, this.tileImages[i]);
-            this.tileImages[i].load();
+        for (var i = 0; i < this.collection.length; i++) {
+            this.collection[i].onLoad = (event: Event) => this.loadCounter(event, this.collection[i]);
+            this.collection[i].load();
         }
         return this;
     }
@@ -179,7 +155,7 @@ class IsoBaseTileImages {
         if (this.onEvery !== undefined) {
             this.onEvery(this.Engine, event, tileSet);
         }
-        if (this.loaded === this.tileImages.length) {
+        if (this.loaded === this.collection.length) {
             new IsoEvent("tilesetsLoaded").trigger();
             this.callThen();
         }
@@ -199,14 +175,5 @@ class IsoBaseTileImages {
         if (this.onLoaded !== undefined) {
             this.onLoaded.call(this.Engine);
         }
-    }
-
-    getByName(name: string): IsoBaseTileImage {
-        for (var i = 0; i < this.tileImages.length; i++) {
-            if (this.tileImages[i].name === name) {
-                return this.tileImages[i];
-            }
-        }
-        return undefined;
     }
 }

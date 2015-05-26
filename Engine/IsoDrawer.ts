@@ -18,6 +18,7 @@ class IsoDrawer {
         this.Layers.sortLayers();
         for (var i = 0; i < this.Layers.layers.length; i++) {
             if (this.Layers.layers[i].hidden !== true) {
+                this.drawBillboards(this.Layers.layers[i].billboards.get());
                 this.drawLayer(this.Layers.layers[i]);
                 this.drawSprites(this.Layers.layers[i].sprites.get());
             }
@@ -28,6 +29,25 @@ class IsoDrawer {
         new IsoEvent("drawComplete").trigger();
     }
 
+    drawBillboards(billboards: Array<IsoBillboard>) {
+        if (billboards !== undefined) {
+            for (var i = 0; i < billboards.length; i++) {
+                var billboard = billboards[i],
+                    image = billboard.get();
+                this.Canvas.context.drawImage(
+                    image,
+                    0,
+                    0,
+                    billboard.width,
+                    billboard.height,
+                    billboard.x + billboard.offsetX + billboard.scrollX,
+                    billboard.y + billboard.offsetY + billboard.scrollY,
+                    billboard.width,
+                    billboard.height);
+            }
+        }
+    }
+
     drawLayer(layer: IsoLayer) {
         for (var row = 0; row < layer.map.get().length; row++) {
             for (var column = 0; column < layer.map.get()[row].length; column++) {
@@ -35,16 +55,17 @@ class IsoDrawer {
                     tileSet = this.TileSets.getByName(layer.tileSet),
                     image = tileSet.get(),
                     offset = tileSet.getTileOffset(tile);
+
                 this.Canvas.context.drawImage(
                     image,
                     offset.offsetX,
                     offset.offsetY,
-                    tileSet.width,
-                    tileSet.height,
-                    column * tileSet.width + layer.offsetX + layer.scrollX,
-                    row * tileSet.height + layer.offsetY + layer.scrollY,
-                    tileSet.width,
-                    tileSet.height);
+                    tileSet.tileWidth,
+                    tileSet.tileHeight,
+                    column * tileSet.tileWidth + layer.offsetX + layer.scrollX,
+                    row * tileSet.tileHeight + layer.offsetY + layer.scrollY,
+                    tileSet.tileWidth,
+                    tileSet.tileHeight);
             }
         }
         if (this.onDrawLayer !== undefined) {
@@ -63,17 +84,16 @@ class IsoDrawer {
                 var sprite = sprites[i],
                     offset = sprite.getTileOffset(sprite.getTile()),
                     image = sprite.get();
-
                 this.Canvas.context.drawImage(
                     image,
                     offset.offsetX,
                     offset.offsetY,
-                    sprite.width,
-                    sprite.height,
+                    sprite.tileWidth,
+                    sprite.tileHeight,
                     sprite.x,
                     sprite.y,
-                    sprite.width,
-                    sprite.height);
+                    sprite.tileWidth,
+                    sprite.tileHeight);
             }
         }
     }

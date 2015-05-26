@@ -296,8 +296,7 @@ class IsoSprite extends IsoBaseTileImage {
      * @param layer Name of the layer the sprite will be placed on
      */
     constructor(Engine: IsoMetric, name: string, src: string, tileWidth: number, tileHeight: number, layer: IsoLayer) {
-        super(Engine);
-        this.create(name, src);
+        super(Engine, name, src);
         this.setTileSize(tileWidth, tileHeight);
         this.setLayer(layer);
         this.animations = new IsoSpriteAnimations(this.Engine);
@@ -352,9 +351,9 @@ class IsoSprite extends IsoBaseTileImage {
     /**
      * @Todo: integrate masks
      */
-    setMask() {
+    // setMask() {
 
-    }
+    // }
 
     /**
      * Sets the direction of the sprite.
@@ -413,9 +412,9 @@ class IsoSprite extends IsoBaseTileImage {
      * @param y The move the position on the Y-axis.
      * @return The sprite.
      */
-    move(x: number, y: number): IsoSprite {
-        this.x = this.x + (this.speed * x);
-        this.y = this.y + (this.speed * y);
+    move(deltaX: number, deltaY: number): IsoSprite {
+        this.x = this.x + (this.speed * deltaX);
+        this.y = this.y + (this.speed * deltaY);
         return this;
     }
     /**
@@ -428,12 +427,12 @@ class IsoSprite extends IsoBaseTileImage {
         return this;
     }
 
-    setCollisionBody(collisionBody: ICollisionBody) : IsoSprite{
+    setCollisionBody(collisionBody: ICollisionBody) : IsoSprite {
         this.collisionBody = collisionBody;
         return this;
     }
 
-    getCollidingTiles() : Array<Array<ITile>>{
+    getCollidingTiles() : Array<Array<ITile>> {
         var layers = this.Engine.layers.layers;
         var tilesO = new Array();
         var collisionBody: ICollisionBody = this.collisionBody;
@@ -441,12 +440,18 @@ class IsoSprite extends IsoBaseTileImage {
             collisionBody = {
                 relativX: 0,
                 relativY: 0,
-                width: this.width,
-                height: this.height
+                width: this.tileWidth,
+                height: this.tileHeight
             };
         }
         for (var i = 0; i < layers.length; i++) {
-            var tiles = layers[i].getTilesInRadius(this.x + collisionBody.relativX, this.y + collisionBody.relativY, collisionBody.width, collisionBody.height);
+            var tiles = layers[i].getTilesInRadius
+                (
+                this.x + collisionBody.relativX,
+                this.y + collisionBody.relativY,
+                collisionBody.width,
+                collisionBody.height
+                );
             if (tiles.length > 0) {
                 tilesO[layers[i].name] = tiles;
             }
@@ -493,7 +498,7 @@ class IsoSprites {
 
     load(): IsoSprites {
         for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].loadCallback = (event) => this.loadCounter(event, this.sprites[i]);
+            this.sprites[i].onLoad = (event: Event) => this.loadCounter(event, this.sprites[i]);
             this.sprites[i].load();
         }
         return this;

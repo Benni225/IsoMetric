@@ -1,7 +1,7 @@
 ﻿/**
- * This is a simple test file for checking out some features.
- * Copyright 2015 Benjamin Werner
- */
+  * This is a simple test file for checking out some features.
+  * Copyright 2015 Benjamin Werner
+  */
 ///<reference path="Engine/IsoCanvas.ts" />
 ///<reference path="Engine/IsoConfig.ts" />
 window.onload = function () {
@@ -61,7 +61,7 @@ window.onload = function () {
                         if (input.keyChar === "a") {
                             grandPa.setDirection(IsoMetric.LEFT).move(-1, 0);
                             var collidedTiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-                            for (var i = 0; i < collidedTiles.length; i++) {                               
+                            for (var i = 0; i < collidedTiles.length; i++) {
                                 if (collidedTiles[i].tile === 1) {
                                     grandPa.move(1, 0);
                                 }
@@ -88,7 +88,7 @@ window.onload = function () {
                             app.layers.getByName("ground").map.edit(tile.x / tile.width, tile.y / tile.height, 1);
                         }
                     }
-                }
+                };
                 app.startLoop();
             });
     });
@@ -101,7 +101,6 @@ window.onload = function () {
         }
 
         var tiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-        var collide = false;
         for (var i = 0; i < tiles.length; i++) {
             var tile = tiles[i];
             app.canvas.context.rect(tile.x, tile.y, tile.width, tile.height);

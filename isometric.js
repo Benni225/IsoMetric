@@ -81,9 +81,9 @@ var IsoConfig = (function () {
     return IsoConfig;
 })();
 /**
- * This is a simple test file for checking out some features.
- * Copyright 2015 Benjamin Werner
- */
+  * This is a simple test file for checking out some features.
+  * Copyright 2015 Benjamin Werner
+  */
 ///<reference path="Engine/IsoCanvas.ts" />
 ///<reference path="Engine/IsoConfig.ts" />
 window.onload = function () {
@@ -179,7 +179,6 @@ window.onload = function () {
             app.canvas.context.stroke();
         }
         var tiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-        var collide = false;
         for (var i = 0; i < tiles.length; i++) {
             var tile = tiles[i];
             app.canvas.context.rect(tile.x, tile.y, tile.width, tile.height);
@@ -191,7 +190,90 @@ window.onload = function () {
     }
 };
 "use strict";
-var IsoBaseTileImage = (function () {
+var IsoImage = (function () {
+    function IsoImage(name, src) {
+        if (name !== undefined && src !== undefined) {
+            this.create(name, src);
+        }
+    }
+    /**
+     * Creates a new image.
+     * @param src Source to the imagefile.
+     * @return Instance of IsoImage
+     */
+    IsoImage.prototype.create = function (name, src) {
+        this.name = name;
+        this.src = src;
+        return this;
+    };
+    /**
+     * Loads the image for further work.
+     * @return Instance of IsoImage
+     */
+    IsoImage.prototype.load = function () {
+        var _this = this;
+        this.image = new Image();
+        this.image.src = this.src;
+        this.image.onload = function (event) { return _this._onLoad(event); };
+    };
+    /**
+     * Called when the image file was loaded.
+     * @param event The triggerd event
+     */
+    IsoImage.prototype._onLoad = function (event) {
+        this.width = this.image.width;
+        this.height = this.image.height;
+        if (typeof this.onLoad === "function") {
+            this.onLoad.call(this, event);
+        }
+    };
+    /**
+     * Returns the image.
+     * @return The image.
+     */
+    IsoImage.prototype.get = function () {
+        return this.image;
+    };
+    /**
+     * Deletes the image.
+     */
+    IsoImage.prototype.free = function () {
+        this.image = null;
+        delete (this);
+    };
+    return IsoImage;
+})();
+"use strict";
+var IsoCollection = (function () {
+    function IsoCollection(Engine) {
+        this.Engine = Engine;
+    }
+    IsoCollection.prototype.get = function () {
+        return this.collection;
+    };
+    IsoCollection.prototype.getByName = function (name) {
+        if (this.collection !== undefined) {
+            for (var i = 0; i < this.collection.length; i++) {
+                if (this.collection[i].name === name) {
+                    return this.collection[i];
+                }
+            }
+        }
+        return undefined;
+    };
+    return IsoCollection;
+})();
+///<reference path="IsoImage.ts" />
+///<reference path="IsoCollection.ts" />
+"use strict";
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var IsoBaseTileImage = (function (_super) {
+    __extends(IsoBaseTileImage, _super);
     /**
      * Creates a new instance of IsoBaseTileImage
      * @param Engine A object of IsoMetric
@@ -199,6 +281,7 @@ var IsoBaseTileImage = (function () {
      * @param src Path to the image file
      */
     function IsoBaseTileImage(Engine, name, src) {
+        _super.call(this, name, src);
         /**
          * ToDo:
          * maybe deprecated
@@ -219,6 +302,7 @@ var IsoBaseTileImage = (function () {
     }
     /**
      * Creates a new Tileset.
+     * @override IsoImage.create
      * @param Engine A object of IsoMetric
      * @param name Name of the new tileset
      * @param src Path to the image file
@@ -231,29 +315,23 @@ var IsoBaseTileImage = (function () {
     };
     /**
      * Loads the image for further work.
+     * @override IsoImage.load
      * @return Instance of IsoBaseTileImage
      */
     IsoBaseTileImage.prototype.load = function () {
         var _this = this;
         this.image = new Image;
         this.image.src = this.src;
-        this.image.id = this.prefix + this.name;
         this.image.onload = function (event) { return _this._onLoad(event); };
         return this;
     };
     /**
      * Called when the image file was loaded.
+     * @override IsoImage._onLoad
      * @param event The triggerd event
      */
     IsoBaseTileImage.prototype._onLoad = function (event) {
-        this.loadCallback.call(this.Engine, event);
-    };
-    /**
-     * Returns the image.
-     * @return The image.
-     */
-    IsoBaseTileImage.prototype.get = function () {
-        return this.image;
+        this.onLoad.call(this.Engine, event);
     };
     /**
      * Return the offset in pixel of a given tile inside the tileset
@@ -273,8 +351,8 @@ var IsoBaseTileImage = (function () {
      * }
      */
     IsoBaseTileImage.prototype.getTileOffset = function (tileNumber) {
-        var column = tileNumber % (this.image.width / this.width), row = Math.floor(tileNumber / (this.image.width / this.width));
-        var ox = column * this.width, oy = row * this.height;
+        var column = tileNumber % (this.image.width / this.tileWidth), row = Math.floor(tileNumber / (this.image.width / this.tileWidth));
+        var ox = column * this.tileWidth, oy = row * this.tileHeight;
         return {
             offsetX: ox,
             offsetY: oy
@@ -286,15 +364,9 @@ var IsoBaseTileImage = (function () {
      * @param height The height in px
      */
     IsoBaseTileImage.prototype.setTileSize = function (width, height) {
-        this.width = width;
-        this.height = height;
+        this.tileWidth = width;
+        this.tileHeight = height;
         return this;
-    };
-    /**
-     * Deletes the instance
-     */
-    IsoBaseTileImage.prototype.free = function () {
-        delete (this);
     };
     /**
      * Sets the direction of the tileset.
@@ -310,22 +382,23 @@ var IsoBaseTileImage = (function () {
         return this;
     };
     return IsoBaseTileImage;
-})();
-var IsoBaseTileImages = (function () {
+})(IsoImage);
+var IsoBaseTileImages = (function (_super) {
+    __extends(IsoBaseTileImages, _super);
     function IsoBaseTileImages(Engine) {
-        this.tileImages = new Array();
+        _super.call(this, Engine);
+        this.collection = new Array();
         this.loaded = 0;
-        this.Engine = Engine;
     }
     IsoBaseTileImages.prototype.add = function (name, src) {
-        this.tileImages.push(new IsoTileSet(this.Engine, name, src));
+        this.collection.push(new IsoTileSet(this.Engine, name, src));
         return this;
     };
     IsoBaseTileImages.prototype.load = function () {
         var _this = this;
-        for (var i = 0; i < this.tileImages.length; i++) {
-            this.tileImages[i].loadCallback = function (event) { return _this.loadCounter(event, _this.tileImages[i]); };
-            this.tileImages[i].load();
+        for (var i = 0; i < this.collection.length; i++) {
+            this.collection[i].onLoad = function (event) { return _this.loadCounter(event, _this.collection[i]); };
+            this.collection[i].load();
         }
         return this;
     };
@@ -334,7 +407,7 @@ var IsoBaseTileImages = (function () {
         if (this.onEvery !== undefined) {
             this.onEvery(this.Engine, event, tileSet);
         }
-        if (this.loaded === this.tileImages.length) {
+        if (this.loaded === this.collection.length) {
             new IsoEvent("tilesetsLoaded").trigger();
             this.callThen();
         }
@@ -352,23 +425,103 @@ var IsoBaseTileImages = (function () {
             this.onLoaded.call(this.Engine);
         }
     };
-    IsoBaseTileImages.prototype.getByName = function (name) {
-        for (var i = 0; i < this.tileImages.length; i++) {
-            if (this.tileImages[i].name === name) {
-                return this.tileImages[i];
-            }
-        }
-        return undefined;
-    };
     return IsoBaseTileImages;
-})();
+})(IsoCollection);
+///<reference path="IsoImage.ts" />
+var IsoBillboard = (function (_super) {
+    __extends(IsoBillboard, _super);
+    function IsoBillboard(Engine, name, src) {
+        _super.call(this, name, src);
+        this.Engine = Engine;
+        if (name != undefined && src != undefined) {
+            this.create(name, src);
+        }
+    }
+    IsoBillboard.prototype.create = function (name, src) {
+        this.name = name;
+        this.src = src;
+        return this;
+    };
+    IsoBillboard.prototype.load = function () {
+        var _this = this;
+        this.image = new Image();
+        this.image.src = this.src;
+        this.image.onload = function (event) { return _this._onLoad(event); };
+        return this;
+    };
+    IsoBillboard.prototype._onLoad = function (event) {
+        this.onLoad.call(this, event);
+    };
+    IsoBillboard.prototype.setPosition = function (x, y) {
+        this.x = x;
+        this.y = y;
+        return this;
+    };
+    IsoBillboard.prototype.setSpeed = function (speed) {
+        this.speed = speed;
+        return this;
+    };
+    IsoBillboard.prototype.move = function (deltaX, deltaY) {
+        this.x = this.x + (deltaX * this.speed);
+        this.y = this.y + (deltaY * this.speed);
+        return this;
+    };
+    IsoBillboard.prototype.setDeltaScroll = function (deltaX, deltaY) {
+        this.scrollX = this.scrollX + (this.speed * -(deltaX));
+        this.scrollY = this.scrollY + (this.speed * (deltaY));
+    };
+    IsoBillboard.prototype.setScroll = function (x, y) {
+        this.scrollX = x;
+        this.scrollY = y;
+    };
+    return IsoBillboard;
+})(IsoImage);
+var IsoBillboards = (function (_super) {
+    __extends(IsoBillboards, _super);
+    function IsoBillboards(Engine, Layer) {
+        _super.call(this, Engine);
+        this.collection = new Array();
+        this.loaded = 0;
+        this.Layer = Layer;
+    }
+    IsoBillboards.prototype.add = function (name, src) {
+        this.collection.push(new IsoBillboard(this.Engine, name, src));
+        return this;
+    };
+    IsoBillboards.prototype.load = function () {
+        var _this = this;
+        for (var i = 0; i < this.collection.length; i++) {
+            this.collection[i].onLoad = function (event) { return _this.loadCounter(event, _this.collection[i]); };
+            this.collection[i].load();
+        }
+        return this;
+    };
+    IsoBillboards.prototype.loadCounter = function (event, tileSet) {
+        this.loaded = this.loaded + 1;
+        if (this.onEvery !== undefined) {
+            this.onEvery(this.Engine, event, tileSet);
+        }
+        if (this.loaded === this.collection.length) {
+            new IsoEvent("tilesetsLoaded").trigger();
+            this.callThen();
+        }
+    };
+    IsoBillboards.prototype.every = function (callback) {
+        this.onEvery = callback;
+        return this;
+    };
+    IsoBillboards.prototype.then = function (callback) {
+        this.onLoaded = callback;
+        return this;
+    };
+    IsoBillboards.prototype.callThen = function () {
+        if (this.onLoaded !== undefined) {
+            this.onLoaded.call(this.Engine);
+        }
+    };
+    return IsoBillboards;
+})(IsoCollection);
 "use strict";
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 /**
  * Includes all animation parameters of a sprite.
  */
@@ -594,7 +747,7 @@ var IsoSprite = (function (_super) {
      * @param layer Name of the layer the sprite will be placed on
      */
     function IsoSprite(Engine, name, src, tileWidth, tileHeight, layer) {
-        _super.call(this, Engine);
+        _super.call(this, Engine, name, src);
         this.speed = 1;
         /**
          * The actual tile.
@@ -604,7 +757,6 @@ var IsoSprite = (function (_super) {
          * The default frame
          */
         this.defaultFrame = 1;
-        this.create(name, src);
         this.setTileSize(tileWidth, tileHeight);
         this.setLayer(layer);
         this.animations = new IsoSpriteAnimations(this.Engine);
@@ -659,8 +811,8 @@ var IsoSprite = (function (_super) {
     /**
      * @Todo: integrate masks
      */
-    IsoSprite.prototype.setMask = function () {
-    };
+    // setMask() {
+    // }
     /**
      * Sets the direction of the sprite.
      * @param direction The direction of the sprite. Possible values are:
@@ -719,9 +871,9 @@ var IsoSprite = (function (_super) {
      * @param y The move the position on the Y-axis.
      * @return The sprite.
      */
-    IsoSprite.prototype.move = function (x, y) {
-        this.x = this.x + (this.speed * x);
-        this.y = this.y + (this.speed * y);
+    IsoSprite.prototype.move = function (deltaX, deltaY) {
+        this.x = this.x + (this.speed * deltaX);
+        this.y = this.y + (this.speed * deltaY);
         return this;
     };
     /**
@@ -745,8 +897,8 @@ var IsoSprite = (function (_super) {
             collisionBody = {
                 relativX: 0,
                 relativY: 0,
-                width: this.width,
-                height: this.height
+                width: this.tileWidth,
+                height: this.tileHeight
             };
         }
         for (var i = 0; i < layers.length; i++) {
@@ -791,7 +943,7 @@ var IsoSprites = (function () {
     IsoSprites.prototype.load = function () {
         var _this = this;
         for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].loadCallback = function (event) { return _this.loadCounter(event, _this.sprites[i]); };
+            this.sprites[i].onLoad = function (event) { return _this.loadCounter(event, _this.sprites[i]); };
             this.sprites[i].load();
         }
         return this;
@@ -849,6 +1001,7 @@ var IsoDrawer = (function () {
         this.Layers.sortLayers();
         for (var i = 0; i < this.Layers.layers.length; i++) {
             if (this.Layers.layers[i].hidden !== true) {
+                this.drawBillboards(this.Layers.layers[i].billboards.get());
                 this.drawLayer(this.Layers.layers[i]);
                 this.drawSprites(this.Layers.layers[i].sprites.get());
             }
@@ -858,11 +1011,19 @@ var IsoDrawer = (function () {
         }
         new IsoEvent("drawComplete").trigger();
     };
+    IsoDrawer.prototype.drawBillboards = function (billboards) {
+        if (billboards !== undefined) {
+            for (var i = 0; i < billboards.length; i++) {
+                var billboard = billboards[i], image = billboard.get();
+                this.Canvas.context.drawImage(image, 0, 0, billboard.width, billboard.height, billboard.x + billboard.offsetX + billboard.scrollX, billboard.y + billboard.offsetY + billboard.scrollY, billboard.width, billboard.height);
+            }
+        }
+    };
     IsoDrawer.prototype.drawLayer = function (layer) {
         for (var row = 0; row < layer.map.get().length; row++) {
             for (var column = 0; column < layer.map.get()[row].length; column++) {
                 var tile = layer.map.get()[row][column], tileSet = this.TileSets.getByName(layer.tileSet), image = tileSet.get(), offset = tileSet.getTileOffset(tile);
-                this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, tileSet.width, tileSet.height, column * tileSet.width + layer.offsetX + layer.scrollX, row * tileSet.height + layer.offsetY + layer.scrollY, tileSet.width, tileSet.height);
+                this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, tileSet.tileWidth, tileSet.tileHeight, column * tileSet.tileWidth + layer.offsetX + layer.scrollX, row * tileSet.tileHeight + layer.offsetY + layer.scrollY, tileSet.tileWidth, tileSet.tileHeight);
             }
         }
         if (this.onDrawLayer !== undefined) {
@@ -877,7 +1038,7 @@ var IsoDrawer = (function () {
         if (sprites !== undefined) {
             for (var i = 0; i < sprites.length; i++) {
                 var sprite = sprites[i], offset = sprite.getTileOffset(sprite.getTile()), image = sprite.get();
-                this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, sprite.width, sprite.height, sprite.x, sprite.y, sprite.width, sprite.height);
+                this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, sprite.tileWidth, sprite.tileHeight, sprite.x, sprite.y, sprite.tileWidth, sprite.tileHeight);
             }
         }
     };
@@ -1015,6 +1176,7 @@ var IsoLayer = (function () {
         this.scrollSpeed = 1;
         this.Engine = Engine;
         this.sprites = new IsoSprites(this.Engine, this);
+        this.billboards = new IsoBillboards(this.Engine, this);
         this.create(name, width, height, index, tileSizeX, tileSizeY);
     }
     IsoLayer.prototype.create = function (name, width, height, index, tileSizeX, tileSizeY) {
@@ -1047,7 +1209,7 @@ var IsoLayer = (function () {
         this.hidden = false;
         return this;
     };
-    IsoLayer.prototype.setScroll = function (x, y) {
+    IsoLayer.prototype.setDeltaScroll = function (x, y) {
         this.scrollX = this.scrollX + (this.scrollSpeed * -(x));
         this.scrollY = this.scrollY + (this.scrollSpeed * (y));
         if (this.scrollX > 0) {

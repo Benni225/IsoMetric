@@ -51,7 +51,7 @@ class IsoInput {
     }
 
     addEvents() {
-        var el = document;
+        var el = window;
         el.onkeydown = (event: KeyboardEvent) => this.checkKeyboard(event);
         el.onkeypress = (event: KeyboardEvent) => this.checkKeyboard(event);
         el.onkeyup = (event: KeyboardEvent) => this.checkKeyboard(event);

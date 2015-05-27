@@ -970,7 +970,7 @@ var IsoInput = (function () {
     }
     IsoInput.prototype.addEvents = function () {
         var _this = this;
-        var el = document;
+        var el = window;
         el.onkeydown = function (event) { return _this.checkKeyboard(event); };
         el.onkeypress = function (event) { return _this.checkKeyboard(event); };
         el.onkeyup = function (event) { return _this.checkKeyboard(event); };
@@ -1374,25 +1374,14 @@ var IsoMetric = (function () {
      * Starts the game- and drawing-loop.
      */
     IsoMetric.prototype.startLoop = function () {
-        var _this = this;
-        this.animationFrame = window.requestAnimationFrame || null;
-        if (this.animationFrame === null) {
-            this.interval = setInterval(function () { return _this.update(); }, 1000.0 / 60.0);
-        }
-        else {
-            this.update();
-        }
+        this.update();
     };
     /**
      * The game- and drawing-loop.
      */
     IsoMetric.prototype.update = function () {
-        var _this = this;
         this.startLoopTime = new Date();
         this.drawer.draw();
-        if (this.animationFrame !== null) {
-            requestAnimationFrame(function () { return _this.update(); });
-        }
     };
     /**
      * [deprecated] Sets the global direction.

@@ -118,12 +118,7 @@ class IsoMetric {
      * Starts the game- and drawing-loop.
      */
     startLoop() {
-        this.animationFrame = window.requestAnimationFrame || null;
-        if (this.animationFrame === null) {
-            this.interval = setInterval(() => this.update(), 1000.0 / 60.0);
-        } else {
-            this.update();
-        }
+        this.update();
     }
     /**
      * The game- and drawing-loop.
@@ -131,9 +126,6 @@ class IsoMetric {
     update() {
         this.startLoopTime = new Date();
         this.drawer.draw();
-        if (this.animationFrame !== null) {
-            requestAnimationFrame(() => this.update());
-        }
     }
     /**
      * [deprecated] Sets the global direction.

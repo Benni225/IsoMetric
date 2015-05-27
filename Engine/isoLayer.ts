@@ -6,7 +6,7 @@ class IsoLayer {
     map: IsoMap;
     tileSizeX: number;
     tileSizeY: number;
-    tileSet: string;
+    tileSet: IsoTileSet;
     shadowTileSet: HTMLImageElement;
     shadowStrength: number = 0.5;
     name: string;
@@ -39,10 +39,14 @@ class IsoLayer {
         return this;
     }
 
-    setTileSet(name: string) : IsoLayer {
-        this.tileSet = name;
-        this.Engine.tileSets.getByName(name).setTileSize(this.tileSizeX, this.tileSizeY);
+    setTileSet(tileSet: IsoTileSet) : IsoLayer {
+        this.tileSet = tileSet;
+        this.tileSet.setTileSize(this.tileSizeX, this.tileSizeY);
         return this;
+    }
+
+    getTileSet(): IsoTileSet {
+        return this.tileSet;
     }
 
     setShadowTileSet(image: HTMLImageElement): IsoLayer {

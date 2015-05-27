@@ -49,13 +49,12 @@ class IsoDrawer {
     }
 
     drawLayer(layer: IsoLayer) {
+        var tileSet = layer.getTileSet(),
+            image = tileSet.get();
+        
         for (var row = 0; row < layer.map.get().length; row++) {
             for (var column = 0; column < layer.map.get()[row].length; column++) {
-                var tile = layer.map.get()[row][column],
-                    tileSet = this.TileSets.getByName(layer.tileSet),
-                    image = tileSet.get(),
-                    offset = tileSet.getTileOffset(tile);
-
+                var tile = layer.map.get()[row][column], offset = tileSet.getTileOffset(tile);
                 this.Canvas.context.drawImage(
                     image,
                     offset.offsetX,

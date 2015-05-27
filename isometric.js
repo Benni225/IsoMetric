@@ -1,195 +1,4 @@
 "use strict";
-var IsoCanvas = (function () {
-    function IsoCanvas(Engine) {
-        this.defaultOptions = {
-            width: 640,
-            height: 480,
-            fullscreen: true
-        };
-        this.Engine = Engine;
-    }
-    IsoCanvas.prototype.create = function (id) {
-        var _this = this;
-        this.canvasElement = document.createElement("canvas");
-        if (id === undefined) {
-            id = "isoMetricCanvas";
-        }
-        this.canvasElement.id = id;
-        this.options = this.defaultOptions;
-        if (this.Engine.config.get("windowOptions") !== undefined) {
-            this.options = this.Engine.config.get("windowOptions");
-        }
-        this.canvasElement.width = this.options.width;
-        this.canvasElement.height = this.options.height;
-        if (this.options.fullscreen === true) {
-            this.canvasElement.width = window.innerWidth;
-            this.canvasElement.height = window.innerHeight;
-            window.onresize = window.onload = function () { return _this.updateScreen(); };
-        }
-        document.body.appendChild(this.canvasElement);
-        this.context = this.canvasElement.getContext("2d");
-        new IsoEvent("IsoCanvasReady").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.updateScreen = function () {
-        this.canvasElement.width = window.innerWidth;
-        this.canvasElement.height = window.innerWidth;
-        new IsoEvent("IsoCanvasUpdate").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.clearScreen = function () {
-        /**
-         * @todo:
-         * Finding a better solution for redraw the canvas.
-         */
-        this.canvasElement.width = this.canvasElement.width;
-        this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-        //console.log(this.canvasElement.width + " x " + this.canvasElement.height)
-        new IsoEvent("IsoCanvasClearScreen").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.get = function () {
-        return this.canvasElement;
-    };
-    return IsoCanvas;
-})();
-"use strict";
-var IsoConfig = (function () {
-    function IsoConfig(Engine, c) {
-        this.Engine = Engine;
-        if (c !== undefined) {
-            this.c = c;
-        }
-        else {
-            this.c = {};
-        }
-    }
-    IsoConfig.prototype.setConfig = function (c) {
-        this.c = c;
-    };
-    IsoConfig.prototype.set = function (name, value) {
-        this.c[name] = value;
-    };
-    IsoConfig.prototype.get = function (name) {
-        if (this.c[name] !== undefined) {
-            return this.c[name];
-        }
-        else {
-            return undefined;
-        }
-    };
-    return IsoConfig;
-})();
-/**
-  * This is a simple test file for checking out some features.
-  * Copyright 2015 Benjamin Werner
-  */
-///<reference path="Engine/IsoCanvas.ts" />
-///<reference path="Engine/IsoConfig.ts" />
-window.onload = function () {
-    var app = new IsoMetric();
-    app.layers.add("ground", 1920, 1920, 64, 64).setScrollSpeed(8);
-    app.tileSets
-        .add("ground", "images/ground.png")
-        .load().then(function () {
-        app.layers.getByName("ground")
-            .setTileSet("ground")
-            .sprites.add("grandpa", "images/grandpa.png", 30, 48).load().then(function () {
-            app.layers.getByName("ground").sprites.getByName("grandpa")
-                .setDirection(IsoMetric.RIGHT)
-                .addAnimation("walk", 1, 3)
-                .setX(50)
-                .setY(50)
-                .setSpeed(8)
-                .setDefaultFrame(2)
-                .setDefaultAnimation("walk")
-                .setCollisionBody({
-                relativX: 10,
-                relativY: 28,
-                width: 5,
-                height: 10
-            })
-                .animations.getByName("walk")
-                .setFramesPerSecond(10)
-                .setAnimationType(IsoSpriteAnimation.PINGPONG);
-            app.drawer.onDrawLayer = function (Engine, layer) { return drawMark(Engine, layer); };
-            app.input.onKeyboard = function () {
-                app.layers.getByName("ground")
-                    .sprites.getByName("grandpa")
-                    .animations.getByName("walk")
-                    .setFramesPerSecond(3)
-                    .play();
-                var grandPa = app.layers.getByName("ground").sprites.getByName("grandpa");
-                var input = app.input;
-                if (input.keyChar === "s") {
-                    grandPa.setDirection(IsoMetric.FRONT).move(0, 1);
-                    var collidedTiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-                    for (var i = 0; i < collidedTiles.length; i++) {
-                        if (collidedTiles[i].tile === 1) {
-                            grandPa.move(0, -1);
-                        }
-                    }
-                }
-                if (input.keyChar === "w") {
-                    grandPa.setDirection(IsoMetric.BACK).move(0, -1);
-                    var collidedTiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-                    for (var i = 0; i < collidedTiles.length; i++) {
-                        if (collidedTiles[i].tile === 1) {
-                            grandPa.move(0, 1);
-                        }
-                    }
-                }
-                if (input.keyChar === "a") {
-                    grandPa.setDirection(IsoMetric.LEFT).move(-1, 0);
-                    var collidedTiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-                    for (var i = 0; i < collidedTiles.length; i++) {
-                        if (collidedTiles[i].tile === 1) {
-                            grandPa.move(1, 0);
-                        }
-                    }
-                }
-                if (input.keyChar === "d") {
-                    grandPa.setDirection(IsoMetric.RIGHT).move(1, 0);
-                    var collidedTiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-                    for (var i = 0; i < collidedTiles.length; i++) {
-                        if (collidedTiles[i].tile === 1) {
-                            grandPa.move(-1, 0);
-                        }
-                    }
-                }
-                if (input.keyEventType === IsoInput.EVENT_KEYUP) {
-                    app.layers.getByName("ground").sprites.getByName("grandpa").animations.getByName("walk").stop();
-                }
-            };
-            app.input.onMouse = function (Engine, event) {
-                if (event.type === "mouseup") {
-                    var tile = app.layers.mouseOver("ground");
-                    if (tile !== null) {
-                        app.layers.getByName("ground").map.edit(tile.x / tile.width, tile.y / tile.height, 1);
-                    }
-                }
-            };
-            app.startLoop();
-        });
-    });
-    function drawMark(Engine, layer) {
-        var mouseTile = app.layers.mouseOver("ground");
-        if (mouseTile !== null) {
-            app.canvas.context.rect(mouseTile.x, mouseTile.y, mouseTile.width, mouseTile.height);
-            app.canvas.context.stroke();
-        }
-        var tiles = app.layers.getByName("ground").sprites.getByName("grandpa").getCollidingTiles()["ground"];
-        for (var i = 0; i < tiles.length; i++) {
-            var tile = tiles[i];
-            app.canvas.context.rect(tile.x, tile.y, tile.width, tile.height);
-            app.canvas.context.stroke();
-        }
-        app.canvas.context.fillStyle = "#fff";
-        app.canvas.context.font = "20px Arial";
-        app.canvas.context.fillText("FPS: " + app.FPS, 10, 30);
-    }
-};
-"use strict";
 var IsoImage = (function () {
     function IsoImage(name, src) {
         if (name !== undefined && src !== undefined) {
@@ -521,6 +330,61 @@ var IsoBillboards = (function (_super) {
     };
     return IsoBillboards;
 })(IsoCollection);
+"use strict";
+var IsoCanvas = (function () {
+    function IsoCanvas(Engine) {
+        this.defaultOptions = {
+            width: 640,
+            height: 480,
+            fullscreen: true
+        };
+        this.Engine = Engine;
+    }
+    IsoCanvas.prototype.create = function (id) {
+        var _this = this;
+        this.canvasElement = document.createElement("canvas");
+        if (id === undefined) {
+            id = "isoMetricCanvas";
+        }
+        this.canvasElement.id = id;
+        this.options = this.defaultOptions;
+        if (this.Engine.config.get("windowOptions") !== undefined) {
+            this.options = this.Engine.config.get("windowOptions");
+        }
+        this.canvasElement.width = this.options.width;
+        this.canvasElement.height = this.options.height;
+        if (this.options.fullscreen === true) {
+            this.canvasElement.width = window.innerWidth;
+            this.canvasElement.height = window.innerHeight;
+            window.onresize = window.onload = function () { return _this.updateScreen(); };
+        }
+        document.body.appendChild(this.canvasElement);
+        this.context = this.canvasElement.getContext("2d");
+        new IsoEvent("IsoCanvasReady").trigger();
+        return this;
+    };
+    IsoCanvas.prototype.updateScreen = function () {
+        this.canvasElement.width = window.innerWidth;
+        this.canvasElement.height = window.innerWidth;
+        new IsoEvent("IsoCanvasUpdate").trigger();
+        return this;
+    };
+    IsoCanvas.prototype.clearScreen = function () {
+        /**
+         * @todo:
+         * Finding a better solution for redraw the canvas.
+         */
+        this.canvasElement.width = this.canvasElement.width;
+        this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+        //console.log(this.canvasElement.width + " x " + this.canvasElement.height)
+        new IsoEvent("IsoCanvasClearScreen").trigger();
+        return this;
+    };
+    IsoCanvas.prototype.get = function () {
+        return this.canvasElement;
+    };
+    return IsoCanvas;
+})();
 "use strict";
 /**
  * Includes all animation parameters of a sprite.
@@ -989,6 +853,33 @@ var IsoCharacter = (function (_super) {
     return IsoCharacter;
 })(IsoSprite);
 "use strict";
+var IsoConfig = (function () {
+    function IsoConfig(Engine, c) {
+        this.Engine = Engine;
+        if (c !== undefined) {
+            this.c = c;
+        }
+        else {
+            this.c = {};
+        }
+    }
+    IsoConfig.prototype.setConfig = function (c) {
+        this.c = c;
+    };
+    IsoConfig.prototype.set = function (name, value) {
+        this.c[name] = value;
+    };
+    IsoConfig.prototype.get = function (name) {
+        if (this.c[name] !== undefined) {
+            return this.c[name];
+        }
+        else {
+            return undefined;
+        }
+    };
+    return IsoConfig;
+})();
+"use strict";
 var IsoDrawer = (function () {
     function IsoDrawer(Engine) {
         this.Engine = Engine;
@@ -1020,9 +911,10 @@ var IsoDrawer = (function () {
         }
     };
     IsoDrawer.prototype.drawLayer = function (layer) {
+        var tileSet = layer.getTileSet(), image = tileSet.get();
         for (var row = 0; row < layer.map.get().length; row++) {
             for (var column = 0; column < layer.map.get()[row].length; column++) {
-                var tile = layer.map.get()[row][column], tileSet = this.TileSets.getByName(layer.tileSet), image = tileSet.get(), offset = tileSet.getTileOffset(tile);
+                var tile = layer.map.get()[row][column], offset = tileSet.getTileOffset(tile);
                 this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, tileSet.tileWidth, tileSet.tileHeight, column * tileSet.tileWidth + layer.offsetX + layer.scrollX, row * tileSet.tileHeight + layer.offsetY + layer.scrollY, tileSet.tileWidth, tileSet.tileHeight);
             }
         }
@@ -1189,10 +1081,13 @@ var IsoLayer = (function () {
         this.map = new IsoMap(this);
         return this;
     };
-    IsoLayer.prototype.setTileSet = function (name) {
-        this.tileSet = name;
-        this.Engine.tileSets.getByName(name).setTileSize(this.tileSizeX, this.tileSizeY);
+    IsoLayer.prototype.setTileSet = function (tileSet) {
+        this.tileSet = tileSet;
+        this.tileSet.setTileSize(this.tileSizeX, this.tileSizeY);
         return this;
+    };
+    IsoLayer.prototype.getTileSet = function () {
+        return this.tileSet;
     };
     IsoLayer.prototype.setShadowTileSet = function (image) {
         if (this.map.isSimpleShadowMap) {

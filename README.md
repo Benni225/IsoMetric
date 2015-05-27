@@ -4,11 +4,7 @@ Some of the main features are already implemented.
 
 ## Example
 
-Just look at the index.html and see it working:
-
-Moving: W A S D
-
-Changing a tile: mouse click
+Just try the examples in the examplefolder.
 
 ## Features
 * Layering

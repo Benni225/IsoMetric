@@ -9,7 +9,7 @@ many features will be added. IsoMetric is fast, simple and flexible.
 * scrolling
 * sprites
 * billboards
-* collsion detection
+* collision detection
 * keyboard and mouse (touch support at the moment under development)
 * tilemaps
 * sprite animations

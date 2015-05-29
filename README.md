@@ -19,6 +19,9 @@ many features will be added. IsoMetric is fast, simple and flexible.
 * shadowmaps
 * isometric drawing
 * animated tilemaps
+* pathfinding
+* rotation
+* zooming
 * and many more
 
 ## Setting up IsoMetric in JavaScript

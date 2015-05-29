@@ -13,9 +13,9 @@ many features will be added. IsoMetric is fast, simple and flexible.
 * keyboard and mouse (touch support at the moment under development)
 * tilemaps
 * sprite animations
+* heightmaps
 
 ### Some of the planned features
-* heightmaps
 * shadowmaps
 * isometric drawing
 * animated tilemaps

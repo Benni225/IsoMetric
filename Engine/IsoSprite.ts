@@ -445,7 +445,7 @@ class IsoSprite extends IsoBaseTileImage {
             };
         }
         for (var i = 0; i < layers.length; i++) {
-            var tiles = layers[i].getTilesInRadius
+            var tiles = layers[i].tileMap.getTilesInRadius
                 (
                 this.x + collisionBody.relativX,
                 this.y + collisionBody.relativY,

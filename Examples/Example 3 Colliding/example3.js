@@ -6,10 +6,10 @@ window.onload = function () {
         fullscreen: true
     });
     // Adding a new layer with the dimension 1920x1920 and a tilewidth and -height of 64x64 
-    App.layers.add("firstLayer", 1920, 1920, 64, 64);
+    App.layers.add("firstLayer").tileMap.create(1920, 1920, 64, 64);
     // Edit the map
     // Setup some tiles that aren't passable.
-    App.layers.getByName("firstLayer").map
+    App.layers.getByName("firstLayer").tileMap.map
         .edit(3, 4, unpassableTileNumber)
         .edit(8, 1, unpassableTileNumber)
         .edit(2, 9, unpassableTileNumber);
@@ -19,8 +19,8 @@ window.onload = function () {
     // After loading all tilesets...
     App.tileSets.load().then(function () {
         //... setup the layer and the tileset
-        firstLayer.setTileSet(App.tileSets.getByName("firstTileSet"));
-        firstLayer.setScrollSpeed(8);
+        firstLayer.tileMap.setTileSet(App.tileSets.getByName("firstTileSet"));
+        firstLayer.tileMap.setScrollSpeed(8);
         // Loading a new sprite to the layer and setting it up
         firstLayer.sprites.add("grandpa", "../images/grandpa.png", 30, 48);
         firstLayer.sprites.getByName("grandpa")

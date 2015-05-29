@@ -766,7 +766,7 @@ var IsoSprite = (function (_super) {
             };
         }
         for (var i = 0; i < layers.length; i++) {
-            var tiles = layers[i].getTilesInRadius(this.x + collisionBody.relativX, this.y + collisionBody.relativY, collisionBody.width, collisionBody.height);
+            var tiles = layers[i].tileMap.getTilesInRadius(this.x + collisionBody.relativX, this.y + collisionBody.relativY, collisionBody.width, collisionBody.height);
             if (tiles.length > 0) {
                 tilesO[layers[i].name] = tiles;
             }
@@ -880,42 +880,100 @@ var IsoConfig = (function () {
     return IsoConfig;
 })();
 "use strict";
+var IsoDrawObject = (function () {
+    function IsoDrawObject() {
+        this.objects = new Array();
+    }
+    IsoDrawObject.prototype.add = function (object) {
+        this.objects.push(object);
+    };
+    IsoDrawObject.prototype.clear = function () {
+        this.objects = null;
+        this.objects = new Array();
+    };
+    return IsoDrawObject;
+})();
 var IsoDrawer = (function () {
     function IsoDrawer(Engine) {
         this.Engine = Engine;
         this.Layers = Engine.layers;
         this.Canvas = Engine.canvas;
         this.TileSets = Engine.tileSets;
+        this.objects = new IsoDrawObject;
     }
     IsoDrawer.prototype.draw = function () {
         this.Canvas.clearScreen();
         this.Layers.sortLayers();
+        this.objects.clear();
         for (var i = 0; i < this.Layers.layers.length; i++) {
             if (this.Layers.layers[i].hidden !== true) {
-                this.drawBillboards(this.Layers.layers[i].billboards.get());
                 this.drawLayer(this.Layers.layers[i]);
-                this.drawSprites(this.Layers.layers[i].sprites.get());
             }
         }
+        this.drawObject();
         if (this.onDrawComplete !== undefined) {
             this.onDrawComplete(this.Engine);
         }
         new IsoEvent("drawComplete").trigger();
     };
-    IsoDrawer.prototype.drawBillboards = function (billboards) {
-        if (billboards !== undefined) {
-            for (var i = 0; i < billboards.length; i++) {
-                var billboard = billboards[i], image = billboard.get();
-                this.Canvas.context.drawImage(image, 0, 0, billboard.width, billboard.height, billboard.x + billboard.offsetX + billboard.scrollX, billboard.y + billboard.offsetY + billboard.scrollY, billboard.width, billboard.height);
+    IsoDrawer.prototype.drawObject = function () {
+        this.objects.objects.sort(this.sortPriorities);
+        for (var i = 0; i < this.objects.objects.length; i++) {
+            if (this.objects.objects[i].tileHeight > 0) {
+                var heightMapImageOffset = this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
+                for (var p = 0; p <= this.objects.objects[i].tileHeight; p++) {
+                    this.Canvas.context.drawImage(this.objects.objects[i].image, heightMapImageOffset.offsetX, heightMapImageOffset.offsetY, this.objects.objects[i].width, this.objects.objects[i].height, this.objects.objects[i].x, this.objects.objects[i].y - (p * this.objects.objects[i].height), this.objects.objects[i].width, this.objects.objects[i].height);
+                }
+                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, this.objects.objects[i].x, this.objects.objects[i].y - (this.objects.objects[i].tileHeight * this.objects.objects[i].height), this.objects.objects[i].width, this.objects.objects[i].height);
+            }
+            else {
+                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, this.objects.objects[i].x, this.objects.objects[i].y, this.objects.objects[i].width, this.objects.objects[i].height);
             }
         }
     };
     IsoDrawer.prototype.drawLayer = function (layer) {
-        var tileSet = layer.getTileSet(), image = tileSet.get();
-        for (var row = 0; row < layer.map.get().length; row++) {
-            for (var column = 0; column < layer.map.get()[row].length; column++) {
-                var tile = layer.map.get()[row][column], offset = tileSet.getTileOffset(tile);
-                this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, tileSet.tileWidth, tileSet.tileHeight, column * tileSet.tileWidth + layer.offsetX + layer.scrollX, row * tileSet.tileHeight + layer.offsetY + layer.scrollY, tileSet.tileWidth, tileSet.tileHeight);
+        var tileSet = layer.tileMap.getTileSet(), image = tileSet.get();
+        var objects = new IsoDrawObject;
+        for (var row = 0; row < layer.tileMap.map.get().length; row++) {
+            for (var column = 0; column < layer.tileMap.map.get()[row].length; column++) {
+                var x1 = column * tileSet.tileWidth + layer.tileMap.offsetX + layer.tileMap.scrollX;
+                var y1 = row * tileSet.tileHeight + layer.tileMap.offsetY + layer.tileMap.scrollY;
+                var x2 = x1 + tileSet.tileWidth;
+                var y2 = y1 + tileSet.tileHeight;
+                var tile = layer.tileMap.map.get()[row][column], offset = tileSet.getTileOffset(tile);
+                var sprites = layer.sprites.sprites;
+                var priorities = new Array();
+                priorities.push({
+                    x: x1,
+                    y: y1,
+                    width: layer.tileMap.tileSizeX,
+                    height: layer.tileMap.tileSizeY,
+                    image: layer.tileMap.tileSet.get(),
+                    imageOffsetX: offset.offsetX,
+                    imageOffsetY: offset.offsetY,
+                    tileHeight: layer.tileMap.heightMap.getHeight(column, row),
+                    layer: layer
+                });
+                for (var i = 0; i < sprites.length; i++) {
+                    // Todo: Check also for height. If not: add.
+                    if ((sprites[i].x) > x1 && (sprites[i].x) < x2 && (sprites[i].y) > y1 && (sprites[i].y) < y2) {
+                        var offset = sprites[i].getTileOffset(sprites[i].getTile());
+                        priorities.push({
+                            x: sprites[i].x,
+                            y: sprites[i].y,
+                            width: sprites[i].tileWidth,
+                            height: sprites[i].tileHeight,
+                            image: sprites[i].image,
+                            imageOffsetX: offset.offsetX,
+                            imageOffsetY: offset.offsetY,
+                            tileHeight: 0,
+                            type: "sprite"
+                        });
+                    }
+                }
+                for (var i = 0; i < priorities.length; i++) {
+                    this.objects.add(priorities[i]);
+                }
             }
         }
         if (this.onDrawLayer !== undefined) {
@@ -926,13 +984,43 @@ var IsoDrawer = (function () {
         this.Engine.frameCount = this.Engine.frameCount + 1;
         new IsoEvent("drawLayerComplete").addData(layer).trigger();
     };
-    IsoDrawer.prototype.drawSprites = function (sprites) {
-        if (sprites !== undefined) {
-            for (var i = 0; i < sprites.length; i++) {
-                var sprite = sprites[i], offset = sprite.getTileOffset(sprite.getTile()), image = sprite.get();
-                this.Canvas.context.drawImage(image, offset.offsetX, offset.offsetY, sprite.tileWidth, sprite.tileHeight, sprite.x, sprite.y, sprite.tileWidth, sprite.tileHeight);
-            }
+    IsoDrawer.prototype.sortPriorities = function (a, b) {
+        var ax, ay, bx, by;
+        if (a.type === "sprite") {
+            ax = a.x + a.width;
+            ay = a.y + a.height;
         }
+        else {
+            ax = a.x;
+            ay = a.y;
+        }
+        if (b.type === "sprite") {
+            bx = b.x + b.width;
+            by = b.y + b.height;
+        }
+        else {
+            bx = b.x;
+            by = b.y;
+        }
+        if (ay > by) {
+            return 1;
+        }
+        if (ay < by) {
+            return -1;
+        }
+        if (ax > bx) {
+            return 1;
+        }
+        if (ax < bx) {
+            return -1;
+        }
+        if (a.tileHeight > b.tileHeight) {
+            return 1;
+        }
+        if (a.tileHeight < b.tileHeight) {
+            return -1;
+        }
+        return 0;
     };
     return IsoDrawer;
 })();
@@ -958,6 +1046,142 @@ var IsoEvent = (function () {
     };
     return IsoEvent;
 })();
+"use strict";
+var IsoLayer = (function () {
+    function IsoLayer(Engine, name, index) {
+        this.hidden = false;
+        this.Engine = Engine;
+        this.name = name;
+        this.sprites = new IsoSprites(this.Engine, this);
+        this.billboards = new IsoBillboards(this.Engine, this);
+        this.tileMap = new IsoTileMap(this.Engine);
+    }
+    IsoLayer.prototype.hide = function () {
+        this.hidden = true;
+        return this;
+    };
+    IsoLayer.prototype.show = function () {
+        this.hidden = false;
+        return this;
+    };
+    return IsoLayer;
+})();
+var IsoLayers = (function () {
+    function IsoLayers(Engine) {
+        this.layers = new Array();
+        this.lastIndex = 0;
+        this.Engine = Engine;
+    }
+    IsoLayers.prototype.add = function (name) {
+        this.layers.push(new IsoLayer(this.Engine, name, this.lastIndex));
+        this.lastIndex++;
+        return this.getByName(name);
+    };
+    IsoLayers.prototype.getByName = function (name) {
+        for (var i = 0; i < this.layers.length; i++) {
+            if (this.layers[i].name === name) {
+                return this.layers[i];
+            }
+        }
+        return undefined;
+    };
+    IsoLayers.prototype.getByIndex = function (index) {
+        for (var i = 0; i < this.layers.length; i++) {
+            if (this.layers[i].index === index) {
+                return this.layers[i];
+            }
+        }
+        return undefined;
+    };
+    IsoLayers.prototype.layerUp = function (name) {
+        var oldIndex = this.getByName(name).index;
+        this.getByIndex(oldIndex + 1).index = oldIndex;
+        this.getByName(name).index = oldIndex + 1;
+        return this;
+    };
+    IsoLayers.prototype.layerDown = function (name) {
+        var oldIndex = this.getByName(name).index;
+        this.getByIndex(oldIndex - 1).index = oldIndex;
+        this.getByName(name).index = oldIndex - 1;
+        return this;
+    };
+    IsoLayers.prototype.swapLayers = function (nameLayer1, nameLayer2) {
+        var oldIndex = this.getByName(nameLayer2).index;
+        this.getByName(nameLayer2).index = this.getByName(nameLayer1).index;
+        this.getByName(nameLayer1).index = oldIndex;
+        return this;
+    };
+    IsoLayers.prototype.sortLayers = function () {
+        this.layers.sort(this.sortLayerByIndex);
+        return this;
+    };
+    IsoLayers.prototype.sortLayerByIndex = function (a, b) {
+        return a.index - b.index;
+    };
+    IsoLayers.prototype.setTileset = function (name) {
+        this.tileset = name;
+        return this;
+    };
+    IsoLayers.prototype.mouseOver = function (name) {
+        return this.getByName(name).tileMap.mouseOver();
+    };
+    return IsoLayers;
+})();
+///<reference path="IsoLayer.ts" />
+"use strict";
+var IsoMap = (function () {
+    function IsoMap(TileMap, map) {
+        this.TileMap = TileMap;
+        if (map !== undefined) {
+            this.create(map);
+        }
+        else {
+            var _mapArray = new Array();
+            for (var y = 0; y < Math.floor(this.TileMap.height / this.TileMap.tileSizeY); y++) {
+                for (var x = 0; x < Math.floor(this.TileMap.width / this.TileMap.tileSizeX); x++) {
+                    if (_mapArray[y] === undefined) {
+                        _mapArray[y] = new Array();
+                    }
+                    _mapArray[y].push(0);
+                }
+            }
+            this.map = _mapArray;
+        }
+    }
+    IsoMap.prototype.create = function (map) {
+        this.map = map;
+        return this;
+    };
+    IsoMap.prototype.edit = function (x, y, value) {
+        this.map[y][x] = value;
+        return this;
+    };
+    IsoMap.prototype.set = function (map) {
+        this.map = map;
+        return this;
+    };
+    IsoMap.prototype.get = function () {
+        return this.map;
+    };
+    return IsoMap;
+})();
+///<reference path="IsoMap.ts" />
+"use strict";
+var IsoHeightMap = (function (_super) {
+    __extends(IsoHeightMap, _super);
+    function IsoHeightMap(tileMap, map) {
+        _super.call(this, tileMap, map);
+        this.strength = 1;
+    }
+    IsoHeightMap.prototype.getHeight = function (x, y) {
+        return this.map[y][x];
+    };
+    IsoHeightMap.prototype.setStrength = function (strength) {
+        this.strength = strength;
+        return this;
+    };
+    return IsoHeightMap;
+})(IsoMap);
 "use strict";
 var IsoInput = (function () {
     function IsoInput(Engine) {
@@ -1055,246 +1279,6 @@ var IsoInput = (function () {
     IsoInput.EVENT_MOUSEDOWN = "mousedown";
     IsoInput.EVENT_MOUSEUP = "mouseup";
     return IsoInput;
-})();
-"use strict";
-var IsoLayer = (function () {
-    function IsoLayer(Engine, name, width, height, index, tileSizeX, tileSizeY) {
-        this.shadowStrength = 0.5;
-        this.hidden = false;
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.scrollX = 0;
-        this.scrollY = 0;
-        this.scrollSpeed = 1;
-        this.Engine = Engine;
-        this.sprites = new IsoSprites(this.Engine, this);
-        this.billboards = new IsoBillboards(this.Engine, this);
-        this.create(name, width, height, index, tileSizeX, tileSizeY);
-    }
-    IsoLayer.prototype.create = function (name, width, height, index, tileSizeX, tileSizeY) {
-        this.width = width;
-        this.height = height;
-        this.index = index;
-        this.tileSizeX = tileSizeX;
-        this.tileSizeY = tileSizeY;
-        this.name = name;
-        this.map = new IsoMap(this);
-        return this;
-    };
-    IsoLayer.prototype.setTileSet = function (tileSet) {
-        this.tileSet = tileSet;
-        this.tileSet.setTileSize(this.tileSizeX, this.tileSizeY);
-        return this;
-    };
-    IsoLayer.prototype.getTileSet = function () {
-        return this.tileSet;
-    };
-    IsoLayer.prototype.setShadowTileSet = function (image) {
-        if (this.map.isSimpleShadowMap) {
-            console.warn("Layer '" + this.name + "' includes a simple shadowmap, so you can not set a shadowmap-tileset!");
-        }
-        this.shadowTileSet = image;
-        return this;
-    };
-    IsoLayer.prototype.hide = function () {
-        this.hidden = true;
-        return this;
-    };
-    IsoLayer.prototype.show = function () {
-        this.hidden = false;
-        return this;
-    };
-    IsoLayer.prototype.setDeltaScroll = function (x, y) {
-        this.scrollX = this.scrollX + (this.scrollSpeed * -(x));
-        this.scrollY = this.scrollY + (this.scrollSpeed * (y));
-        if (this.scrollX > 0) {
-            this.scrollX = 0;
-        }
-        if (this.scrollY > 0) {
-            this.scrollY = 0;
-        }
-        if (-(this.scrollX) + this.Engine.config.get("windowOptions").width + this.offsetX > (this.width - (this.width % this.tileSizeX))) {
-            this.scrollX =
-                -((this.width - (this.width % this.tileSizeX)) + this.offsetX - this.Engine.config.get("windowOptions").width);
-        }
-        if (-(this.scrollY) + this.Engine.config.get("windowOptions").height + this.offsetY > (this.height - (this.height % this.tileSizeY))) {
-            this.scrollY =
-                -((this.height - (this.height % this.tileSizeY)) + this.offsetY - this.Engine.config.get("windowOptions").height);
-        }
-    };
-    IsoLayer.prototype.setScrollSpeed = function (speed) {
-        this.scrollSpeed = speed;
-        return this;
-    };
-    IsoLayer.prototype.mouseOver = function () {
-        var mouseX = this.Engine.input.mouseX, mouseY = this.Engine.input.mouseY;
-        if (mouseX > this.width ||
-            mouseY > this.height ||
-            typeof mouseX === "NaN" ||
-            typeof mouseY === "NaN" ||
-            mouseX === undefined ||
-            mouseY === undefined) {
-            return null;
-        }
-        else {
-            mouseX = mouseX - this.offsetX;
-            mouseY = mouseY - this.offsetY;
-            if (mouseY > 0 && mouseX > 0) {
-                var row = Math.floor((mouseY + (-this.scrollY)) / this.tileSizeY), column = Math.floor((mouseX + (-this.scrollX)) / this.tileSizeX), x = Math.floor(column * this.tileSizeX) + this.scrollX + this.offsetX, y = Math.floor(row * this.tileSizeY) + this.scrollY + this.offsetY;
-                return {
-                    x: x,
-                    y: y,
-                    width: this.tileSizeX,
-                    height: this.tileSizeY,
-                    tile: this.map.get()[row][column]
-                };
-            }
-            else {
-                return null;
-            }
-        }
-    };
-    IsoLayer.prototype.setOffset = function (x, y) {
-        this.offsetX = x;
-        this.offsetY = y;
-        return this;
-    };
-    IsoLayer.prototype.getTilesInRadius = function (x, y, width, height) {
-        x = x - this.offsetX;
-        y = y - this.offsetY;
-        var tiles = new Array(), toX = x + width, toY = y + height, rowStart = (y - (y % this.tileSizeY)) / this.tileSizeY, rowEnd = (toY - (toY % this.tileSizeY)) / this.tileSizeY, colStart = (x - (x % this.tileSizeX)) / this.tileSizeX, colEnd = (toX - (toX % this.tileSizeX)) / this.tileSizeX;
-        for (var iy = rowStart; iy <= rowEnd; iy++) {
-            for (var ix = colStart; ix <= colEnd; ix++) {
-                var tileX = ix * this.tileSizeX, tileY = iy * this.tileSizeY, tileX2 = tileX + this.tileSizeX, tileY2 = tileY + this.tileSizeY;
-                tiles.push({
-                    x: ix * this.tileSizeX,
-                    y: iy * this.tileSizeY,
-                    width: this.tileSizeX,
-                    height: this.tileSizeY,
-                    tile: this.map.get()[iy][ix]
-                });
-            }
-        }
-        return tiles;
-    };
-    return IsoLayer;
-})();
-var IsoLayers = (function () {
-    function IsoLayers(Engine) {
-        this.layers = new Array();
-        this.lastIndex = 0;
-        this.Engine = Engine;
-    }
-    IsoLayers.prototype.add = function (name, width, height, tileSizeX, tileSizeY) {
-        this.layers.push(new IsoLayer(this.Engine, name, width, height, this.lastIndex, tileSizeX, tileSizeY));
-        this.lastIndex++;
-        return this.getByName(name);
-    };
-    IsoLayers.prototype.getByName = function (name) {
-        for (var i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].name === name) {
-                return this.layers[i];
-            }
-        }
-        return undefined;
-    };
-    IsoLayers.prototype.getByIndex = function (index) {
-        for (var i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].index === index) {
-                return this.layers[i];
-            }
-        }
-        return undefined;
-    };
-    IsoLayers.prototype.layerUp = function (name) {
-        var oldIndex = this.getByName(name).index;
-        this.getByIndex(oldIndex + 1).index = oldIndex;
-        this.getByName(name).index = oldIndex + 1;
-        return this;
-    };
-    IsoLayers.prototype.layerDown = function (name) {
-        var oldIndex = this.getByName(name).index;
-        this.getByIndex(oldIndex - 1).index = oldIndex;
-        this.getByName(name).index = oldIndex - 1;
-        return this;
-    };
-    IsoLayers.prototype.swapLayers = function (nameLayer1, nameLayer2) {
-        var oldIndex = this.getByName(nameLayer2).index;
-        this.getByName(nameLayer2).index = this.getByName(nameLayer1).index;
-        this.getByName(nameLayer1).index = oldIndex;
-        return this;
-    };
-    IsoLayers.prototype.sortLayers = function () {
-        this.layers.sort(this.sortLayerByIndex);
-        return this;
-    };
-    IsoLayers.prototype.sortLayerByIndex = function (a, b) {
-        return a.index - b.index;
-    };
-    IsoLayers.prototype.setTileset = function (name) {
-        this.tileset = name;
-        return this;
-    };
-    IsoLayers.prototype.mouseOver = function (name) {
-        return this.getByName(name).mouseOver();
-    };
-    return IsoLayers;
-})();
-///<reference path="IsoLayer.ts" />
-"use strict";
-var IsoMap = (function () {
-    function IsoMap(Layer, map) {
-        this.isSimpleShadowMap = false;
-        this.Layer = Layer;
-        if (map !== undefined) {
-            this.create(map);
-        }
-        else {
-            var _mapArray = new Array();
-            for (var y = 0; y < Math.floor(this.Layer.height / this.Layer.tileSizeY); y++) {
-                for (var x = 0; x < Math.floor(this.Layer.width / this.Layer.tileSizeX); x++) {
-                    if (_mapArray[y] === undefined) {
-                        _mapArray[y] = new Array();
-                    }
-                    _mapArray[y].push(0);
-                }
-            }
-            this.map = _mapArray;
-        }
-    }
-    IsoMap.prototype.create = function (map) {
-        this.map = map;
-        return this;
-    };
-    IsoMap.prototype.createShadowMap = function (map) {
-        this.shadowMap = map;
-        return this;
-    };
-    IsoMap.prototype.createSimpleShadowMap = function () {
-        this.isSimpleShadowMap = true;
-        var _shadowMapArray = new Array();
-        for (var y = 0; y < Math.round(this.Layer.height / this.Layer.tileSizeY); y++) {
-            for (var x = 0; x < Math.round(this.Layer.width / this.Layer.tileSizeX); x++) {
-                _shadowMapArray[y][x] = 255;
-            }
-        }
-    };
-    IsoMap.prototype.edit = function (x, y, value) {
-        this.map[y][x] = value;
-        return this;
-    };
-    IsoMap.prototype.editShadowMap = function (x, y, value) {
-        this.shadowMap[y][x] = value;
-        return this;
-    };
-    IsoMap.prototype.set = function (map) {
-        this.map = map;
-        return this;
-    };
-    IsoMap.prototype.get = function () {
-        return this.map;
-    };
-    return IsoMap;
 })();
 ///<reference path="IsoMap.ts" />
 "use strict";
@@ -1394,5 +1378,106 @@ var IsoMetric = (function () {
     IsoMetric.BACK = 4;
     IsoMetric.LEFT = 2;
     return IsoMetric;
+})();
+"use strict";
+var IsoTileMap = (function () {
+    function IsoTileMap(Engine, width, height, tileSizeX, tileSizeY) {
+        this.scrollX = 0;
+        this.scrollY = 0;
+        this.scrollSpeed = 1;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.Engine = Engine;
+        if (width !== undefined && height !== undefined && tileSizeX !== undefined && tileSizeY !== undefined) {
+            this.create(width, height, tileSizeX, tileSizeY);
+        }
+    }
+    IsoTileMap.prototype.create = function (width, height, tileSizeX, tileSizeY) {
+        this.width = width;
+        this.height = height;
+        this.tileSizeX = tileSizeX;
+        this.tileSizeY = tileSizeY;
+        this.map = new IsoMap(this);
+        this.heightMap = new IsoHeightMap(this);
+        return this;
+    };
+    IsoTileMap.prototype.setTileSet = function (tileSet) {
+        this.tileSet = tileSet;
+        this.tileSet.setTileSize(this.tileSizeX, this.tileSizeY);
+        return this;
+    };
+    IsoTileMap.prototype.getTileSet = function () {
+        return this.tileSet;
+    };
+    IsoTileMap.prototype.setDeltaScroll = function (x, y) {
+        this.scrollX = this.scrollX + (this.scrollSpeed * -(x));
+        this.scrollY = this.scrollY + (this.scrollSpeed * (y));
+        if (this.scrollX > 0) {
+            this.scrollX = 0;
+        }
+        if (this.scrollY > 0) {
+            this.scrollY = 0;
+        }
+        if (-(this.scrollX) + this.Engine.config.get("windowOptions").width + this.offsetX > (this.width - (this.width % this.tileSizeX))) {
+            this.scrollX =
+                -((this.width - (this.width % this.tileSizeX)) + this.offsetX - this.Engine.config.get("windowOptions").width);
+        }
+        if (-(this.scrollY) + this.Engine.config.get("windowOptions").height + this.offsetY > (this.height - (this.height % this.tileSizeY))) {
+            this.scrollY =
+                -((this.height - (this.height % this.tileSizeY)) + this.offsetY - this.Engine.config.get("windowOptions").height);
+        }
+    };
+    IsoTileMap.prototype.setScrollSpeed = function (speed) {
+        this.scrollSpeed = speed;
+        return this;
+    };
+    IsoTileMap.prototype.mouseOver = function () {
+        var mouseX = this.Engine.input.mouseX, mouseY = this.Engine.input.mouseY;
+        if (mouseX > this.width ||
+            mouseY > this.height ||
+            typeof mouseX === "NaN" ||
+            typeof mouseY === "NaN" ||
+            mouseX === undefined ||
+            mouseY === undefined) {
+            return null;
+        }
+        else {
+            mouseX = mouseX - this.offsetX;
+            mouseY = mouseY - this.offsetY;
+            if (mouseY > 0 && mouseX > 0) {
+                var row = Math.floor((mouseY + (-this.scrollY)) / this.tileSizeY), column = Math.floor((mouseX + (-this.scrollX)) / this.tileSizeX), x = Math.floor(column * this.tileSizeX) + this.scrollX + this.offsetX, y = Math.floor(row * this.tileSizeY) + this.scrollY + this.offsetY;
+                return {
+                    x: x,
+                    y: y,
+                    width: this.tileSizeX,
+                    height: this.tileSizeY,
+                    tile: this.map.get()[row][column]
+                };
+            }
+            else {
+                return null;
+            }
+        }
+    };
+    IsoTileMap.prototype.getTilesInRadius = function (x, y, width, height) {
+        x = x - this.offsetX;
+        y = y - this.offsetY;
+        var tiles = new Array(), toX = x + width, toY = y + height, rowStart = (y - (y % this.tileSizeY)) / this.tileSizeY, rowEnd = (toY - (toY % this.tileSizeY)) / this.tileSizeY, colStart = (x - (x % this.tileSizeX)) / this.tileSizeX, colEnd = (toX - (toX % this.tileSizeX)) / this.tileSizeX;
+        for (var iy = rowStart; iy <= rowEnd; iy++) {
+            for (var ix = colStart; ix <= colEnd; ix++) {
+                var tileX = ix * this.tileSizeX, tileY = iy * this.tileSizeY, tileX2 = tileX + this.tileSizeX, tileY2 = tileY + this.tileSizeY;
+                tiles.push({
+                    x: ix * this.tileSizeX,
+                    y: iy * this.tileSizeY,
+                    width: this.tileSizeX,
+                    height: this.tileSizeY,
+                    tile: this.map.get()[iy][ix],
+                    tileHeight: this.heightMap.getHeight(ix, iy)
+                });
+            }
+        }
+        return tiles;
+    };
+    return IsoTileMap;
 })();
 //# sourceMappingURL=isometric.js.map

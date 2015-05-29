@@ -1,5 +1,5 @@
-///<reference path="../isometric.d.ts" />
-var App, firstLayer;
+﻿///<reference path="../isometric.d.ts" />
+var App: IsoMetric, firstLayer: IsoLayer, unpassableTileNumber = 1;
 window.onload = function () {
     // Init IsoMetric
     App = new IsoMetric({
@@ -7,6 +7,15 @@ window.onload = function () {
     });
     // Adding a new layer with the dimension 1920x1920 and a tilewidth and -height of 64x64 
     App.layers.add("firstLayer").tileMap.create(1920, 1920, 64, 64);
+
+    // Edit the map
+    // Setup some tiles that aren't passable.
+    App.layers.getByName("firstLayer").tileMap.map
+        .edit(3, 4, unpassableTileNumber)
+        .edit(8, 1, unpassableTileNumber)
+        .edit(2, 9, unpassableTileNumber);
+
+
     // Add infomation about the tileset
     App.tileSets.add("firstTileSet", "../images/ground.png");
     firstLayer = App.layers.getByName("firstLayer");
@@ -15,6 +24,20 @@ window.onload = function () {
         //... setup the layer and the tileset
         firstLayer.tileMap.setTileSet(App.tileSets.getByName("firstTileSet"));
         firstLayer.tileMap.setScrollSpeed(8);
+        // Set the tile that is shown instead of the original tile if the height is > 0
+        firstLayer.tileMap.heightTile = 19;
+        // Edit the heightmap
+        firstLayer.tileMap.heightMap.edit(10, 3, 2);
+        firstLayer.tileMap.heightMap.edit(11, 3, 3);
+        firstLayer.tileMap.heightMap.edit(10, 4, 2);
+        firstLayer.tileMap.heightMap.edit(11, 4, 2);
+        firstLayer.tileMap.heightMap.edit(6, 6, 2);
+        // Using different tileimages on places where the height is > 0
+        firstLayer.tileMap.map.edit(10, 3, 27);
+        firstLayer.tileMap.map.edit(11, 3, 27);
+        firstLayer.tileMap.map.edit(10, 4, 27);
+        firstLayer.tileMap.map.edit(11, 4, 27);
+        firstLayer.tileMap.map.edit(6, 6, 27);
         // Loading a new sprite to the layer and setting it up
         firstLayer.sprites.add("grandpa", "../images/grandpa.png", 30, 48);
         firstLayer.sprites.getByName("grandpa")
@@ -26,8 +49,8 @@ window.onload = function () {
             .setDefaultFrame(2)
             .setDefaultAnimation("walk")
             .animations.getByName("walk")
-            .setFramesPerSecond(10)
-            .setAnimationType(IsoSpriteAnimation.PINGPONG);
+                .setFramesPerSecond(10)
+                .setAnimationType(IsoSpriteAnimation.PINGPONG);
         // For a better result you can edit the collision-body of a sprite.
         // The collision-body is the region of a sprite that detects the collision with anonther object.
         firstLayer.sprites.getByName("grandpa").setCollisionBody({
@@ -37,12 +60,12 @@ window.onload = function () {
             height: 10
         });
         // After all sprites loaded, starting the game
-        firstLayer.sprites.load().then(function () { return gameExample2(); });
+        firstLayer.sprites.load().then(() => gameExample4());
     });
-};
+}
 // The gameloop
-function gameExample2() {
-    var grandpa = firstLayer.sprites.getByName("grandpa");
+function gameExample4() {
+    var grandpa: IsoSprite = firstLayer.sprites.getByName("grandpa");
     // Check if a key is down
     if (App.input.keyEventType === IsoInput.EVENT_KEYDOWN) {
         // starting the walking animation
@@ -62,6 +85,9 @@ function gameExample2() {
                 grandpa.move(1, 0).setDirection(IsoMetric.RIGHT);
         }
     }
+    // Check the collision
+    checkCollisionOnHeightMap(grandpa);
+
     // If the keyup-event was fired stopping the animation
     if (App.input.keyEventType === IsoInput.EVENT_KEYUP) {
         grandpa.animations.getByName("walk").stop();
@@ -74,7 +100,32 @@ function gameExample2() {
     // Draw ing the FPS to the screen
     App.canvas.context.fillText("FPS: " + App.FPS, 10, 30);
     // Restart the game loop
-    requestAnimationFrame(function () { return gameExample2(); });
+    requestAnimationFrame(() => gameExample4());
+};
+
+function checkCollisionOnHeightMap(sprite: IsoSprite) {
+    // Returns all the tiles of the layer 'firstLayer' the sprite collids with.
+    var collidingTiles = sprite.getCollidingTiles()["firstLayer"];
+    // Check if a tile has the unpassable value we setted up at the beginning.
+    for (var i = 0; i < collidingTiles.length; i++) {
+        // We reset the movement if the sprite collides with an unpassable tile or a tile with a tileheight > 0
+        if (collidingTiles[i].tile === unpassableTileNumber || collidingTiles[i].tileHeight > 0) {
+            switch (sprite.direction) {
+                case IsoMetric.FRONT:
+                    sprite.move(0, -1);
+                    break;
+                case IsoMetric.BACK:
+                    sprite.move(0, 1);
+                    break;
+                case IsoMetric.LEFT:
+                    sprite.move(1, 0);
+                    break;
+                case IsoMetric.RIGHT:
+                    sprite.move(-1, 0);
+                    break;
+            }
+            // and stop the animation
+            sprite.animations.getByName("walk").stop();
+        }
+    }
 }
-;
-//# sourceMappingURL=example2.js.map

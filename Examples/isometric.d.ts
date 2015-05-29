@@ -541,6 +541,23 @@ declare class IsoConfig {
     set(name: string, value: any): void;
     get(name: string): any;
 }
+interface IIsoDrawObject {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    image: HTMLImageElement;
+    imageOffsetX: number;
+    imageOffsetY: number;
+    type?: string;
+    tileHeight?: number;
+    layer?: IsoLayer;
+}
+declare class IsoDrawObject {
+    objects: Array<IIsoDrawObject>;
+    add(object: IIsoDrawObject): void;
+    clear(): void;
+}
 declare class IsoDrawer {
     Engine: IsoMetric;
     Layers: IsoLayers;
@@ -548,11 +565,12 @@ declare class IsoDrawer {
     TileSets: IsoTileSets;
     onDrawLayer: Function;
     onDrawComplete: Function;
+    objects: IsoDrawObject;
     constructor(Engine: IsoMetric);
     draw(): void;
-    drawBillboards(billboards: Array<IsoBillboard>): void;
+    drawObject(): void;
     drawLayer(layer: IsoLayer): void;
-    drawSprites(sprites: Array<IsoSprite>): void;
+    sortPriorities(a: IIsoDrawObject, b: IIsoDrawObject): number;
 }
 declare class IsoEvent {
     type: string;
@@ -560,6 +578,50 @@ declare class IsoEvent {
     constructor(type: string);
     addData(data: any): IsoEvent;
     trigger(target?: string): void;
+}
+declare class IsoLayer {
+    index: number;
+    name: string;
+    hidden: boolean;
+    Engine: IsoMetric;
+    sprites: IsoSprites;
+    billboards: IsoBillboards;
+    tileMap: IsoTileMap;
+    constructor(Engine: IsoMetric, name: string, index: number);
+    hide(): IsoLayer;
+    show(): IsoLayer;
+}
+declare class IsoLayers {
+    layers: Array<IsoLayer>;
+    private lastIndex;
+    tileset: string;
+    Engine: IsoMetric;
+    constructor(Engine: IsoMetric);
+    add(name: string): IsoLayer;
+    getByName(name: string): IsoLayer;
+    getByIndex(index: number): IsoLayer;
+    layerUp(name: string): IsoLayers;
+    layerDown(name: string): IsoLayers;
+    swapLayers(nameLayer1: string, nameLayer2: string): IsoLayers;
+    sortLayers(): IsoLayers;
+    sortLayerByIndex(a: IsoLayer, b: IsoLayer): number;
+    setTileset(name: string): IsoLayers;
+    mouseOver(name: string): ITile;
+}
+declare class IsoMap {
+    map: Array<Array<number>>;
+    TileMap: IsoTileMap;
+    constructor(TileMap: IsoTileMap, map?: Array<Array<number>>);
+    create(map: Array<Array<number>>): IsoMap;
+    edit(x: number, y: number, value: number): IsoMap;
+    set(map: Array<Array<number>>): IsoMap;
+    get(): Array<Array<number>>;
+}
+declare class IsoHeightMap extends IsoMap {
+    strength: number;
+    constructor(tileMap: IsoTileMap, map?: Array<Array<number>>);
+    getHeight(x: number, y: number): number;
+    setStrength(strength: number): IsoHeightMap;
 }
 declare class IsoInput {
     static KEYDOWN: number;
@@ -607,70 +669,6 @@ declare class IsoInput {
     checkTouch(event: TouchEvent): void;
     reset(): void;
     callCallback(event: Event): void;
-}
-declare class IsoLayer {
-    width: number;
-    height: number;
-    index: number;
-    map: IsoMap;
-    tileSizeX: number;
-    tileSizeY: number;
-    tileSet: IsoTileSet;
-    shadowTileSet: HTMLImageElement;
-    shadowStrength: number;
-    name: string;
-    hidden: boolean;
-    Engine: IsoMetric;
-    offsetX: number;
-    offsetY: number;
-    scrollX: number;
-    scrollY: number;
-    scrollSpeed: number;
-    sprites: IsoSprites;
-    billboards: IsoBillboards;
-    constructor(Engine: IsoMetric, name: string, width: number, height: number, index: number, tileSizeX: number, tileSizeY: number);
-    create(name: string, width: number, height: number, index: number, tileSizeX: number, tileSizeY: number): IsoLayer;
-    setTileSet(tileSet: IsoTileSet): IsoLayer;
-    getTileSet(): IsoTileSet;
-    setShadowTileSet(image: HTMLImageElement): IsoLayer;
-    hide(): IsoLayer;
-    show(): IsoLayer;
-    setDeltaScroll(x: number, y: number): void;
-    setScrollSpeed(speed: number): IsoLayer;
-    mouseOver(): ITile;
-    setOffset(x: number, y: number): IsoLayer;
-    getTilesInRadius(x: number, y: number, width: number, height: number): Array<ITile>;
-}
-declare class IsoLayers {
-    layers: Array<IsoLayer>;
-    private lastIndex;
-    tileset: string;
-    Engine: IsoMetric;
-    constructor(Engine: IsoMetric);
-    add(name: string, width: number, height: number, tileSizeX: number, tileSizeY: number): IsoLayer;
-    getByName(name: string): IsoLayer;
-    getByIndex(index: number): IsoLayer;
-    layerUp(name: string): IsoLayers;
-    layerDown(name: string): IsoLayers;
-    swapLayers(nameLayer1: string, nameLayer2: string): IsoLayers;
-    sortLayers(): IsoLayers;
-    sortLayerByIndex(a: IsoLayer, b: IsoLayer): number;
-    setTileset(name: string): IsoLayers;
-    mouseOver(name: string): ITile;
-}
-declare class IsoMap {
-    map: Array<Array<number>>;
-    shadowMap: Array<Array<number>>;
-    isSimpleShadowMap: boolean;
-    Layer: IsoLayer;
-    constructor(Layer: IsoLayer, map?: Array<Array<number>>);
-    create(map: Array<Array<number>>): IsoMap;
-    createShadowMap(map: Array<Array<number>>): IsoMap;
-    createSimpleShadowMap(): void;
-    edit(x: number, y: number, value: number): IsoMap;
-    editShadowMap(x: number, y: number, value: number): IsoMap;
-    set(map: Array<Array<number>>): IsoMap;
-    get(): Array<Array<number>>;
 }
 interface ITile {
     x: number;
@@ -780,4 +778,28 @@ declare class IsoMetric {
      * [deprecated] Sets the global direction.
      */
     setDirection(direction: number): void;
+}
+declare class IsoTileMap {
+    tileSizeX: number;
+    tileSizeY: number;
+    tileSet: IsoTileSet;
+    map: IsoMap;
+    heightMap: IsoHeightMap;
+    heightTile: number;
+    scrollX: number;
+    scrollY: number;
+    scrollSpeed: number;
+    height: number;
+    width: number;
+    offsetX: number;
+    offsetY: number;
+    Engine: IsoMetric;
+    constructor(Engine: IsoMetric, width?: number, height?: number, tileSizeX?: number, tileSizeY?: number);
+    create(width: number, height: number, tileSizeX: number, tileSizeY: number): IsoTileMap;
+    setTileSet(tileSet: IsoTileSet): IsoTileMap;
+    getTileSet(): IsoTileSet;
+    setDeltaScroll(x: number, y: number): void;
+    setScrollSpeed(speed: number): IsoTileMap;
+    mouseOver(): ITile;
+    getTilesInRadius(x: number, y: number, width: number, height: number): Array<ITile>;
 }

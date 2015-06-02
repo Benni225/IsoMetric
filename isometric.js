@@ -104,11 +104,27 @@ var IsoBaseTileImage = (function (_super) {
          * - IsoMetric.RIGHT
          */
         this.direction = IsoMetric.FRONT;
+        this.offsetX = 0;
+        this.offsetY = 0;
         this.Engine = Engine;
         if (name !== undefined && src !== undefined) {
             this.create(name, src);
         }
     }
+    /**
+     * Define a part of the image as tileset.
+     * @param x The point on the X-axis where the imagepart starts.
+     * @param y the point on the Y-axis where the imagepart starts.
+     * @param width The width in pixels of the imagepart.
+     * @param height The height in pixels of the imagepart.
+     */
+    IsoBaseTileImage.prototype.crop = function (x, y, width, height) {
+        this.offsetX = x;
+        this.offsetY = y;
+        this.width = width;
+        this.height = height;
+        return this;
+    };
     /**
      * Creates a new Tileset.
      * @override IsoImage.create
@@ -135,14 +151,6 @@ var IsoBaseTileImage = (function (_super) {
         return this;
     };
     /**
-     * Called when the image file was loaded.
-     * @override IsoImage._onLoad
-     * @param event The triggerd event
-     */
-    IsoBaseTileImage.prototype._onLoad = function (event) {
-        this.onLoad.call(this.Engine, event);
-    };
-    /**
      * Return the offset in pixel of a given tile inside the tileset
      * @param tileNumber The number of the tile
      * @return An object including the offset
@@ -160,8 +168,8 @@ var IsoBaseTileImage = (function (_super) {
      * }
      */
     IsoBaseTileImage.prototype.getTileOffset = function (tileNumber) {
-        var column = tileNumber % (this.image.width / this.tileWidth), row = Math.floor(tileNumber / (this.image.width / this.tileWidth));
-        var ox = column * this.tileWidth, oy = row * this.tileHeight;
+        var column = tileNumber % (this.width / this.tileWidth), row = Math.floor(tileNumber / (this.width / this.tileWidth));
+        var ox = column * this.tileWidth + this.offsetX, oy = row * this.tileHeight + this.offsetY;
         return {
             offsetX: ox,
             offsetY: oy
@@ -359,6 +367,12 @@ var IsoCanvas = (function () {
             window.onresize = window.onload = function () { return _this.updateScreen(); };
         }
         document.body.appendChild(this.canvasElement);
+        this.context = this.canvasElement.getContext("2d");
+        new IsoEvent("IsoCanvasReady").trigger();
+        return this;
+    };
+    IsoCanvas.prototype.set = function (canvas) {
+        this.canvasElement = canvas;
         this.context = this.canvasElement.getContext("2d");
         new IsoEvent("IsoCanvasReady").trigger();
         return this;
@@ -880,6 +894,7 @@ var IsoConfig = (function () {
     return IsoConfig;
 })();
 "use strict";
+"use strict";
 var IsoDrawObject = (function () {
     function IsoDrawObject() {
         this.objects = new Array();
@@ -955,7 +970,6 @@ var IsoDrawer = (function () {
                     layer: layer
                 });
                 for (var i = 0; i < sprites.length; i++) {
-                    // Todo: Check also for height. If not: add.
                     if ((sprites[i].x) > x1 && (sprites[i].x) < x2 && (sprites[i].y) > y1 && (sprites[i].y) < y2) {
                         var offset = sprites[i].getTileOffset(sprites[i].getTile());
                         priorities.push({
@@ -1002,10 +1016,10 @@ var IsoDrawer = (function () {
             bx = b.x;
             by = b.y;
         }
-        if (ay > by) {
+        if (ay > by + 1) {
             return 1;
         }
-        if (ay < by) {
+        if (ay < by + 1) {
             return -1;
         }
         if (ax > bx) {
@@ -1380,18 +1394,52 @@ var IsoMetric = (function () {
     return IsoMetric;
 })();
 "use strict";
+/**
+ * Collects all information about a tilemap. For example the scrolling, the used tileset and so on.
+ */
 var IsoTileMap = (function () {
+    /**
+     * Initializes the new tilemap.
+     * @param Engine A instance of IsoMetric
+     * @param width (optional) The width of the new tilemap in pixel
+     * @param height (optional) The height of the tilemap in pixel
+     * @param tileSizeX (optional) The width of a single tile
+     * @param tileSizeY (optional) The height of a single tile
+     */
     function IsoTileMap(Engine, width, height, tileSizeX, tileSizeY) {
+        /**
+         * Scroll on the X-axis
+         */
         this.scrollX = 0;
+        /**
+         * Scroll on the Y-axis
+         */
         this.scrollY = 0;
+        /**
+         * The scrolling speed
+         */
         this.scrollSpeed = 1;
+        /**
+         * The offset on the X-axis
+         */
         this.offsetX = 0;
+        /**
+         * The offset on the Y-axis
+         */
         this.offsetY = 0;
         this.Engine = Engine;
         if (width !== undefined && height !== undefined && tileSizeX !== undefined && tileSizeY !== undefined) {
             this.create(width, height, tileSizeX, tileSizeY);
         }
     }
+    /**
+     * Creates the new tilemap.
+     * @param width The width of the new tilemap in pixel
+     * @param height The height of the tilemap in pixel
+     * @param tileSizeX The width of a single tile
+     * @param tileSizeY The height of a single tile
+     * @return The new tilemap
+     */
     IsoTileMap.prototype.create = function (width, height, tileSizeX, tileSizeY) {
         this.width = width;
         this.height = height;
@@ -1401,14 +1449,29 @@ var IsoTileMap = (function () {
         this.heightMap = new IsoHeightMap(this);
         return this;
     };
+    /**
+     * Sets the tileset for the tilemap. A tileset is an image which includes all imagedata of a tilemap.
+     * @param tileset A instance of the tileset
+     * @return The tilemap
+     * @see IsoTileSet
+     */
     IsoTileMap.prototype.setTileSet = function (tileSet) {
         this.tileSet = tileSet;
         this.tileSet.setTileSize(this.tileSizeX, this.tileSizeY);
         return this;
     };
+    /**
+     * Returns the tileset of a tilemap
+     * @return The instance of the tileset
+     */
     IsoTileMap.prototype.getTileSet = function () {
         return this.tileSet;
     };
+    /**
+     * Adds the value of x and y to the actual srollvalues
+     * @param x Scroll on the X-axis in pixel
+     * @param y Scroll on the Y-axis in pixel
+     */
     IsoTileMap.prototype.setDeltaScroll = function (x, y) {
         this.scrollX = this.scrollX + (this.scrollSpeed * -(x));
         this.scrollY = this.scrollY + (this.scrollSpeed * (y));
@@ -1427,10 +1490,19 @@ var IsoTileMap = (function () {
                 -((this.height - (this.height % this.tileSizeY)) + this.offsetY - this.Engine.config.get("windowOptions").height);
         }
     };
+    /**
+     * Sets the scrolling speed
+     * @param speed The speed
+     * @return The tilemap
+     */
     IsoTileMap.prototype.setScrollSpeed = function (speed) {
         this.scrollSpeed = speed;
         return this;
     };
+    /**
+     * Checks the tile which the mouse pointer is touching
+     * return The tile.
+     */
     IsoTileMap.prototype.mouseOver = function () {
         var mouseX = this.Engine.input.mouseX, mouseY = this.Engine.input.mouseY;
         if (mouseX > this.width ||
@@ -1459,6 +1531,14 @@ var IsoTileMap = (function () {
             }
         }
     };
+    /**
+     * Gets all tiles in specified area
+     * @param x The position on the X-axis of the area
+     * @param y The position on the Y-axis of the area
+     * @param width The width of the area
+     * @param height The height of the area
+     * @retrurn An array with information of all tiles
+     */
     IsoTileMap.prototype.getTilesInRadius = function (x, y, width, height) {
         x = x - this.offsetX;
         y = y - this.offsetY;

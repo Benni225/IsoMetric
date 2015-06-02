@@ -39,6 +39,13 @@ class IsoCanvas {
         return this;
     }
 
+    set(canvas: HTMLCanvasElement) {
+        this.canvasElement = canvas;
+        this.context = this.canvasElement.getContext("2d");
+        new IsoEvent("IsoCanvasReady").trigger();
+        return this;
+    }
+
     updateScreen() : IsoCanvas {
         this.canvasElement.width = window.innerWidth;
         this.canvasElement.height = window.innerWidth;

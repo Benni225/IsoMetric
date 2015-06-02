@@ -2,6 +2,17 @@
 ///<reference path="IsoCollection.ts" />
 "use strict";
 
+interface IIsoTransparentColor {
+    r: number;
+    g: number;
+    b: number;
+}
+
+interface IIsoImageData {
+    raw: ImageData;
+    urlData: string;
+}
+
 class IsoBaseTileImage extends IsoImage {
     /**
      * Width of the image
@@ -16,6 +27,8 @@ class IsoBaseTileImage extends IsoImage {
      * maybe deprecated
      */
     prefix: string = "TILEIMAGE";
+
+    tansparentColor: IIsoTransparentColor;
     /**
      * The the direction. Possible values are:
      * - IsoMetric.FRONT
@@ -28,6 +41,9 @@ class IsoBaseTileImage extends IsoImage {
      * An object of IsoMetric
      */
     Engine: IsoMetric;
+
+    offsetX: number = 0;
+    offsetY: number = 0;
     /**
      * Creates a new instance of IsoBaseTileImage
      * @param Engine A object of IsoMetric
@@ -41,6 +57,22 @@ class IsoBaseTileImage extends IsoImage {
             this.create(name, src);
         }
     }
+    /**
+     * Define a part of the image as tileset.
+     * @param x The point on the X-axis where the imagepart starts.
+     * @param y the point on the Y-axis where the imagepart starts.
+     * @param width The width in pixels of the imagepart.
+     * @param height The height in pixels of the imagepart.
+     */
+    crop(x: number, y: number, width: number, height: number) : IsoBaseTileImage {
+        this.offsetX = x;
+        this.offsetY = y;
+        this.width = width;
+        this.height = height;
+        return this;
+    }
+
+  
     /**
      * Creates a new Tileset.
      * @override IsoImage.create
@@ -65,14 +97,7 @@ class IsoBaseTileImage extends IsoImage {
         this.image.onload = (event: Event) => this._onLoad(event);
         return this;
     }
-    /**
-     * Called when the image file was loaded.
-     * @override IsoImage._onLoad
-     * @param event The triggerd event
-     */
-    _onLoad(event: Event) {
-        this.onLoad.call(this.Engine, event);
-    }
+    
     /**
      * Return the offset in pixel of a given tile inside the tileset
      * @param tileNumber The number of the tile
@@ -91,11 +116,11 @@ class IsoBaseTileImage extends IsoImage {
      * }
      */
     getTileOffset(tileNumber: number) {
-        var column = tileNumber % (this.image.width / this.tileWidth),
-            row = Math.floor(tileNumber / (this.image.width / this.tileWidth));
+        var column = tileNumber % (this.width / this.tileWidth),
+            row = Math.floor(tileNumber / (this.width / this.tileWidth));
 
-        var ox = column * this.tileWidth,
-            oy = row * this.tileHeight;
+        var ox = column * this.tileWidth + this.offsetX,
+            oy = row * this.tileHeight + this.offsetY;
         return {
             offsetX: ox,
             offsetY: oy

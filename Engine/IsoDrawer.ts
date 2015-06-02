@@ -10,7 +10,10 @@ interface IIsoDrawObject {
     type?: string;
     tileHeight?: number;
     layer?: IsoLayer;
+    imageUrl?: string;
 }
+
+"use strict";
 class IsoDrawObject {
     objects: Array<IIsoDrawObject> = new Array();
     add(object: IIsoDrawObject) {
@@ -57,7 +60,7 @@ class IsoDrawer {
 
     drawObject() {
         this.objects.objects.sort(this.sortPriorities);
-        for (var i = 0; i < this.objects.objects.length; i++){
+        for (var i = 0; i < this.objects.objects.length; i++) {
             if (this.objects.objects[i].tileHeight > 0) {
                 var heightMapImageOffset = this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
                 for (var p = 0; p <= this.objects.objects[i].tileHeight; p++) {
@@ -123,7 +126,6 @@ class IsoDrawer {
                     layer: layer
                 });
                 for (var i = 0; i < sprites.length; i++) {
-                    // Todo: Check also for height. If not: add.
                     if ((sprites[i].x) > x1 && (sprites[i].x) < x2 && (sprites[i].y) > y1 && (sprites[i].y) < y2) {
                         var offset = sprites[i].getTileOffset(sprites[i].getTile());
                         priorities.push({
@@ -172,11 +174,11 @@ class IsoDrawer {
             bx = b.x;
             by = b.y;
         }
-        if (ay > by) {
+        if (ay > by + 1) {
             return 1;
         }
 
-        if (ay < by) {
+        if (ay < by + 1) {
             return -1;
         }
 
@@ -196,4 +198,4 @@ class IsoDrawer {
         }
         return 0;
     }
-} 
+}   

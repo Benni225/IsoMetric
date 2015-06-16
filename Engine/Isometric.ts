@@ -120,6 +120,12 @@ class IsoMetric {
     startLoop() {
         this.update();
     }
+
+    endLoop() {
+        var endLoop = new Date();
+        this.frameTime = (endLoop.getMilliseconds() - this.startLoopTime.getMilliseconds());
+        this.frameCount = this.frameCount + 1;
+    }
     /**
      * The game- and drawing-loop.
      */

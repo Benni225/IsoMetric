@@ -249,6 +249,7 @@ var IsoBillboard = (function (_super) {
     __extends(IsoBillboard, _super);
     function IsoBillboard(Engine, name, src) {
         _super.call(this, name, src);
+        this.scrollable = true;
         this.Engine = Engine;
         if (name != undefined && src != undefined) {
             this.create(name, src);
@@ -372,16 +373,30 @@ var IsoCanvas = (function () {
         return this;
     };
     IsoCanvas.prototype.set = function (canvas) {
+        if (this.canvasElement !== undefined) {
+            this.canvasElement.remove();
+        }
         this.canvasElement = canvas;
         this.context = this.canvasElement.getContext("2d");
         new IsoEvent("IsoCanvasReady").trigger();
         return this;
+    };
+    IsoCanvas.prototype.setClass = function (cssClass) {
+        this.canvasElement.className = cssClass;
     };
     IsoCanvas.prototype.updateScreen = function () {
         this.canvasElement.width = window.innerWidth;
         this.canvasElement.height = window.innerWidth;
         new IsoEvent("IsoCanvasUpdate").trigger();
         return this;
+    };
+    IsoCanvas.prototype.updateSize = function (width, height) {
+        this.canvasElement.width = width;
+        this.canvasElement.height = height;
+        this.canvasElement.style.width = width + "px";
+        this.canvasElement.style.height = height + "px";
+        this.options.height = height;
+        this.options.width = width;
     };
     IsoCanvas.prototype.clearScreen = function () {
         /**
@@ -930,6 +945,7 @@ var IsoDrawer = (function () {
             this.onDrawComplete(this.Engine);
         }
         new IsoEvent("drawComplete").trigger();
+        this.Engine.endLoop();
     };
     IsoDrawer.prototype.drawObject = function () {
         this.objects.objects.sort(this.sortPriorities);
@@ -947,8 +963,7 @@ var IsoDrawer = (function () {
         }
     };
     IsoDrawer.prototype.drawLayer = function (layer) {
-        var tileSet = layer.tileMap.getTileSet(), image = tileSet.get();
-        var objects = new IsoDrawObject;
+        var tileSet = layer.tileMap.getTileSet();
         for (var row = 0; row < layer.tileMap.map.get().length; row++) {
             for (var column = 0; column < layer.tileMap.map.get()[row].length; column++) {
                 var x1 = column * tileSet.tileWidth + layer.tileMap.offsetX + layer.tileMap.scrollX;
@@ -990,51 +1005,76 @@ var IsoDrawer = (function () {
                 }
             }
         }
+        for (var i = 0; i < layer.billboards.collection.length; i++) {
+            var billboard = layer.billboards.collection[i];
+            this.objects.add({
+                x: billboard.x + (billboard.scrollable === true ? billboard.scrollX : 0),
+                y: billboard.y + (billboard.scrollable === true ? billboard.scrollY : 0),
+                width: billboard.width,
+                height: billboard.height,
+                image: billboard.image,
+                imageOffsetX: billboard.offsetX,
+                imageOffsetY: billboard.offsetY,
+                tileHeight: 0,
+                type: "billboard"
+            });
+        }
         if (this.onDrawLayer !== undefined) {
             this.onDrawLayer(this.Engine, layer);
         }
-        var endLoop = new Date();
-        this.Engine.frameTime = (endLoop.getMilliseconds() - this.Engine.startLoopTime.getMilliseconds());
-        this.Engine.frameCount = this.Engine.frameCount + 1;
         new IsoEvent("drawLayerComplete").addData(layer).trigger();
     };
     IsoDrawer.prototype.sortPriorities = function (a, b) {
-        var ax, ay, bx, by;
-        if (a.type === "sprite") {
-            ax = a.x + a.width;
-            ay = a.y + a.height;
+        //bringing billbords in the foreground
+        if (a.type === "billboard" || b.type === "billboard") {
+            if (a.type === "billboard" && b.type === "billboard") {
+                return 0;
+            }
+            else if (a.type === "billboard" && b.type !== "billboard") {
+                return 1;
+            }
+            else {
+                return -1;
+            }
         }
         else {
-            ax = a.x;
-            ay = a.y;
+            var ax, ay, bx, by;
+            if (a.type === "sprite") {
+                ax = a.x + a.width;
+                ay = a.y + a.height;
+            }
+            else {
+                ax = a.x;
+                ay = a.y;
+            }
+            if (b.type === "sprite") {
+                bx = b.x + b.width;
+                by = b.y + b.height;
+            }
+            else {
+                bx = b.x;
+                by = b.y;
+            }
+            if (ay > by + 1) {
+                return 1;
+            }
+            if (ay < by + 1) {
+                return -1;
+            }
+            if (ax > bx) {
+                return 1;
+            }
+            if (ax < bx) {
+                return -1;
+            }
+            if (a.tileHeight > b.tileHeight) {
+                return 1;
+            }
+            if (a.tileHeight < b.tileHeight) {
+                return -1;
+            }
+            return 0;
         }
-        if (b.type === "sprite") {
-            bx = b.x + b.width;
-            by = b.y + b.height;
-        }
-        else {
-            bx = b.x;
-            by = b.y;
-        }
-        if (ay > by + 1) {
-            return 1;
-        }
-        if (ay < by + 1) {
-            return -1;
-        }
-        if (ax > bx) {
-            return 1;
-        }
-        if (ax < bx) {
-            return -1;
-        }
-        if (a.tileHeight > b.tileHeight) {
-            return 1;
-        }
-        if (a.tileHeight < b.tileHeight) {
-            return -1;
-        }
-        return 0;
     };
     return IsoDrawer;
 })();
@@ -1373,6 +1413,11 @@ var IsoMetric = (function () {
      */
     IsoMetric.prototype.startLoop = function () {
         this.update();
+    };
+    IsoMetric.prototype.endLoop = function () {
+        var endLoop = new Date();
+        this.frameTime = (endLoop.getMilliseconds() - this.startLoopTime.getMilliseconds());
+        this.frameCount = this.frameCount + 1;
     };
     /**
      * The game- and drawing-loop.

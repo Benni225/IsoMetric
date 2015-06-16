@@ -187,6 +187,7 @@ declare class IsoBillboard extends IsoImage {
     speed: number;
     Engine: IsoMetric;
     layer: IsoLayer;
+    scrollable: boolean;
     constructor(Engine: IsoMetric, name?: string, src?: string);
     create(name: string, src: string): IsoBillboard;
     load(): IsoBillboard;
@@ -212,15 +213,18 @@ declare class IsoBillboards extends IsoCollection {
     callThen(): void;
 }
 declare class IsoCanvas {
-    private canvasElement;
+    canvasElement: HTMLCanvasElement;
     context: any;
+    private clearColor;
     private defaultOptions;
     options: IIsoConfigWindowOptions;
     Engine: IsoMetric;
     constructor(Engine: IsoMetric);
     create(id?: string): IsoCanvas;
     set(canvas: HTMLCanvasElement): IsoCanvas;
+    setClass(cssClass: string): void;
     updateScreen(): IsoCanvas;
+    updateSize(width: number, height: number): void;
     clearScreen(): IsoCanvas;
     get(): HTMLCanvasElement;
 }
@@ -786,6 +790,7 @@ declare class IsoMetric {
      * Starts the game- and drawing-loop.
      */
     startLoop(): void;
+    endLoop(): void;
     /**
      * The game- and drawing-loop.
      */

@@ -9,6 +9,7 @@ class IsoBillboard extends IsoImage {
     speed: number;
     Engine: IsoMetric;
     layer: IsoLayer;
+    scrollable: boolean = true;
     constructor(Engine: IsoMetric, name?: string, src?: string) {
         super(name, src);
         this.Engine = Engine;

@@ -56,13 +56,15 @@ class IsoDrawer {
             this.onDrawComplete(this.Engine);
         }
         new IsoEvent("drawComplete").trigger();
+        this.Engine.endLoop();
     }
 
     drawObject() {
         this.objects.objects.sort(this.sortPriorities);
         for (var i = 0; i < this.objects.objects.length; i++) {
             if (this.objects.objects[i].tileHeight > 0) {
-                var heightMapImageOffset = this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
+                var heightMapImageOffset =
+                    this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
                 for (var p = 0; p <= this.objects.objects[i].tileHeight; p++) {
                     this.Canvas.context.drawImage(
                         this.objects.objects[i].image,
@@ -86,6 +88,7 @@ class IsoDrawer {
                     this.objects.objects[i].width,
                     this.objects.objects[i].height);
             } else {
+
                 this.Canvas.context.drawImage(
                     this.objects.objects[i].image,
                     this.objects.objects[i].imageOffsetX,
@@ -101,9 +104,7 @@ class IsoDrawer {
     }
 
     drawLayer(layer: IsoLayer) {
-        var tileSet = layer.tileMap.getTileSet(),
-            image = tileSet.get();
-        var objects = new IsoDrawObject;
+        var tileSet = layer.tileMap.getTileSet();
         for (var row = 0; row < layer.tileMap.map.get().length; row++) {
             for (var column = 0; column < layer.tileMap.map.get()[row].length; column++) {
                 var x1 = column * tileSet.tileWidth + layer.tileMap.offsetX + layer.tileMap.scrollX;
@@ -147,55 +148,77 @@ class IsoDrawer {
                 }
             }
         }
+        for (var i = 0; i < layer.billboards.collection.length; i++) {
+            var billboard = layer.billboards.collection[i];
+            this.objects.add({
+                x: billboard.x + (billboard.scrollable === true ? billboard.scrollX : 0),
+                y: billboard.y + (billboard.scrollable === true ? billboard.scrollY : 0),
+                width: billboard.width,
+                height: billboard.height,
+                image: billboard.image,
+                imageOffsetX: billboard.offsetX,
+                imageOffsetY: billboard.offsetY,
+                tileHeight: 0,
+                type: "billboard"
+            });
+        }
+
         if (this.onDrawLayer !== undefined) {
             this.onDrawLayer(this.Engine, layer);
         }
-        var endLoop = new Date();
-        this.Engine.frameTime = (endLoop.getMilliseconds() - this.Engine.startLoopTime.getMilliseconds());
-        this.Engine.frameCount = this.Engine.frameCount + 1;
-
         new IsoEvent("drawLayerComplete").addData(layer).trigger();
     }
 
     sortPriorities(a: IIsoDrawObject, b: IIsoDrawObject) {
-        var ax, ay, bx, by;
-        if (a.type === "sprite") {
-            ax = a.x + a.width;
-            ay = a.y + a.height;
+        //bringing billbords in the foreground
+        if (a.type === "billboard" || b.type === "billboard") {
+            if (a.type === "billboard" && b.type === "billboard") {
+                return 0;
+            } else if (a.type === "billboard" && b.type !== "billboard") {
+                return 1;
+            } else {
+                return -1;
+            }
         } else {
-            ax = a.x;
-            ay = a.y;
-        }
+            var ax, ay, bx, by;
+            if (a.type === "sprite") {
+                ax = a.x + a.width;
+                ay = a.y + a.height;
+            } else {
+                ax = a.x;
+                ay = a.y;
+            }
 
-        if (b.type === "sprite") {
-            bx = b.x + b.width;
-            by = b.y + b.height;
-        } else {
-            bx = b.x;
-            by = b.y;
-        }
-        if (ay > by + 1) {
-            return 1;
-        }
+            if (b.type === "sprite") {
+                bx = b.x + b.width;
+                by = b.y + b.height;
+            } else {
+                bx = b.x;
+                by = b.y;
+            }
+            if (ay > by + 1) {
+                return 1;
+            }
 
-        if (ay < by + 1) {
-            return -1;
-        }
+            if (ay < by + 1) {
+                return -1;
+            }
 
-        if (ax > bx) {
-            return 1;
-        }
+            if (ax > bx) {
+                return 1;
+            }
 
-        if (ax < bx) {
-            return -1;
-        }
-        if (a.tileHeight > b.tileHeight) {
-            return 1;
-        }
+            if (ax < bx) {
+                return -1;
+            }
+            if (a.tileHeight > b.tileHeight) {
+                return 1;
+            }
 
-        if (a.tileHeight < b.tileHeight) {
-            return -1;
+            if (a.tileHeight < b.tileHeight) {
+                return -1;
+            }
+            return 0;
         }
-        return 0;
     }
 }   

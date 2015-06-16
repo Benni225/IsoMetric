@@ -1,7 +1,8 @@
 ﻿"use strict";
 class IsoCanvas {
-    private canvasElement: HTMLCanvasElement;
+    canvasElement: HTMLCanvasElement;
     context: any;
+    private clearColor: string;
     private defaultOptions: IIsoConfigWindowOptions = {
         width: 640,
         height: 480,
@@ -40,10 +41,17 @@ class IsoCanvas {
     }
 
     set(canvas: HTMLCanvasElement) {
+        if (this.canvasElement !== undefined) {
+            this.canvasElement.remove();
+        }
         this.canvasElement = canvas;
         this.context = this.canvasElement.getContext("2d");
         new IsoEvent("IsoCanvasReady").trigger();
         return this;
+    }
+
+    setClass(cssClass: string) {
+        this.canvasElement.className = cssClass;
     }
 
     updateScreen() : IsoCanvas {
@@ -53,6 +61,17 @@ class IsoCanvas {
         return this;
     }
 
+    updateSize(width: number, height: number) {
+        this.canvasElement.width = width;
+        this.canvasElement.height = height;
+
+        this.canvasElement.style.width = width + "px";
+        this.canvasElement.style.height = height + "px";
+
+        this.options.height = height;
+        this.options.width = width;
+    }
+
     clearScreen() : IsoCanvas {
         /**
          * @todo: 
@@ -60,6 +79,7 @@ class IsoCanvas {
          */
         this.canvasElement.width = this.canvasElement.width;
         this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+        
         //console.log(this.canvasElement.width + " x " + this.canvasElement.height)
 
         new IsoEvent("IsoCanvasClearScreen").trigger();

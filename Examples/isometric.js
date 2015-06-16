@@ -960,9 +960,9 @@ var IsoDrawer = (function () {
             if (this.objects.objects[i].tileHeight > 0) {
                 var heightMapImageOffset = this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
                 for (var p = 0; p <= this.objects.objects[i].tileHeight; p++) {
-                    this.Canvas.context.drawImage(this.objects.objects[i].image, heightMapImageOffset.offsetX, heightMapImageOffset.offsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY - (p * this.objects.objects[i].height * zoomLevel), zoomWidth, zoomHeight);
+                    this.Canvas.context.drawImage(this.objects.objects[i].image, heightMapImageOffset.offsetX, heightMapImageOffset.offsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY - (p * zoomHeight), zoomWidth, zoomHeight);
                 }
-                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY, zoomWidth, zoomHeight);
+                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY - (this.objects.objects[i].tileHeight * zoomHeight), zoomWidth, zoomHeight);
             }
             else {
                 this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY, zoomWidth, zoomHeight);

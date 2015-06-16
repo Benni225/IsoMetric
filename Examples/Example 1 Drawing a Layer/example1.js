@@ -8,6 +8,7 @@ window.onload = function () {
     App.layers.getByName("firstLayer").tileMap.create(1920, 1920, 64, 64);
     App.tileSets.add("firstTileSet", "../images/ground.png");
     firstLayer = App.layers.getByName("firstLayer");
+    firstLayer.zoomStrength = 0.1;
     App.tileSets.load().then(function () {
         firstLayer.tileMap.setTileSet(App.tileSets.getByName("firstTileSet"));
         firstLayer.tileMap.setScrollSpeed(8);
@@ -30,13 +31,17 @@ function gameExample1() {
                 firstLayer.tileMap.setDeltaScroll(1, 0);
         }
     }
+    if (App.input.mouseEventType === IsoInput.EVENT_MOUSEWHEEL) {
+        App.layers.getByName("firstLayer").setZoom(App.input.mouseWheelDelta);
+    }
     // Draw all the layers and sprites
     App.update();
     //After drawing the maps and sprites:
     App.canvas.context.fillStyle = "#fff";
-    App.canvas.context.font = "20px Arial";
+    App.canvas.context.font = "14px Arial";
     //Draw ing the FPS to the screen
     App.canvas.context.fillText("FPS: " + App.FPS, 10, 30);
+    App.canvas.context.fillText("Use the arrow-keys for scrolling and the mousewheel for zooming.", 10, 50);
     // Restart the game loop
     requestAnimationFrame(function () { return gameExample1(); });
 }

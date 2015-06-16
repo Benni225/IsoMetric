@@ -1,5 +1,9 @@
 ﻿"use strict";
 interface IIsoDrawObject {
+    scrollX: number;
+    scrollY: number;
+    offsetX: number;
+    offsetY: number;
     x: number;
     y: number;
     width: number;
@@ -11,6 +15,9 @@ interface IIsoDrawObject {
     tileHeight?: number;
     layer?: IsoLayer;
     imageUrl?: string;
+    zoom: number;
+    row?: number;
+    column?: number;
 }
 
 "use strict";
@@ -61,7 +68,15 @@ class IsoDrawer {
 
     drawObject() {
         this.objects.objects.sort(this.sortPriorities);
+        var lastRow, lastColumn;
         for (var i = 0; i < this.objects.objects.length; i++) {
+            var zoomX = 0, zoomY = 0, zoomWidth = 0, zoomHeight = 0, object = this.objects.objects[i], zoomLevel = object.zoom, zoomPoint = object.layer.zoomPoint;
+            // calculating the zoom
+            zoomX = (object.offsetX * zoomLevel) + (object.scrollX * zoomLevel) - (zoomPoint.x * zoomLevel - zoomPoint.x);
+            zoomY = (object.offsetY * zoomLevel) + (object.scrollY * zoomLevel) - (zoomPoint.y * zoomLevel - zoomPoint.y);
+            zoomWidth = object.width * zoomLevel;
+            zoomHeight = object.height * zoomLevel;
+
             if (this.objects.objects[i].tileHeight > 0) {
                 var heightMapImageOffset =
                     this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
@@ -72,10 +87,10 @@ class IsoDrawer {
                         heightMapImageOffset.offsetY,
                         this.objects.objects[i].width,
                         this.objects.objects[i].height,
-                        this.objects.objects[i].x,
-                        this.objects.objects[i].y - (p * this.objects.objects[i].height),
-                        this.objects.objects[i].width,
-                        this.objects.objects[i].height);
+                        zoomX,
+                        zoomY - (p * this.objects.objects[i].height * zoomLevel),
+                        zoomWidth,
+                        zoomHeight);
                 }
                 this.Canvas.context.drawImage(
                     this.objects.objects[i].image,
@@ -83,22 +98,21 @@ class IsoDrawer {
                     this.objects.objects[i].imageOffsetY,
                     this.objects.objects[i].width,
                     this.objects.objects[i].height,
-                    this.objects.objects[i].x,
-                    this.objects.objects[i].y - (this.objects.objects[i].tileHeight * this.objects.objects[i].height),
-                    this.objects.objects[i].width,
-                    this.objects.objects[i].height);
+                    zoomX,
+                    zoomY,
+                    zoomWidth,
+                    zoomHeight);
             } else {
-
                 this.Canvas.context.drawImage(
                     this.objects.objects[i].image,
                     this.objects.objects[i].imageOffsetX,
                     this.objects.objects[i].imageOffsetY,
                     this.objects.objects[i].width,
                     this.objects.objects[i].height,
-                    this.objects.objects[i].x,
-                    this.objects.objects[i].y,
-                    this.objects.objects[i].width,
-                    this.objects.objects[i].height);
+                    zoomX,
+                    zoomY,
+                    zoomWidth,
+                    zoomHeight);
             }
         }
     }
@@ -116,6 +130,10 @@ class IsoDrawer {
 
                 var priorities: Array<IIsoDrawObject> = new Array();
                 priorities.push({
+                    scrollX: layer.tileMap.scrollX,
+                    scrollY: layer.tileMap.scrollY,
+                    offsetX: column * tileSet.tileWidth + layer.tileMap.offsetX,
+                    offsetY: row * tileSet.tileHeight + layer.tileMap.offsetY,
                     x: x1,
                     y: y1,
                     width: layer.tileMap.tileSizeX,
@@ -124,12 +142,20 @@ class IsoDrawer {
                     imageOffsetX: offset.offsetX,
                     imageOffsetY: offset.offsetY,
                     tileHeight: layer.tileMap.heightMap.getHeight(column, row),
-                    layer: layer
+                    layer: layer,
+                    zoom: layer.zoom,
+                    row: row,
+                    column: column,
+                    type: "tilemap"
                 });
                 for (var i = 0; i < sprites.length; i++) {
                     if ((sprites[i].x) > x1 && (sprites[i].x) < x2 && (sprites[i].y) > y1 && (sprites[i].y) < y2) {
                         var offset = sprites[i].getTileOffset(sprites[i].getTile());
                         priorities.push({
+                            scrollX: 0,
+                            scrollY: 0,
+                            offsetX: sprites[i].x,
+                            offsetY: sprites[i].y,
                             x: sprites[i].x,
                             y: sprites[i].y,
                             width: sprites[i].tileWidth,
@@ -138,7 +164,9 @@ class IsoDrawer {
                             imageOffsetX: offset.offsetX,
                             imageOffsetY: offset.offsetY,
                             tileHeight: 0,
-                            type: "sprite"
+                            type: "sprite",
+                            zoom: layer.zoom,
+                            layer: layer
                         });
                     }
                 }
@@ -151,6 +179,10 @@ class IsoDrawer {
         for (var i = 0; i < layer.billboards.collection.length; i++) {
             var billboard = layer.billboards.collection[i];
             this.objects.add({
+                scrollX: (billboard.scrollable === true ? billboard.scrollX : 0),
+                scrollY: (billboard.scrollable === true ? billboard.scrollY : 0),
+                offsetX: billboard.x,
+                offsetY: billboard.y,
                 x: billboard.x + (billboard.scrollable === true ? billboard.scrollX : 0),
                 y: billboard.y + (billboard.scrollable === true ? billboard.scrollY : 0),
                 width: billboard.width,
@@ -159,7 +191,9 @@ class IsoDrawer {
                 imageOffsetX: billboard.offsetX,
                 imageOffsetY: billboard.offsetY,
                 tileHeight: 0,
-                type: "billboard"
+                type: "billboard",
+                zoom: layer.zoom,
+                layer: layer
             });
         }
 

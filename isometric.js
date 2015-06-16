@@ -949,16 +949,23 @@ var IsoDrawer = (function () {
     };
     IsoDrawer.prototype.drawObject = function () {
         this.objects.objects.sort(this.sortPriorities);
+        var lastRow, lastColumn;
         for (var i = 0; i < this.objects.objects.length; i++) {
+            var zoomX = 0, zoomY = 0, zoomWidth = 0, zoomHeight = 0, object = this.objects.objects[i], zoomLevel = object.zoom, zoomPoint = object.layer.zoomPoint;
+            // calculating the zoom
+            zoomX = (object.offsetX * zoomLevel) + (object.scrollX * zoomLevel) - (zoomPoint.x * zoomLevel - zoomPoint.x);
+            zoomY = (object.offsetY * zoomLevel) + (object.scrollY * zoomLevel) - (zoomPoint.y * zoomLevel - zoomPoint.y);
+            zoomWidth = object.width * zoomLevel;
+            zoomHeight = object.height * zoomLevel;
             if (this.objects.objects[i].tileHeight > 0) {
                 var heightMapImageOffset = this.objects.objects[i].layer.tileMap.tileSet.getTileOffset(this.objects.objects[i].layer.tileMap.heightTile);
                 for (var p = 0; p <= this.objects.objects[i].tileHeight; p++) {
-                    this.Canvas.context.drawImage(this.objects.objects[i].image, heightMapImageOffset.offsetX, heightMapImageOffset.offsetY, this.objects.objects[i].width, this.objects.objects[i].height, this.objects.objects[i].x, this.objects.objects[i].y - (p * this.objects.objects[i].height), this.objects.objects[i].width, this.objects.objects[i].height);
+                    this.Canvas.context.drawImage(this.objects.objects[i].image, heightMapImageOffset.offsetX, heightMapImageOffset.offsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY - (p * this.objects.objects[i].height * zoomLevel), zoomWidth, zoomHeight);
                 }
-                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, this.objects.objects[i].x, this.objects.objects[i].y - (this.objects.objects[i].tileHeight * this.objects.objects[i].height), this.objects.objects[i].width, this.objects.objects[i].height);
+                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY, zoomWidth, zoomHeight);
             }
             else {
-                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, this.objects.objects[i].x, this.objects.objects[i].y, this.objects.objects[i].width, this.objects.objects[i].height);
+                this.Canvas.context.drawImage(this.objects.objects[i].image, this.objects.objects[i].imageOffsetX, this.objects.objects[i].imageOffsetY, this.objects.objects[i].width, this.objects.objects[i].height, zoomX, zoomY, zoomWidth, zoomHeight);
             }
         }
     };
@@ -974,6 +981,10 @@ var IsoDrawer = (function () {
                 var sprites = layer.sprites.sprites;
                 var priorities = new Array();
                 priorities.push({
+                    scrollX: layer.tileMap.scrollX,
+                    scrollY: layer.tileMap.scrollY,
+                    offsetX: column * tileSet.tileWidth + layer.tileMap.offsetX,
+                    offsetY: row * tileSet.tileHeight + layer.tileMap.offsetY,
                     x: x1,
                     y: y1,
                     width: layer.tileMap.tileSizeX,
@@ -982,12 +993,20 @@ var IsoDrawer = (function () {
                     imageOffsetX: offset.offsetX,
                     imageOffsetY: offset.offsetY,
                     tileHeight: layer.tileMap.heightMap.getHeight(column, row),
-                    layer: layer
+                    layer: layer,
+                    zoom: layer.zoom,
+                    row: row,
+                    column: column,
+                    type: "tilemap"
                 });
                 for (var i = 0; i < sprites.length; i++) {
                     if ((sprites[i].x) > x1 && (sprites[i].x) < x2 && (sprites[i].y) > y1 && (sprites[i].y) < y2) {
                         var offset = sprites[i].getTileOffset(sprites[i].getTile());
                         priorities.push({
+                            scrollX: 0,
+                            scrollY: 0,
+                            offsetX: sprites[i].x,
+                            offsetY: sprites[i].y,
                             x: sprites[i].x,
                             y: sprites[i].y,
                             width: sprites[i].tileWidth,
@@ -996,7 +1015,9 @@ var IsoDrawer = (function () {
                             imageOffsetX: offset.offsetX,
                             imageOffsetY: offset.offsetY,
                             tileHeight: 0,
-                            type: "sprite"
+                            type: "sprite",
+                            zoom: layer.zoom,
+                            layer: layer
                         });
                     }
                 }
@@ -1008,6 +1029,10 @@ var IsoDrawer = (function () {
         for (var i = 0; i < layer.billboards.collection.length; i++) {
             var billboard = layer.billboards.collection[i];
             this.objects.add({
+                scrollX: (billboard.scrollable === true ? billboard.scrollX : 0),
+                scrollY: (billboard.scrollable === true ? billboard.scrollY : 0),
+                offsetX: billboard.x,
+                offsetY: billboard.y,
                 x: billboard.x + (billboard.scrollable === true ? billboard.scrollX : 0),
                 y: billboard.y + (billboard.scrollable === true ? billboard.scrollY : 0),
                 width: billboard.width,
@@ -1016,7 +1041,9 @@ var IsoDrawer = (function () {
                 imageOffsetX: billboard.offsetX,
                 imageOffsetY: billboard.offsetY,
                 tileHeight: 0,
-                type: "billboard"
+                type: "billboard",
+                zoom: layer.zoom,
+                layer: layer
             });
         }
         if (this.onDrawLayer !== undefined) {
@@ -1104,11 +1131,19 @@ var IsoEvent = (function () {
 var IsoLayer = (function () {
     function IsoLayer(Engine, name, index) {
         this.hidden = false;
+        this.zoom = 1;
+        this.maxZoom = 2;
+        this.minZoom = 0.5;
+        this.zoomStrength = 1;
         this.Engine = Engine;
         this.name = name;
         this.sprites = new IsoSprites(this.Engine, this);
         this.billboards = new IsoBillboards(this.Engine, this);
         this.tileMap = new IsoTileMap(this.Engine);
+        this.zoomPoint = {
+            x: Math.floor(this.Engine.canvas.canvasElement.width / 2),
+            y: Math.floor(this.Engine.canvas.canvasElement.height / 2)
+        };
     }
     IsoLayer.prototype.hide = function () {
         this.hidden = true;
@@ -1116,6 +1151,27 @@ var IsoLayer = (function () {
     };
     IsoLayer.prototype.show = function () {
         this.hidden = false;
+        return this;
+    };
+    IsoLayer.prototype.setZoom = function (zoom) {
+        var zoomNew = this.zoom + (zoom * (this.zoomStrength / 1000));
+        if (zoomNew <= this.maxZoom && zoomNew >= this.minZoom)
+            this.zoom = this.zoom + (zoom * (this.zoomStrength / 1000));
+        return this;
+    };
+    IsoLayer.prototype.setMaxZoom = function (maxZoom) {
+        this.maxZoom = maxZoom;
+        return this;
+    };
+    IsoLayer.prototype.setMinZoom = function (minZoom) {
+        this.minZoom = minZoom;
+        return this;
+    };
+    IsoLayer.prototype.getZoom = function () {
+        return this.zoom;
+    };
+    IsoLayer.prototype.setZoomPoint = function (zoomPoint) {
+        this.zoomPoint = zoomPoint;
         return this;
     };
     return IsoLayer;
@@ -1274,9 +1330,11 @@ var IsoInput = (function () {
         this.oldEvent = event;
         this.isMouseEvent = true;
         this.mouseEvent = event;
-        this.lastMouseCode = event.which;
+        this.mouseEventType = event.type;
+        this.mouseCode = event.which;
         this.mouseX = event.clientX;
         this.mouseY = event.clientY;
+        this.mouseWheelDelta = event.wheelDelta || -event.detail;
         this.callCallback(event);
     };
     IsoInput.prototype.checkTouch = function (event) {
@@ -1291,12 +1349,13 @@ var IsoInput = (function () {
         this.isMouseEvent = false;
         this.isTouchEvent = false;
         this.keyChar = "";
-        this.keyCode = 0;
+        this.keyCode = undefined;
         this.keyEventType = undefined;
-        this.lastMouseCode = 0;
-        this.lastMouseEventType = "";
+        this.mouseCode = 0;
         this.keyEvent = undefined;
         this.mouseEvent = undefined;
+        this.mouseEventType = undefined;
+        this.mouseWheelDelta = undefined;
         this.touches = undefined;
         this.touchEvent = undefined;
         this.lastTouchEventType = "";
@@ -1332,6 +1391,7 @@ var IsoInput = (function () {
     IsoInput.EVENT_KEYUP = "keyup";
     IsoInput.EVENT_MOUSEDOWN = "mousedown";
     IsoInput.EVENT_MOUSEUP = "mouseup";
+    IsoInput.EVENT_MOUSEWHEEL = "mousewheel";
     return IsoInput;
 })();
 ///<reference path="IsoMap.ts" />

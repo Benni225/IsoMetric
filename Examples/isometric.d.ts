@@ -57,6 +57,15 @@ declare class IsoCollection {
     get(): Array<any>;
     getByName(name: string): any;
 }
+interface IIsoTransparentColor {
+    r: number;
+    g: number;
+    b: number;
+}
+interface IIsoImageData {
+    raw: ImageData;
+    urlData: string;
+}
 declare class IsoBaseTileImage extends IsoImage {
     /**
      * Width of the image
@@ -71,6 +80,7 @@ declare class IsoBaseTileImage extends IsoImage {
      * maybe deprecated
      */
     prefix: string;
+    tansparentColor: IIsoTransparentColor;
     /**
      * The the direction. Possible values are:
      * - IsoMetric.FRONT
@@ -83,6 +93,8 @@ declare class IsoBaseTileImage extends IsoImage {
      * An object of IsoMetric
      */
     Engine: IsoMetric;
+    offsetX: number;
+    offsetY: number;
     /**
      * Creates a new instance of IsoBaseTileImage
      * @param Engine A object of IsoMetric
@@ -90,6 +102,14 @@ declare class IsoBaseTileImage extends IsoImage {
      * @param src Path to the image file
      */
     constructor(Engine: IsoMetric, name?: string, src?: string);
+    /**
+     * Define a part of the image as tileset.
+     * @param x The point on the X-axis where the imagepart starts.
+     * @param y the point on the Y-axis where the imagepart starts.
+     * @param width The width in pixels of the imagepart.
+     * @param height The height in pixels of the imagepart.
+     */
+    crop(x: number, y: number, width: number, height: number): IsoBaseTileImage;
     /**
      * Creates a new Tileset.
      * @override IsoImage.create
@@ -105,12 +125,6 @@ declare class IsoBaseTileImage extends IsoImage {
      * @return Instance of IsoBaseTileImage
      */
     load(): IsoBaseTileImage;
-    /**
-     * Called when the image file was loaded.
-     * @override IsoImage._onLoad
-     * @param event The triggerd event
-     */
-    _onLoad(event: Event): void;
     /**
      * Return the offset in pixel of a given tile inside the tileset
      * @param tileNumber The number of the tile
@@ -173,6 +187,7 @@ declare class IsoBillboard extends IsoImage {
     speed: number;
     Engine: IsoMetric;
     layer: IsoLayer;
+    scrollable: boolean;
     constructor(Engine: IsoMetric, name?: string, src?: string);
     create(name: string, src: string): IsoBillboard;
     load(): IsoBillboard;
@@ -198,14 +213,18 @@ declare class IsoBillboards extends IsoCollection {
     callThen(): void;
 }
 declare class IsoCanvas {
-    private canvasElement;
+    canvasElement: HTMLCanvasElement;
     context: any;
+    private clearColor;
     private defaultOptions;
     options: IIsoConfigWindowOptions;
     Engine: IsoMetric;
     constructor(Engine: IsoMetric);
     create(id?: string): IsoCanvas;
+    set(canvas: HTMLCanvasElement): IsoCanvas;
+    setClass(cssClass: string): void;
     updateScreen(): IsoCanvas;
+    updateSize(width: number, height: number): void;
     clearScreen(): IsoCanvas;
     get(): HTMLCanvasElement;
 }
@@ -542,6 +561,10 @@ declare class IsoConfig {
     get(name: string): any;
 }
 interface IIsoDrawObject {
+    scrollX: number;
+    scrollY: number;
+    offsetX: number;
+    offsetY: number;
     x: number;
     y: number;
     width: number;
@@ -552,6 +575,10 @@ interface IIsoDrawObject {
     type?: string;
     tileHeight?: number;
     layer?: IsoLayer;
+    imageUrl?: string;
+    zoom: number;
+    row?: number;
+    column?: number;
 }
 declare class IsoDrawObject {
     objects: Array<IIsoDrawObject>;
@@ -579,6 +606,10 @@ declare class IsoEvent {
     addData(data: any): IsoEvent;
     trigger(target?: string): void;
 }
+interface zoomPoint {
+    x: number;
+    y: number;
+}
 declare class IsoLayer {
     index: number;
     name: string;
@@ -587,9 +618,19 @@ declare class IsoLayer {
     sprites: IsoSprites;
     billboards: IsoBillboards;
     tileMap: IsoTileMap;
+    zoom: number;
+    maxZoom: number;
+    minZoom: number;
+    zoomStrength: number;
+    zoomPoint: zoomPoint;
     constructor(Engine: IsoMetric, name: string, index: number);
     hide(): IsoLayer;
     show(): IsoLayer;
+    setZoom(zoom: number): IsoLayer;
+    setMaxZoom(maxZoom: number): IsoLayer;
+    setMinZoom(minZoom: number): IsoLayer;
+    getZoom(): number;
+    setZoomPoint(zoomPoint: zoomPoint): IsoLayer;
 }
 declare class IsoLayers {
     layers: Array<IsoLayer>;
@@ -623,6 +664,9 @@ declare class IsoHeightMap extends IsoMap {
     getHeight(x: number, y: number): number;
     setStrength(strength: number): IsoHeightMap;
 }
+interface IsoMouseEvent extends MouseEvent {
+    wheelDelta?: number;
+}
 declare class IsoInput {
     static KEYDOWN: number;
     static KEYUP: number;
@@ -641,6 +685,7 @@ declare class IsoInput {
     static EVENT_KEYUP: string;
     static EVENT_MOUSEDOWN: string;
     static EVENT_MOUSEUP: string;
+    static EVENT_MOUSEWHEEL: string;
     Engine: IsoMetric;
     keyCode: number;
     keyEventType: string;
@@ -648,13 +693,14 @@ declare class IsoInput {
     keyEvent: KeyboardEvent;
     keyChar: string;
     onKeyboard: Function;
-    lastMouseCode: number;
-    lastMouseEventType: string;
+    mouseCode: number;
+    mouseEventType: string;
     isMouseEvent: boolean;
-    mouseEvent: MouseEvent;
+    mouseEvent: IsoMouseEvent;
     onMouse: Function;
     mouseX: number;
     mouseY: number;
+    mouseWheelDelta: number;
     lastTouchEventType: string;
     touches: TouchList;
     isTouchEvent: boolean;
@@ -665,7 +711,7 @@ declare class IsoInput {
     constructor(Engine: IsoMetric);
     addEvents(): void;
     checkKeyboard(event: KeyboardEvent): void;
-    checkMouse(event: MouseEvent): void;
+    checkMouse(event: IsoMouseEvent): void;
     checkTouch(event: TouchEvent): void;
     reset(): void;
     callCallback(event: Event): void;
@@ -770,6 +816,7 @@ declare class IsoMetric {
      * Starts the game- and drawing-loop.
      */
     startLoop(): void;
+    endLoop(): void;
     /**
      * The game- and drawing-loop.
      */
@@ -779,27 +826,120 @@ declare class IsoMetric {
      */
     setDirection(direction: number): void;
 }
+/**
+ * Collects all information about a tilemap. For example the scrolling, the used tileset and so on.
+ */
 declare class IsoTileMap {
+    /**
+     * The width of one tile
+     */
     tileSizeX: number;
+    /**
+     * The height of one tile
+     */
     tileSizeY: number;
+    /**
+     * The tileset for the tilemap
+     */
     tileSet: IsoTileSet;
+    /**
+     * The map including the information which tiles is drawn on a specified position
+     */
     map: IsoMap;
+    /**
+     * The height map
+     */
     heightMap: IsoHeightMap;
+    /**
+     * Specifies which tile is drawn in case the the height of an tile is > 0
+     */
     heightTile: number;
+    /**
+     * Scroll on the X-axis
+     */
     scrollX: number;
+    /**
+     * Scroll on the Y-axis
+     */
     scrollY: number;
+    /**
+     * The scrolling speed
+     */
     scrollSpeed: number;
+    /**
+     * The height of the tilemap
+     */
     height: number;
+    /**
+     * The width of the tilemap
+     */
     width: number;
+    /**
+     * The offset on the X-axis
+     */
     offsetX: number;
+    /**
+     * The offset on the Y-axis
+     */
     offsetY: number;
+    /**
+     * An instance of IsoMetric
+     */
     Engine: IsoMetric;
+    /**
+     * Initializes the new tilemap.
+     * @param Engine A instance of IsoMetric
+     * @param width (optional) The width of the new tilemap in pixel
+     * @param height (optional) The height of the tilemap in pixel
+     * @param tileSizeX (optional) The width of a single tile
+     * @param tileSizeY (optional) The height of a single tile
+     */
     constructor(Engine: IsoMetric, width?: number, height?: number, tileSizeX?: number, tileSizeY?: number);
+    /**
+     * Creates the new tilemap.
+     * @param width The width of the new tilemap in pixel
+     * @param height The height of the tilemap in pixel
+     * @param tileSizeX The width of a single tile
+     * @param tileSizeY The height of a single tile
+     * @return The new tilemap
+     */
     create(width: number, height: number, tileSizeX: number, tileSizeY: number): IsoTileMap;
+    /**
+     * Sets the tileset for the tilemap. A tileset is an image which includes all imagedata of a tilemap.
+     * @param tileset A instance of the tileset
+     * @return The tilemap
+     * @see IsoTileSet
+     */
     setTileSet(tileSet: IsoTileSet): IsoTileMap;
+    /**
+     * Returns the tileset of a tilemap
+     * @return The instance of the tileset
+     */
     getTileSet(): IsoTileSet;
+    /**
+     * Adds the value of x and y to the actual srollvalues
+     * @param x Scroll on the X-axis in pixel
+     * @param y Scroll on the Y-axis in pixel
+     */
     setDeltaScroll(x: number, y: number): void;
+    /**
+     * Sets the scrolling speed
+     * @param speed The speed
+     * @return The tilemap
+     */
     setScrollSpeed(speed: number): IsoTileMap;
+    /**
+     * Checks the tile which the mouse pointer is touching
+     * return The tile.
+     */
     mouseOver(): ITile;
+    /**
+     * Gets all tiles in specified area
+     * @param x The position on the X-axis of the area
+     * @param y The position on the Y-axis of the area
+     * @param width The width of the area
+     * @param height The height of the area
+     * @retrurn An array with information of all tiles
+     */
     getTilesInRadius(x: number, y: number, width: number, height: number): Array<ITile>;
 }

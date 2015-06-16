@@ -561,6 +561,10 @@ declare class IsoConfig {
     get(name: string): any;
 }
 interface IIsoDrawObject {
+    scrollX: number;
+    scrollY: number;
+    offsetX: number;
+    offsetY: number;
     x: number;
     y: number;
     width: number;
@@ -572,6 +576,9 @@ interface IIsoDrawObject {
     tileHeight?: number;
     layer?: IsoLayer;
     imageUrl?: string;
+    zoom: number;
+    row?: number;
+    column?: number;
 }
 declare class IsoDrawObject {
     objects: Array<IIsoDrawObject>;
@@ -599,6 +606,10 @@ declare class IsoEvent {
     addData(data: any): IsoEvent;
     trigger(target?: string): void;
 }
+interface zoomPoint {
+    x: number;
+    y: number;
+}
 declare class IsoLayer {
     index: number;
     name: string;
@@ -607,9 +618,19 @@ declare class IsoLayer {
     sprites: IsoSprites;
     billboards: IsoBillboards;
     tileMap: IsoTileMap;
+    zoom: number;
+    maxZoom: number;
+    minZoom: number;
+    zoomStrength: number;
+    zoomPoint: zoomPoint;
     constructor(Engine: IsoMetric, name: string, index: number);
     hide(): IsoLayer;
     show(): IsoLayer;
+    setZoom(zoom: number): IsoLayer;
+    setMaxZoom(maxZoom: number): IsoLayer;
+    setMinZoom(minZoom: number): IsoLayer;
+    getZoom(): number;
+    setZoomPoint(zoomPoint: zoomPoint): IsoLayer;
 }
 declare class IsoLayers {
     layers: Array<IsoLayer>;
@@ -643,6 +664,9 @@ declare class IsoHeightMap extends IsoMap {
     getHeight(x: number, y: number): number;
     setStrength(strength: number): IsoHeightMap;
 }
+interface IsoMouseEvent extends MouseEvent {
+    wheelDelta?: number;
+}
 declare class IsoInput {
     static KEYDOWN: number;
     static KEYUP: number;
@@ -661,6 +685,7 @@ declare class IsoInput {
     static EVENT_KEYUP: string;
     static EVENT_MOUSEDOWN: string;
     static EVENT_MOUSEUP: string;
+    static EVENT_MOUSEWHEEL: string;
     Engine: IsoMetric;
     keyCode: number;
     keyEventType: string;
@@ -668,13 +693,14 @@ declare class IsoInput {
     keyEvent: KeyboardEvent;
     keyChar: string;
     onKeyboard: Function;
-    lastMouseCode: number;
-    lastMouseEventType: string;
+    mouseCode: number;
+    mouseEventType: string;
     isMouseEvent: boolean;
-    mouseEvent: MouseEvent;
+    mouseEvent: IsoMouseEvent;
     onMouse: Function;
     mouseX: number;
     mouseY: number;
+    mouseWheelDelta: number;
     lastTouchEventType: string;
     touches: TouchList;
     isTouchEvent: boolean;
@@ -685,7 +711,7 @@ declare class IsoInput {
     constructor(Engine: IsoMetric);
     addEvents(): void;
     checkKeyboard(event: KeyboardEvent): void;
-    checkMouse(event: MouseEvent): void;
+    checkMouse(event: IsoMouseEvent): void;
     checkTouch(event: TouchEvent): void;
     reset(): void;
     callCallback(event: Event): void;

@@ -1,4 +1,9 @@
 ﻿"use strict";
+
+interface IsoMouseEvent extends MouseEvent {
+    wheelDelta?: number;
+}
+
 class IsoInput {
     static KEYDOWN: number = 40;
     static KEYUP: number = 38;
@@ -18,6 +23,7 @@ class IsoInput {
     static EVENT_KEYUP = "keyup";
     static EVENT_MOUSEDOWN = "mousedown";
     static EVENT_MOUSEUP = "mouseup";
+    static EVENT_MOUSEWHEEL = "mousewheel";
 
     Engine: IsoMetric;
     keyCode: number;
@@ -27,13 +33,14 @@ class IsoInput {
     keyChar: string;
     onKeyboard: Function;
 
-    lastMouseCode: number;
-    lastMouseEventType: string;
+    mouseCode: number;
+    mouseEventType: string;
     isMouseEvent: boolean = false;
-    mouseEvent: MouseEvent;
+    mouseEvent: IsoMouseEvent;
     onMouse: Function;
     mouseX: number;
     mouseY: number;
+    mouseWheelDelta: number;
 
     lastTouchEventType: string;
     touches: TouchList;
@@ -55,10 +62,10 @@ class IsoInput {
         el.onkeydown = (event: KeyboardEvent) => this.checkKeyboard(event);
         el.onkeypress = (event: KeyboardEvent) => this.checkKeyboard(event);
         el.onkeyup = (event: KeyboardEvent) => this.checkKeyboard(event);
-        el.onmousedown = (event: MouseEvent) => this.checkMouse(event);
-        el.onmousemove = (event: MouseEvent) => this.checkMouse(event);
-        el.onmouseup = (event: MouseEvent) => this.checkMouse(event);
-        el.onmousewheel = (event: MouseEvent) => this.checkMouse(event);
+        el.onmousedown = (event: IsoMouseEvent) => this.checkMouse(event);
+        el.onmousemove = (event: IsoMouseEvent) => this.checkMouse(event);
+        el.onmouseup = (event: IsoMouseEvent) => this.checkMouse(event);
+        el.onmousewheel = (event: IsoMouseEvent) => this.checkMouse(event);
         el.ontouchcancel = (event: TouchEvent) => this.checkTouch(event);
         el.ontouchend = (event: TouchEvent) => this.checkTouch(event);
         el.ontouchmove = (event: TouchEvent) => this.checkTouch(event);
@@ -75,13 +82,15 @@ class IsoInput {
         this.callCallback(event);
     }
 
-    checkMouse(event: MouseEvent) {
+    checkMouse(event: IsoMouseEvent) {
         this.oldEvent = event;
         this.isMouseEvent = true;
         this.mouseEvent = event;
-        this.lastMouseCode = event.which;
+        this.mouseEventType = event.type;
+        this.mouseCode = event.which;
         this.mouseX = event.clientX;
         this.mouseY = event.clientY;
+        this.mouseWheelDelta = event.wheelDelta || -event.detail;
         this.callCallback(event);
     }
 
@@ -98,12 +107,13 @@ class IsoInput {
         this.isMouseEvent = false;
         this.isTouchEvent = false;
         this.keyChar = "";
-        this.keyCode = 0;
+        this.keyCode = undefined;
         this.keyEventType = undefined;
-        this.lastMouseCode = 0;
-        this.lastMouseEventType = "";
+        this.mouseCode = 0;
         this.keyEvent = undefined;
         this.mouseEvent = undefined;
+        this.mouseEventType = undefined;
+        this.mouseWheelDelta = undefined;
         this.touches = undefined;
         this.touchEvent = undefined;
         this.lastTouchEventType = "";

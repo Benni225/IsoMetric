@@ -63,7 +63,9 @@ function gameExample2() {
                 grandpa.move(1, 0).setDirection(IsoMetric.RIGHT);
         }
     }
-
+    if (App.input.mouseEventType === IsoInput.EVENT_MOUSEWHEEL) {
+        App.layers.getByName("firstLayer").setZoom(App.input.mouseWheelDelta);
+    }
     // If the keyup-event was fired stopping the animation
     if (App.input.keyEventType === IsoInput.EVENT_KEYUP) {
         grandpa.animations.getByName("walk").stop();
@@ -72,9 +74,10 @@ function gameExample2() {
     App.update();
     // After drawing the maps and sprites:
     App.canvas.context.fillStyle = "#fff";
-    App.canvas.context.font = "20px Arial";
+    App.canvas.context.font = "14px Arial";
     // Draw ing the FPS to the screen
     App.canvas.context.fillText("FPS: " + App.FPS, 10, 30);
+    App.canvas.context.fillText("Mov the grandpa with the arrow-keys and zoom with the mousewheel.", 10, 50);
     // Restart the game loop
     requestAnimationFrame(() => gameExample2());
 };

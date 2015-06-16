@@ -1,4 +1,8 @@
 ﻿"use strict";
+interface zoomPoint {
+    x: number;
+    y: number;
+}
 class IsoLayer {
     index: number;
     name: string;
@@ -7,6 +11,11 @@ class IsoLayer {
     sprites: IsoSprites;
     billboards: IsoBillboards;
     tileMap: IsoTileMap;
+    zoom: number = 1;
+    maxZoom: number = 2;
+    minZoom: number = 0.5;
+    zoomStrength: number = 1;
+    zoomPoint: zoomPoint;
 
     constructor(Engine: IsoMetric, name: string, index: number) {
         this.Engine = Engine;
@@ -14,6 +23,10 @@ class IsoLayer {
         this.sprites = new IsoSprites(this.Engine, this);
         this.billboards = new IsoBillboards(this.Engine, this);
         this.tileMap = new IsoTileMap(this.Engine);
+        this.zoomPoint = {
+            x: Math.floor(this.Engine.canvas.canvasElement.width / 2),
+            y: Math.floor(this.Engine.canvas.canvasElement.height / 2)
+        };
     }
 
     hide() : IsoLayer {
@@ -23,6 +36,32 @@ class IsoLayer {
 
     show() : IsoLayer {
         this.hidden = false;
+        return this;
+    }
+
+    setZoom(zoom: number): IsoLayer {
+        var zoomNew = this.zoom + (zoom * (this.zoomStrength / 1000));
+        if (zoomNew <= this.maxZoom && zoomNew >= this.minZoom)
+            this.zoom = this.zoom + (zoom * (this.zoomStrength / 1000));
+        return this;
+    }
+
+    setMaxZoom(maxZoom: number): IsoLayer {
+        this.maxZoom = maxZoom;
+        return this;
+    }
+
+    setMinZoom(minZoom: number): IsoLayer {
+        this.minZoom = minZoom;
+        return this;
+    }
+
+    getZoom(): number {
+        return this.zoom;
+    }
+
+    setZoomPoint(zoomPoint: zoomPoint) : IsoLayer {
+        this.zoomPoint = zoomPoint;
         return this;
     }
 }

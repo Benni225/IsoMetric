@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <style>
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../isometric.js"></script>
+    <script>
+        var app = new IsoMetric({
+            width: 640,
+            height: 480,
+            fullscreen: true
+        });
+        var ressources = app.ressources;
+        var layer = app.layers,
+            firstLayer;
+        ressources.add("ground", "../images/ground.png", IsoRessource.IMAGE);
+
+        ressources.load().then(function () {
+            layer.add("firstLayer", 1);
+            firstLayer = layer.get("firstLayer");
+            firstLayer.addTileMap("sprite", ressources.get("ground"), 32, 32);
+
+            var tileMap = layer.get("firstLayer").getTileMap();
+            tileMap.setZoomPoint({ x: 320, y: 240 });
+            tileMap.setSpeed(4);
+            tileMap.createMap(100, 100, new Array(0, 0));
+            gameloop();
+
+        });
+
+        function gameloop() {
+            if (app.input.keyEventType === IsoInput.EVENT_KEYDOWN) {
+                switch (app.input.keyCode) {
+                    case IsoInput.KEYUP:
+                        firstLayer.tileMap.scroll(0, 1);
+                        break;
+                    case IsoInput.KEYDOWN:
+                        firstLayer.tileMap.scroll(0, -1);
+                        break;
+                    case IsoInput.KEYLEFT:
+                        firstLayer.tileMap.scroll(1, 0);
+                        break;
+                    case IsoInput.KEYRIGHT:
+                        firstLayer.tileMap.scroll(-1, 0);
+                        break;
+                }
+            }
+            if (app.input.keyEventType === IsoInput.EVENT_KEYPRESS) {
+                console.log(app.input.keyCode);
+                switch (app.input.keyCode) {
+                    case 43:
+                        firstLayer.tileMap.zoom(4);
+                        console.log(firstLayer.tileMap.tiles[0][0].getRenderDetails());
+                        console.log(firstLayer.tileMap.zoomPoint);
+                        break;
+                    case 45:
+                        //console.log("substract");
+                        firstLayer.tileMap.zoom(-4);
+                        //console.log(firstLayer.tileMap.tiles[0][0].getRenderDetails());
+                        break;
+                }
+            }
+            app.update();
+
+            //After drawing the maps and sprites:
+            app.canvas.context.fillStyle = "#fff";
+            app.canvas.context.font = "14px Arial";
+            //Draw ing the FPS to the screen
+            app.canvas.context.fillText("FPS: " + app.FPS, 10, 30);
+            app.canvas.context.fillText("Use the arrow-keys for scrolling and the mousewheel for zooming.", 10, 50);
+            requestAnimationFrame(function () {
+                gameloop()
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div></div>
+</body>
+</html>

@@ -1,218 +1,354 @@
-﻿"use strict";
-/**
- * Collects all information about a tilemap. For example the scrolling, the used tileset and so on.
- */
+﻿///<reference path="IsoMap" />
+///<reference path="IsoTile" />
+"use strict";
+interface IsoTilesInView {
+    rowStart: number;
+    rowEnd: number;
+    columnStart: number;
+    columnEnd: number;
+    tiles: Array<Array<IsoTile>>;
+}
+
 class IsoTileMap {
-    /**
-     * The width of one tile
-     */
-    tileSizeX: number;
-    /**
-     * The height of one tile
-     */
-    tileSizeY: number;
-    /**
-     * The tileset for the tilemap
-     */
-    tileSet: IsoTileSet;
-    /**
-     * The map including the information which tiles is drawn on a specified position
-     */
     map: IsoMap;
-    /**
-     * The height map
-     */
-    heightMap: IsoHeightMap;
-    /**
-     * Specifies which tile is drawn in case the the height of an tile is > 0
-     */
-    heightTile: number;
-    /**
-     * Scroll on the X-axis
-     */
-    scrollX: number = 0;
-    /**
-     * Scroll on the Y-axis
-     */
-    scrollY: number = 0;
-    /**
-     * The scrolling speed
-     */
-    scrollSpeed: number = 1;
-    /**
-     * The height of the tilemap
-     */
-    height: number;
-    /**
-     * The width of the tilemap
-     */
-    width: number;
-    /**
-     * The offset on the X-axis
-     */
-    offsetX: number = 0;
-    /**
-     * The offset on the Y-axis
-     */
-    offsetY: number = 0;
-    /**
-     * An instance of IsoMetric
-     */
+    tiles: Array<Array<IsoTile>> = new Array();
+    tilesInView: IsoTilesInView;
+    tileSize: IsoTileSize;
+    image: IsoRessource;
+    offset: IsoOffset;
+    scrollPosition: IsoScroll;
+    speed: number = 1;
+    zoomLevel: number = 1;
+    zoomStrength: number = 1 / 1000;
+    minZoomLevel: number;
+    maxZoomLevel: number;
+    zoomPoint: IsoPoint = { x: 0, y: 0 };
+    name: string;
     Engine: IsoMetric;
-    /**
-     * Initializes the new tilemap. 
-     * @param Engine A instance of IsoMetric
-     * @param width (optional) The width of the new tilemap in pixel
-     * @param height (optional) The height of the tilemap in pixel
-     * @param tileSizeX (optional) The width of a single tile
-     * @param tileSizeY (optional) The height of a single tile
-     */
-    constructor(Engine: IsoMetric, width?: number, height?: number, tileSizeX?: number, tileSizeY?: number) {
+
+    constructor(
+        Engine: IsoMetric,
+        name?: string,
+        tileWidth?: number,
+        tileHeight?: number,
+        image?: IsoRessource,
+        map?: Array<Array<Array<number>>>
+        ) {
         this.Engine = Engine;
-        if (width !== undefined && height !== undefined && tileSizeX !== undefined && tileSizeY !== undefined) {
-            this.create(width, height, tileSizeX, tileSizeY);
+        if (name !== undefined) {
+            this.setName(name);
         }
-    }
-    /**
-     * Creates the new tilemap. 
-     * @param width The width of the new tilemap in pixel
-     * @param height The height of the tilemap in pixel
-     * @param tileSizeX The width of a single tile
-     * @param tileSizeY The height of a single tile
-     * @return The new tilemap
-     */
-    create(width: number, height: number, tileSizeX: number, tileSizeY: number): IsoTileMap {
-        this.width = width;
-        this.height = height;
-        this.tileSizeX = tileSizeX;
-        this.tileSizeY = tileSizeY;
-        this.map = new IsoMap(this);
-        this.heightMap = new IsoHeightMap(this);
+        if (tileWidth !== undefined && tileHeight !== undefined) {
+            this.setTileSize({ width: tileWidth, height: tileHeight });
+        }
+        if (image !== undefined) {
+            this.setImage(image);
+        }
+        if (map !== undefined) {
+            this.setMap(map);
+        }
+        this.setOffset({ x: 0, y: 0 });
+        this.setScroll(0, 0);
         return this;
     }
-    /**
-     * Sets the tileset for the tilemap. A tileset is an image which includes all imagedata of a tilemap.
-     * @param tileset A instance of the tileset
-     * @return The tilemap
-     * @see IsoTileSet
-     */
-    setTileSet(tileSet: IsoTileSet): IsoTileMap {
-        this.tileSet = tileSet;
-        this.tileSet.setTileSize(this.tileSizeX, this.tileSizeY);
+
+    setMap(map: Array<Array<Array<number>>>): IsoTileMap {
+        this.map = new IsoMap(map);
         return this;
     }
-    /**
-     * Returns the tileset of a tilemap
-     * @return The instance of the tileset
-     */
-    getTileSet(): IsoTileSet {
-        return this.tileSet;
+
+    createMap(numTilesX: number, numTilesY: number, defaultValue?: Array<number>): IsoTileMap {
+        if (defaultValue === undefined) {
+            defaultValue = new Array(0);
+        }
+        var map = new Array();
+        for (var y = 0; y < numTilesY; y++) {
+            for (var x = 0; x < numTilesX; x++) {
+                if (map[y] === undefined) {
+                    map[y] = new Array();
+                }
+                map[y][x] = defaultValue;
+            }
+        }
+
+        return this.setMap(map);
     }
-    /**
-     * Adds the value of x and y to the actual srollvalues
-     * @param x Scroll on the X-axis in pixel
-     * @param y Scroll on the Y-axis in pixel
-     */
-    setDeltaScroll(x: number, y: number) {
-        this.scrollX = this.scrollX + (this.scrollSpeed * -(x));
-        this.scrollY = this.scrollY + (this.scrollSpeed * (y));
-        if (this.scrollX > 0) {
-            this.scrollX = 0;
-        }
-        if (this.scrollY > 0) {
-            this.scrollY = 0;
-        }
-        if (-(this.scrollX) + this.Engine.config.get("windowOptions").width + this.offsetX > (this.width - (this.width % this.tileSizeX))) {
-            this.scrollX =
-            -((this.width - (this.width % this.tileSizeX)) + this.offsetX - this.Engine.config.get("windowOptions").width);
-        }
-        if (
-            -(this.scrollY) + this.Engine.config.get("windowOptions").height + this.offsetY > (this.height - (this.height % this.tileSizeY))
-            ) {
-            this.scrollY =
-            -((this.height - (this.height % this.tileSizeY)) + this.offsetY - this.Engine.config.get("windowOptions").height);
-        }
-    }
-    /**
-     * Sets the scrolling speed
-     * @param speed The speed
-     * @return The tilemap
-     */
-    setScrollSpeed(speed: number): IsoTileMap {
-        this.scrollSpeed = speed;
-        return this;
-    }
-    /**
-     * Checks the tile which the mouse pointer is touching
-     * return The tile.
-     */
-    mouseOver(): ITile {
-        var mouseX = this.Engine.input.mouseX,
-            mouseY = this.Engine.input.mouseY;
-        if (
-            mouseX > this.width ||
-            mouseY > this.height ||
-            typeof mouseX === "NaN" ||
-            typeof mouseY === "NaN" ||
-            mouseX === undefined ||
-            mouseY === undefined
-            ) {
-            return null;
-        } else {
-            mouseX = mouseX - this.offsetX;
-            mouseY = mouseY - this.offsetY;
-            if (mouseY > 0 && mouseX > 0) {
-                var row = Math.floor((mouseY + (-this.scrollY)) / this.tileSizeY),
-                    column = Math.floor((mouseX + (-this.scrollX)) / this.tileSizeX),
-                    x = Math.floor(column * this.tileSizeX) + this.scrollX + this.offsetX,
-                    y = Math.floor(row * this.tileSizeY) + this.scrollY + this.offsetY;
-                return {
-                    x: x,
-                    y: y,
-                    width: this.tileSizeX,
-                    height: this.tileSizeY,
-                    tile: this.map.get()[row][column]
-                };
+
+    createTiles(): IsoTileMap {
+        try {
+            this.tiles = new Array();
+            if (this.verify()) {
+                var map = this.map.get(),
+                    rows = map.length,
+                    columns = map[0].length;
+                for (var y = 0; y < rows; y++) {
+                     for (var x = 0; x < columns; x++) {
+                        if (this.tiles[y] === undefined) {
+                            this.tiles[y] = new Array();
+                        }
+                        var tile = map[y][x][0],
+                            height = 0;
+                        if (map[y][x][1] !== undefined) {
+                            height = map[y][x][1];
+                        }
+                        this.tiles[y][x] = new IsoTile(this.image, {
+                            tile: tile,
+                            height: height,
+                            size: this.tileSize,
+                            mapPosition: {
+                                column: x,
+                                row: y
+                            }
+                        });
+                    }
+                }
             } else {
-                return null;
+                throw ("The tilemap '" + this.name + "' is not valid. Please check the properties image, map and tileSize.");
+            }
+            return this;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    getTile(name: string) {
+        for (var i = 0; i < this.tiles.length; i++) {
+            for (var p = 0; p < this.tiles[0].length; p++) {
+                if (this.tiles[i][p].name === name) {
+                    return this.tiles[i][p];
+                }
             }
         }
     }
+    /**
+     * @todo
+     * find a solution for columnStart, columnEnd, rowStart and rowEnd in connection with zooming.
+     */
+    getTilesInView(): IsoTilesInView {
+        if (this.verify()) {
+            var canvasWidth = this.Engine.canvas.canvasElement.width,
+                canvasHeight = this.Engine.canvas.canvasElement.height,
+                map = this.map.get(),
+                mapLengthY = map.length,
+                mapLengthX = map[0].length,
+                columnStart =
+                    Math.floor(((this.offset.x + (-this.scrollPosition.x)) * this.zoomLevel) / (this.tileSize.width * this.zoomLevel))
+                    - Math.floor(1 / this.zoomLevel),
+                columnEnd =
+                    columnStart + Math.floor(canvasWidth / (this.tileSize.width * this.zoomLevel)) + 2 * Math.floor(1 / (this.zoomLevel)),
+                rowStart =
+                    Math.floor(((this.offset.y + (-this.scrollPosition.y)) * this.zoomLevel) / (this.tileSize.height * this.zoomLevel))
+                    - Math.floor(1 / this.zoomLevel),
+                rowEnd =
+                    rowStart + Math.floor(canvasHeight / (this.tileSize.height * this.zoomLevel)) + 2 * Math.floor(1 / this.zoomLevel);
+            if (columnStart < 0) {
+                columnStart = 0;
+            }
+            if (rowStart < 0) {
+                rowStart = 0;
+            }
+            if (columnEnd >= mapLengthX) {
+                columnEnd = mapLengthX;
+            }
+            if (rowEnd >= mapLengthY) {
+                rowEnd = mapLengthY;
+            }
+
+            var tiles = new Array();
+            for (var y = 0; y < rowEnd - rowStart; y++) {
+                for (var x = 0; x < columnEnd - columnStart; x++) {
+                    if (tiles[y] === undefined) {
+                        tiles[y] = new Array();
+                    }
+                    tiles[y][x] = this.tiles[y + rowStart][x + columnStart];
+                }
+            }
+            return {
+                rowStart: rowStart,
+                rowEnd: rowEnd,
+                columnEnd: columnEnd,
+                columnStart: columnStart,
+                tiles: tiles
+            };
+        } else {
+            throw ("The tilemap '" + this.name + "' is not valid. Please check the properties image, map and tileSize.");
+        }
+    }
+
     /**
      * Gets all tiles in specified area
      * @param x The position on the X-axis of the area
      * @param y The position on the Y-axis of the area
      * @param width The width of the area
      * @param height The height of the area
-     * @retrurn An array with information of all tiles
+     * @retrurn An object with information of all tiles
      */
-    getTilesInRadius(x: number, y: number, width: number, height: number): Array<ITile> {
-        x = x - this.offsetX;
-        y = y - this.offsetY;
-        var tiles = new Array(),
-            toX = x + width,
-            toY = y + height,
-            rowStart = (y - (y % this.tileSizeY)) / this.tileSizeY,
-            rowEnd = (toY - (toY % this.tileSizeY)) / this.tileSizeY,
-            colStart = (x - (x % this.tileSizeX)) / this.tileSizeX,
-            colEnd = (toX - (toX % this.tileSizeX)) / this.tileSizeX;
+    getTilesInRadius(x: number, y: number, width: number, height: number): Array<IsoTile> {
+        x = x - this.offset.x + this.scrollPosition.x;
+        y = y - this.offset.y + this.scrollPosition.y;
 
-        for (var iy = rowStart; iy <= rowEnd; iy++) {
-            for (var ix = colStart; ix <= colEnd; ix++) {
-                var tileX = ix * this.tileSizeX,
-                    tileY = iy * this.tileSizeY,
-                    tileX2 = tileX + this.tileSizeX,
-                    tileY2 = tileY + this.tileSizeY;
-                tiles.push({
-                    x: ix * this.tileSizeX,
-                    y: iy * this.tileSizeY,
-                    width: this.tileSizeX,
-                    height: this.tileSizeY,
-                    tile: this.map.get()[iy][ix],
-                    tileHeight: this.heightMap.getHeight(ix, iy)
-                });
+        var map = this.map.get(),
+            mapLengthY = map.length,
+            mapLengthX = map[0].length,
+            columnStart = (x - (x % this.tileSize.width)) / this.tileSize.width,
+            columnEnd = ((x + width) - ((x + width) % this.tileSize.width)) / this.tileSize.width,
+            rowStart = (y - (y % this.tileSize.height)) / this.tileSize.height,
+            rowEnd = ((y + height) - ((y + height) % this.tileSize.height)) / this.tileSize.height;
+
+        if (columnStart < 0) {
+            columnStart = 0;
+        }
+        if (rowStart < 0) {
+            rowStart = 0;
+        }
+        if (columnEnd >= mapLengthX) {
+            columnEnd = mapLengthX;
+        }
+        if (rowEnd >= mapLengthY) {
+            rowEnd = mapLengthY;
+        }
+
+        var tiles = new Array();
+        for (var row = rowStart; row < rowEnd; row++) {
+            for (var column = columnStart; column < columnEnd; column++) {
+                tiles[row][column] = this.tiles[row][column];
             }
         }
         return tiles;
+    }
+
+    setImage(image: IsoRessource): IsoTileMap {
+        this.image = image;
+        return this;
+    }
+
+    setMaxZoomLevel(zoomLevel: number): IsoTileMap {
+        this.maxZoomLevel = zoomLevel;
+        return this;
+    }
+
+    setMinZoomLevel(zoomLevel: number): IsoTileMap {
+        this.minZoomLevel = zoomLevel;
+        return this;
+    }
+
+    setName(name: string): IsoTileMap {
+        this.name = name;
+        return this;
+    }
+
+    setOffset(o: IsoOffset): IsoTileMap {
+        this.offset = o;
+        return this;
+    }
+
+    setScroll(x: number, y: number): IsoTileMap {
+        this.scrollPosition = { x: x, y: y };
+        return this;
+    }
+
+    setSpeed(speed: number): IsoTileMap {
+        this.speed = speed;
+        return this;
+    }
+
+    scroll(x: number, y: number): IsoTileMap {
+        x = (x * this.speed) + this.scrollPosition.x;
+        y = (y * this.speed) + this.scrollPosition.y;
+        this.scrollPosition = {
+            x: x,
+            y: y
+        };
+        return this;
+    }
+
+    setTileSize(size: IsoTileSize): IsoTileMap {
+        this.tileSize = size;
+        return this;
+    }
+
+    setZoomLevel(zoomLevel: number): IsoTileMap {
+        this.zoomLevel = zoomLevel;
+        return this;
+    }
+
+    setZoomPoint(point: IsoPoint): IsoTileMap {
+        this.zoomPoint = point;
+        return this;
+    }
+
+    setZoomStrength(zoomStrength: number): IsoTileMap {
+        this.zoomStrength = zoomStrength / 1000;
+        return this;
+    }
+
+    update() {
+        if (this.tiles === undefined || this.tiles.length === 0) {
+            this.createTiles();
+        }
+        this.tilesInView = this.getTilesInView();
+        for (var y = 0; y < this.tiles.length; y++) {
+            for (var x = 0; x < this.tiles[0].length; x++) {
+                this.updateTile(this.tiles[y][x]);
+            }
+        }
+    }
+
+    updateTile(tile: IsoTile) {
+        if (tile !== undefined) {
+            if (tile.updateType === IsoTile.AUTOMATIC) {
+                tile.offset = this.offset;
+                tile.scrollPosition = this.scrollPosition;
+                tile.setZoomLevel(this.zoomLevel);
+                tile.setZoomPoint(this.zoomPoint);
+            } else if (tile.updateType === IsoTile.POSITION) {
+                tile.offset = this.offset;
+                tile.scrollPosition = this.scrollPosition;
+            } else if (tile.updateType === IsoTile.ZOOM) {
+                tile.setZoomLevel(this.zoomLevel);
+                tile.setZoomPoint(this.zoomPoint);
+            }
+
+            tile.tile = this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0];
+            tile.height = 0;
+            if (this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0][1] !== undefined) {
+                tile.height = this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0][1];
+            }
+        }
+    }
+
+    verify() {
+        if (this.image === undefined || this.image.image.isLoaded === false) {
+            return false;
+        }
+
+        if (this.tileSize === undefined) {
+            return false;
+        }
+
+        if (this.map === undefined && this.map.get() === undefined && this.map.get()[0] === undefined) {
+            return false;
+        }
+        return true;
+    }
+
+    zoom(zoom: number): IsoTileMap {
+        var zoomLevel = this.zoomLevel + (this.zoomStrength * zoom);
+        if (this.maxZoomLevel !== undefined && this.minZoomLevel !== undefined) {
+            if (zoomLevel >= this.minZoomLevel && zoomLevel <= this.maxZoomLevel) {
+                this.setZoomLevel(zoomLevel);
+            }
+        } else if (this.maxZoomLevel !== undefined) {
+            if (zoomLevel <= this.maxZoomLevel) {
+                this.setZoomLevel(zoomLevel);
+            }
+        } else if (this.minZoomLevel !== undefined) {
+            if (zoomLevel >= this.minZoomLevel) {
+                this.setZoomLevel(zoomLevel);
+            }
+        } else {
+            this.setZoomLevel(zoomLevel);
+        }
+        return this;
     }
 } 

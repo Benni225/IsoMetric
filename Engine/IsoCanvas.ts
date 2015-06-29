@@ -29,10 +29,13 @@ class IsoCanvas {
         this.canvasElement.height = this.options.height;
         if (this.options.fullscreen === true) {
             this.canvasElement.width = window.innerWidth;
-            this.canvasElement.height = window.innerHeight;
+            this.canvasElement.height = window.innerWidth;
             window.onresize = window.onload = () => this.updateScreen();
+            this.canvasElement.style.overflow = "hidden";
         }
-
+        if (document.body === null) {
+            document.body = document.createElement("body");
+        }
         document.body.appendChild(this.canvasElement);
 
         this.context = this.canvasElement.getContext("2d");
@@ -78,10 +81,13 @@ class IsoCanvas {
          * Finding a better solution for redraw the canvas.
          */
         this.canvasElement.width = this.canvasElement.width;
-        this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-        
-        //console.log(this.canvasElement.width + " x " + this.canvasElement.height)
-
+        if (this.clearColor === undefined) {
+            this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+        } else {
+            this.context.fillStyle = this.clearColor;
+            this.context.rect(0, 0, this.canvasElement.width, this.canvasElement.height);
+            this.context.fill();
+        }
         new IsoEvent("IsoCanvasClearScreen").trigger();
         return this;
     }

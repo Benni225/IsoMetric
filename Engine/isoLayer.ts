@@ -1,141 +1,69 @@
-﻿"use strict";
-interface zoomPoint {
-    x: number;
-    y: number;
-}
+﻿///<reference path="IsoObject.ts" />
+///<reference path="IsoSprite.ts" />
+///<reference path="IsoTileMap.ts" />
+"use strict";
 class IsoLayer {
-    index: number;
-    name: string;
-    hidden: boolean = false;
-    Engine: IsoMetric;
-    sprites: IsoSprites;
-    billboards: IsoBillboards;
+    objects: Array<IsoObject> = new Array();
     tileMap: IsoTileMap;
-    zoom: number = 1;
-    maxZoom: number = 2;
-    minZoom: number = 0.5;
-    zoomStrength: number = 1;
-    zoomPoint: zoomPoint;
+    sprites: Array<IsoSprite> = new Array();
+    billboards: any; // isoBillboards
 
-    constructor(Engine: IsoMetric, name: string, index: number) {
-        this.Engine = Engine;
-        this.name = name;
-        this.sprites = new IsoSprites(this.Engine, this);
-        this.billboards = new IsoBillboards(this.Engine, this);
-        this.tileMap = new IsoTileMap(this.Engine);
-        this.zoomPoint = {
-            x: Math.floor(this.Engine.canvas.canvasElement.width / 2),
-            y: Math.floor(this.Engine.canvas.canvasElement.height / 2)
-        };
-    }
-
-    hide() : IsoLayer {
-        this.hidden = true;
-        return this;
-    }
-
-    show() : IsoLayer {
-        this.hidden = false;
-        return this;
-    }
-
-    setZoom(zoom: number): IsoLayer {
-        var zoomNew = this.zoom + (zoom * (this.zoomStrength / 1000));
-        if (zoomNew <= this.maxZoom && zoomNew >= this.minZoom)
-            this.zoom = this.zoom + (zoom * (this.zoomStrength / 1000));
-        return this;
-    }
-
-    setMaxZoom(maxZoom: number): IsoLayer {
-        this.maxZoom = maxZoom;
-        return this;
-    }
-
-    setMinZoom(minZoom: number): IsoLayer {
-        this.minZoom = minZoom;
-        return this;
-    }
-
-    getZoom(): number {
-        return this.zoom;
-    }
-
-    setZoomPoint(zoomPoint: zoomPoint) : IsoLayer {
-        this.zoomPoint = zoomPoint;
-        return this;
-    }
-}
-
-class IsoLayers {
-    layers: Array<IsoLayer> = new Array();
-    private lastIndex: number = 0;
-    tileset: string;
+    name: string;
+    index: number;
     Engine: IsoMetric;
 
-    constructor(Engine: IsoMetric) {
+    constructor(Engine: IsoMetric, index: number, name?: string) {
         this.Engine = Engine;
+        this.index = index;
+        if (name !== undefined) {
+            this.setName(name);
+        }
+        return this;
+    }
+    addObject(name: string, image: IsoRessource): IsoObject {
+        var o = new IsoObject(image, name);
+        this.objects.push(o);
+        return o;
     }
 
-    add(name: string) : IsoLayer {
-        this.layers.push(new IsoLayer(this.Engine, name, this.lastIndex));
-        this.lastIndex++;
-        return this.getByName(name);
+    addSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoSprite {
+        var s = new IsoSprite(this.Engine, image, tileObjectInfo, name);
+        this.sprites.push(s);
+        return s;
     }
 
-    getByName(name: string) : IsoLayer {
-        for (var i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].name === name) {
-                return this.layers[i];
+    addAnimatedSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoAnimatedSprite {
+        var s = new IsoAnimatedSprite(this.Engine, image, tileObjectInfo, name);
+        this.sprites.push(s);
+        return s;
+    }
+
+    addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>) {
+        this.tileMap = new IsoTileMap(this.Engine, name, tileWidth, tileHeight, image, map);
+    }
+
+    setName(name: string): IsoLayer {
+        this.name = name;
+        return this;
+    }
+
+    getObject(name: string): IsoObject {
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].name === name) {
+                return this.objects[i];
             }
         }
-        return undefined;
     }
 
-    getByIndex(index: number): IsoLayer {
-        for (var i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].index === index) {
-                return this.layers[i];
+    getSprite(name: string) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            if (this.sprites[i].name === name) {
+                return this.sprites[i];
             }
         }
-        return undefined;
     }
 
-    layerUp(name: string) : IsoLayers {
-        var oldIndex = this.getByName(name).index;
-        this.getByIndex(oldIndex + 1).index = oldIndex;
-        this.getByName(name).index = oldIndex + 1;
-        return this;
-    }
-
-    layerDown(name: string) : IsoLayers {
-        var oldIndex = this.getByName(name).index;
-        this.getByIndex(oldIndex - 1).index = oldIndex;
-        this.getByName(name).index = oldIndex - 1;
-        return this;
-    }
-
-    swapLayers(nameLayer1: string, nameLayer2: string): IsoLayers {
-        var oldIndex = this.getByName(nameLayer2).index;
-        this.getByName(nameLayer2).index = this.getByName(nameLayer1).index;
-        this.getByName(nameLayer1).index = oldIndex;
-        return this;
-    }
-
-    sortLayers() : IsoLayers {
-        this.layers.sort(this.sortLayerByIndex);
-        return this;
-    }
-
-    sortLayerByIndex(a: IsoLayer, b: IsoLayer) : number {
-        return a.index - b.index;
-    }
-
-    setTileset(name : string): IsoLayers {
-        this.tileset = name;
-        return this;
-    }
-
-    mouseOver(name: string) {
-        return this.getByName(name).tileMap.mouseOver();
+    getTileMap(): IsoTileMap {
+        return this.tileMap;
     }
 } 

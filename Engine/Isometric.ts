@@ -1,13 +1,22 @@
-﻿/**
+﻿///<reference path="IsoConfig.ts" />
+///<reference path="IsoCanvas.ts" />
+///<reference path="IsoEvent.ts" />
+///<reference path="IsoMap.ts" />
+///<reference path="IsoRessourceManager.ts" />
+// <reference path="IsoTileSet.ts" />
+///<reference path="IsoLayers.ts" />
+///<reference path="IsoOn.ts" />
+///<reference path="IsoDrawer.ts" />
+interface IsoCallback {
+    eventType: string;
+    callback: EventListener;
+}
+
+/**
  * IsoMetric
  * =========
  * IsoMetric is a small and simple tileengine. This software is a pre-alpha.
  */
-///<reference path="IsoConfig.ts" />
-///<reference path="IsoCanvas.ts" />
-///<reference path="IsoEvent.ts" />
-///<reference path="IsoMap.ts" />
-///<reference path="IsoTileSet.ts" />
 "use strict";
 /**
  * The mainclass of IsoMetric and the starting point for the gameloop.
@@ -31,12 +40,7 @@ class IsoMetric {
      * All layers of the actual game
      * @see IsoLayers
      */
-    layers: IsoLayers;
-    /**
-     * @Todo:
-     * Maybe deprecated
-     */
-    tileSets: IsoTileSets;
+     layers: IsoLayers;
     /**
      * The drawing lib.
      * @see IsoDrawer
@@ -46,7 +50,12 @@ class IsoMetric {
      * The input library.
      * @see IsoInput
      */
-    input: IsoInput;
+     input: IsoInput;
+    /**
+     * Handles all ressources of a project.
+     * @see IsoRessourceManager
+     */
+     ressources: IsoRessourceManager;
     /**
      * [deprecated] The global direction of all layers.
      */
@@ -71,6 +80,8 @@ class IsoMetric {
      * The frames per second
      */
     FPS: number = 0;
+
+    on: IsoOn;
     /**
      * The default canvas configuration.
      */
@@ -92,19 +103,20 @@ class IsoMetric {
      * @param windowOptions (optional) The canvas configuration.
      */
     constructor(windowOptions?: Object) {
+        console.log("Construct");
         this.config = new IsoConfig(this);
         this.canvas = new IsoCanvas(this);
         this.layers = new IsoLayers(this);
         this.input = new IsoInput(this);
-        this.tileSets = new IsoTileSets(this);
-        this.drawer = new IsoDrawer(this);
+        this.on = new IsoOn();
+        this.ressources = new IsoRessourceManager(this);
 
         if (windowOptions === undefined) {
             windowOptions = this.defaultWindowOptions;
         }
         this.config.set("windowOptions", windowOptions);
-
         this.canvas.create();
+        this.drawer = new IsoDrawer(this);
         this.frameCountInteral = setInterval(() => this.setFPS(), 1000);
     }
     /**
@@ -131,7 +143,7 @@ class IsoMetric {
      */
     update() {
         this.startLoopTime = new Date();
-        this.drawer.draw();
+        this.drawer.update();
     }
     /**
      * [deprecated] Sets the global direction.

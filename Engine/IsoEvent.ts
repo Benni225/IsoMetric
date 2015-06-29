@@ -12,11 +12,16 @@ class IsoEvent {
         return this;
     }
 
-    trigger(target?: string) {
+    trigger(target?: string|HTMLElement) {
         var event = new CustomEvent(this.type);
         event.initCustomEvent(this.type, false, false, this.data);
         if (target !== undefined) {
-            document.querySelector(target).dispatchEvent(event);
+            if (typeof target === "string") {
+                document.querySelector(target).dispatchEvent(event);
+            } else {
+                target.dispatchEvent(event);
+            }
+                
         } else {
             document.dispatchEvent(event);
         }

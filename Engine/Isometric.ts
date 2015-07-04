@@ -103,7 +103,6 @@ class IsoMetric {
      * @param windowOptions (optional) The canvas configuration.
      */
     constructor(windowOptions?: Object) {
-        console.log("Construct");
         this.config = new IsoConfig(this);
         this.canvas = new IsoCanvas(this);
         this.layers = new IsoLayers(this);

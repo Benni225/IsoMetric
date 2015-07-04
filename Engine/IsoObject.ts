@@ -31,8 +31,8 @@ class IsoObject {
     static BOX_COLLISION: string = "box";
     static PIXEL_COLLISION: string = "pixel";
     position: IsoPoint = {x: 0, y: 0};
-    scrollPosition: IsoScroll;
-    offset: IsoOffset;
+    scrollPosition: IsoScroll = {x: 0, y: 0 };
+    offset: IsoOffset = {x: 0, y: 0};
     width: number;
     height: number;
     zoomLevel: number = 1;
@@ -227,8 +227,8 @@ class IsoObject {
         return this;
     }
 
-    zoom(zoom: number) : IsoObject {
-        this.setZoomLevel(zoom * this.zoomStrength);
+    zoom(zoom: number): IsoObject {
+        this.setZoomLevel(this.zoomLevel + (zoom * this.zoomStrength));
         return this;
     }
 } 

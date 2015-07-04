@@ -1,4 +1,5 @@
 ﻿///<reference path="IsoObject.ts" />
+///<reference path="IsoTileObject.ts" />
 ///<reference path="IsoSprite.ts" />
 ///<reference path="IsoTileMap.ts" />
 "use strict";
@@ -38,8 +39,9 @@ class IsoLayer {
         return s;
     }
 
-    addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>) {
+    addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>): IsoTileMap {
         this.tileMap = new IsoTileMap(this.Engine, name, tileWidth, tileHeight, image, map);
+        return this.tileMap;
     }
 
     setName(name: string): IsoLayer {
@@ -53,14 +55,16 @@ class IsoLayer {
                 return this.objects[i];
             }
         }
+        return undefined;
     }
 
-    getSprite(name: string) {
+    getSprite(name: string): IsoSprite {
         for (var i = 0; i < this.sprites.length; i++) {
             if (this.sprites[i].name === name) {
                 return this.sprites[i];
             }
         }
+        return undefined;
     }
 
     getTileMap(): IsoTileMap {

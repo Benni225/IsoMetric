@@ -4,9 +4,11 @@ class IsoDrawer {
     Engine: IsoMetric;
     canvas: IsoCanvas;
     context: any;
+    __DEBUG_SHOW: boolean = false;
     constructor(Engine: IsoMetric) {
         this.Engine = Engine;
         this.canvas = Engine.canvas;
+        this.context = Engine.canvas.context;
     }
 
     update() {
@@ -21,15 +23,15 @@ class IsoDrawer {
 
     drawLayer(layer: IsoLayer) {
         this.drawTileMap(layer.getTileMap());
+        this.drawSprites(layer.sprites);
     }
 
     drawTileMap(tileMap: IsoTileMap) {
-        tileMap.update();
         var tiles = tileMap.getTilesInView();
         for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
             for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {
                 var detail = tiles.tiles[y][x].getRenderDetails();
-                this.canvas.context.drawImage(
+                this.context.drawImage(
                     detail.image,
                     detail.offset.x,
                     detail.offset.y,
@@ -40,6 +42,25 @@ class IsoDrawer {
                     detail.renderSize.width,
                     detail.renderSize.height);
             }
+        }
+    }
+
+    drawSprites(sprites: Array<IsoSprite>) {
+        for (var i = 0; i < sprites.length; i++) {
+            var s = sprites[i];
+            var renderDetails = s.getRenderDetails();
+
+            this.context.drawImage(
+                renderDetails.image,
+                renderDetails.offset.x,
+                renderDetails.offset.y,
+                renderDetails.tileSize.width,
+                renderDetails.tileSize.height,
+                renderDetails.position.x,
+                renderDetails.position.y,
+                renderDetails.renderSize.width,
+                renderDetails.renderSize.height
+                );
         }
     }
 } 

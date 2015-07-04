@@ -131,16 +131,19 @@ class IsoTileMap {
                 map = this.map.get(),
                 mapLengthY = map.length,
                 mapLengthX = map[0].length,
+                startPointX = (((this.offset.x - this.scrollPosition.x) * this.zoomLevel)
+                    + ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x)),
+                startPointY = (((this.offset.y - this.scrollPosition.y) * this.zoomLevel)
+                    + ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y)),
                 columnStart =
-                    Math.floor(((this.offset.x + (-this.scrollPosition.x)) * this.zoomLevel) / (this.tileSize.width * this.zoomLevel))
-                    - Math.floor(1 / this.zoomLevel),
+                    Math.floor(startPointX / (this.tileSize.width * this.zoomLevel)),
                 columnEnd =
-                    columnStart + Math.floor(canvasWidth / (this.tileSize.width * this.zoomLevel)) + 2 * Math.floor(1 / (this.zoomLevel)),
+                    Math.floor((canvasWidth + startPointX) / (this.tileSize.width * this.zoomLevel)) + 1,
                 rowStart =
-                    Math.floor(((this.offset.y + (-this.scrollPosition.y)) * this.zoomLevel) / (this.tileSize.height * this.zoomLevel))
-                    - Math.floor(1 / this.zoomLevel),
+                    Math.floor(startPointY / (this.tileSize.height * this.zoomLevel)),
                 rowEnd =
-                    rowStart + Math.floor(canvasHeight / (this.tileSize.height * this.zoomLevel)) + 2 * Math.floor(1 / this.zoomLevel);
+                    Math.floor((canvasHeight + startPointY) / (this.tileSize.height * this.zoomLevel)) + 1
+
             if (columnStart < 0) {
                 columnStart = 0;
             }
@@ -215,6 +218,42 @@ class IsoTileMap {
             }
         }
         return tiles;
+    }
+
+    /**
+     * Checks the tile which the mouse pointer is touching
+     * return The tile.
+     */
+    getTileOnPosition(position: IsoPoint): IsoTile {
+        if (this.map.get() !== undefined) {
+            var mapLengthY = this.map.map.length,
+                mapLengthX = this.map.map[0].length;
+
+            if (
+                position.x > (mapLengthX * (this.tileSize.width * this.zoomLevel)) ||
+                position.y > (mapLengthY * (this.tileSize.height * this.zoomLevel)) ||
+                typeof position.x === "NaN" ||
+                typeof position.y === "NaN" ||
+                position.x === undefined ||
+                position.y === undefined
+                ) {
+                return null;
+            } else {
+                position.x = position.x - (((this.offset.x + this.scrollPosition.x) * this.zoomLevel)
+                    - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x));
+                position.y = position.y - (((this.offset.y + this.scrollPosition.y) * this.zoomLevel)
+                    - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y));
+                if (position.y > 0 && position.x > 0) {
+                    var row = Math.floor(position.y / (this.tileSize.height * this.zoomLevel)),
+                        column = Math.floor(position.x / (this.tileSize.width * this.zoomLevel));
+                    return this.tiles[row][column];
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            return undefined;
+        }
     }
 
     setImage(image: IsoRessource): IsoTileMap {

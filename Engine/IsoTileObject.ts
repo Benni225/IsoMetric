@@ -1,5 +1,10 @@
 ﻿///<reference path="IsoObject.ts" />
 "use strict";
+interface IsoTileSize {
+    width: number;
+    height: number;
+}
+
 interface IsoTileObjectInfo {
     tile: number;
     height: number;
@@ -7,7 +12,7 @@ interface IsoTileObjectInfo {
 }
 
 class IsoTileObject extends IsoObject {
-    tileOffset: IsoOffset;
+    tileOffset: IsoOffset = {x: 0, y: 0};
     tileSize: IsoTileSize;
     tileHeight: number = 0;
     tile: number;
@@ -20,7 +25,7 @@ class IsoTileObject extends IsoObject {
             }
             return this;
         } catch (e) {
-            throw ("Can not create tileObject with error message: " + e);
+            throw (e);
         }
     }
 
@@ -33,12 +38,12 @@ class IsoTileObject extends IsoObject {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-            + ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x);/* (this.position.x * this.zoomLevel) +
+            - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x);/* (this.position.x * this.zoomLevel) +
         (this.offset.x * this.zoomLevel) +
         (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x) + this.scrollPosition.x; */
         y =
             ((this.position.y + this.offset.y + this.scrollPosition.y + this.height) * this.zoomLevel)
-            + ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y); /*(this.position.y * this.zoomLevel) +
+            - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y); /*(this.position.y * this.zoomLevel) +
         (this.offset.y * this.zoomLevel) +
         (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y) -
         (this.tileHeight * this.zoomLevel) + this.scrollPosition.y;*/
@@ -78,9 +83,9 @@ class IsoTileObject extends IsoObject {
     }
 
     set(tile: IsoTileObjectInfo): IsoTileObject {
-        this.setTile(tile.tile);
         this.tileHeight = tile.height;
         this.tileSize = tile.size;
+        this.setTile(tile.tile);
         return this;
     }
 }  

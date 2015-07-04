@@ -18,20 +18,31 @@
             height: 480,
             fullscreen: true
         });
-        var ressources = app.ressources;
-        var layer = app.layers,
-            firstLayer;
+        var ressources = app.ressources,
+            layer = app.layers,
+            firstLayer = layer.add("firstLayer", 1),
+            tileMap,
+            grandpa,
+            shown = 0;
+
+        
+
         ressources.add("ground", "../images/ground.png", IsoRessource.IMAGE);
+        ressources.add("grandpa", "../images/grandpa.png", IsoRessource.IMAGE);
 
         ressources.load().then(function () {
-            layer.add("firstLayer", 1);
-            firstLayer = layer.get("firstLayer");
-            firstLayer.addTileMap("sprite", ressources.get("ground"), 32, 32);
 
-            var tileMap = layer.get("firstLayer").getTileMap();
-            tileMap.setZoomPoint({ x: 320, y: 240 });
+            firstLayer = layer.get("firstLayer");
+            tileMap = firstLayer.addTileMap("sprite", ressources.get("ground"), 32, 32);
+            grandpa = firstLayer.addSprite("grandpa", ressources.get("grandpa"), { tile: 1, height: 0, size: { width: 32, height: 48 } });
+
+            tileMap.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
             tileMap.setSpeed(4);
             tileMap.createMap(100, 100, new Array(0, 0));
+            tileMap.update();
+
+            grandpa.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
+            grandpa.setSpeed(5);
             gameloop();
 
         });
@@ -41,34 +52,59 @@
                 switch (app.input.keyCode) {
                     case IsoInput.KEYUP:
                         firstLayer.tileMap.scroll(0, 1);
+                        grandpa.scroll(0, -1);
+                        firstLayer.tileMap.update();
                         break;
                     case IsoInput.KEYDOWN:
                         firstLayer.tileMap.scroll(0, -1);
+                        grandpa.scroll(0, 1);
+                        firstLayer.tileMap.update();
                         break;
                     case IsoInput.KEYLEFT:
                         firstLayer.tileMap.scroll(1, 0);
+                        grandpa.scroll(-1, 0);
+                        firstLayer.tileMap.update();
                         break;
                     case IsoInput.KEYRIGHT:
                         firstLayer.tileMap.scroll(-1, 0);
+                        grandpa.scroll(1, 0);
+                        firstLayer.tileMap.update();
                         break;
                 }
             }
             if (app.input.keyEventType === IsoInput.EVENT_KEYPRESS) {
-                console.log(app.input.keyCode);
                 switch (app.input.keyCode) {
                     case 43:
                         firstLayer.tileMap.zoom(4);
-                        console.log(firstLayer.tileMap.tiles[0][0].getRenderDetails());
-                        console.log(firstLayer.tileMap.zoomPoint);
+                        firstLayer.tileMap.update();
+                        firstLayer.getSprite("grandpa").zoom(4);
                         break;
                     case 45:
-                        //console.log("substract");
                         firstLayer.tileMap.zoom(-4);
-                        //console.log(firstLayer.tileMap.tiles[0][0].getRenderDetails());
+                        firstLayer.tileMap.update();
+                        firstLayer.getSprite("grandpa").zoom(-4);
                         break;
                 }
             }
             app.update();
+
+            tile = tileMap.getTileOnPosition({
+                x: app.input.mouseX,
+                y: app.input.mouseY
+            });
+
+            if (tile !== undefined && tile !== null) {
+                var renderDetails = tile.getRenderDetails();
+                if (shown < 100) {
+                    shown++;
+                }
+                app.canvas.context.strokeRect(
+                    renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel),
+                    renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel),
+                    renderDetails.renderSize.width,
+                    renderDetails.renderSize.height
+                );
+            }
 
             //After drawing the maps and sprites:
             app.canvas.context.fillStyle = "#fff";

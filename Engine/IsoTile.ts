@@ -1,9 +1,5 @@
 ﻿///<reference path="IsoTileObject.ts" />
 "use strict";
-interface IsoTileSize {
-    width: number;
-    height: number;
-}
 
 interface IsoTileImage {
     x: number;

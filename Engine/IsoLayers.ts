@@ -9,12 +9,14 @@ class IsoLayers {
         this.Engine = Engine;
     }
 
-    add(name: string, index?: number) {
+    add(name: string, index?: number): IsoLayer {
         this.length++;
         if (index === undefined) {
             index = this.length - 1;
         }
-        this.layers.push(new IsoLayer(this.Engine, index, name));
+        var l = new IsoLayer(this.Engine, index, name);
+        this.layers.push(l);
+        return l;
     }
 
     get(name: string): IsoLayer {
@@ -26,7 +28,7 @@ class IsoLayers {
     }
 
     sort() {
-        //this.layers.sort(this._sort);
+        this.layers.sort(this._sort);
     }
 
     _sort(layerA: IsoLayer, layerB: IsoLayer) {

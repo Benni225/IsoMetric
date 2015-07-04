@@ -1,10 +1,13 @@
 ﻿///<reference path="IsoSprite.ts" />
-
 "use strict";
-class IsoAnimatedSprite extends IsoSprite {
-    stripeLength: number = 1;
 
-    animations: Array<any>;
+interface IsoAnimation {
+    name: string;
+    frames: Array<IsoFrame>;
+    speed: number;
+}
+class IsoAnimatedSprite extends IsoSprite {
+    animations: Array<IsoAnimation>;
 
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string) {
         super(Engine, image, tileInfo);
@@ -13,18 +16,18 @@ class IsoAnimatedSprite extends IsoSprite {
         }
         return this;
     }
+    
+    addAnimation(name: string, frames: Array<IsoFrame>, speed: number): IsoAnimatedSprite {
+        if (this.animations === undefined) {
+            this.animations = new Array();
+        }
 
-    setStripeLength(stripeLength: number): IsoAnimatedSprite {
-        this.stripeLength = stripeLength;
-        return this;
-    }
+        this.animations.push({
+            name: name,
+            frames: frames,
+            speed: speed
+        });
 
-    setTile(tile: number): IsoAnimatedSprite {
-        this.tile = tile + this.direction * this.stripeLength + this.startTile;
-        this.tileOffset.x =
-            (this.tile % (this.width / this.tileSize.width)) * (this.tileSize.width + this.image.image.offset.x);
-        this.tileOffset.y =
-            (Math.floor(this.tile / (this.width / this.tileSize.width))) * (this.tileSize.height + this.image.image.offset.y);
         return this;
     }
 }

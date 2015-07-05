@@ -122,4 +122,40 @@ class IsoLayer {
             //this.billboards[i].rotate(degrees);
         }
     }
+
+    setZoomPoint(point: IsoPoint) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.setZoomPoint(point);
+        }
+
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].setZoomPoint(point);
+        }
+
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].setZoomPoint(point);
+        }
+
+        for (var i = 0; i < this.billboards.length; i++) {
+            //this.billboards[i].setZoomPoint(point);
+        }
+    }
+
+    setSpeed(speed: number) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.setSpeed(speed);
+        }
+
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].setSpeed(speed);
+        }
+
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].setSpeed(speed);
+        }
+
+        for (var i = 0; i < this.billboards.length; i++) {
+            //this.billboards[i].setSpeed(speed);
+        }
+    }
 } 

@@ -989,7 +989,6 @@ var IsoAnimation = (function () {
     };
     IsoAnimation.prototype.play = function () {
         if (this.isPlaying === false) {
-            console.log("Play");
             this.iterations = (this.duration / 1000) * this.framesPerSecond;
             this.currentIteration = 0;
             this.isPlaying = true;
@@ -1061,17 +1060,14 @@ var IsoAnimation = (function () {
         }
     };
     IsoAnimation.prototype.stop = function () {
-        console.log("Stop");
         this.isPlaying = false;
         return this;
     };
     IsoAnimation.prototype.pause = function () {
-        console.log("Pause");
         this.isPlaying = false;
         return this;
     };
     IsoAnimation.prototype.resume = function () {
-        console.log("Resume");
         this.isPlaying = true;
         if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
             this.__playAttribute();
@@ -1272,6 +1268,7 @@ var IsoDrawer = (function () {
         this.drawSprites(layer.sprites);
     };
     IsoDrawer.prototype.drawTileMap = function (tileMap) {
+        tileMap.update();
         var tiles = tileMap.getTilesInView();
         for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
             for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {
@@ -1582,6 +1579,32 @@ var IsoLayer = (function () {
         }
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].rotate(degrees);
+        }
+        for (var i = 0; i < this.billboards.length; i++) {
+        }
+    };
+    IsoLayer.prototype.setZoomPoint = function (point) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.setZoomPoint(point);
+        }
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].setZoomPoint(point);
+        }
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].setZoomPoint(point);
+        }
+        for (var i = 0; i < this.billboards.length; i++) {
+        }
+    };
+    IsoLayer.prototype.setSpeed = function (speed) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.setSpeed(speed);
+        }
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].setSpeed(speed);
+        }
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].setSpeed(speed);
         }
         for (var i = 0; i < this.billboards.length; i++) {
         }

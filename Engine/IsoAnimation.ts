@@ -152,7 +152,6 @@ class IsoAnimation {
 
     play(): IsoAnimation {
         if (this.isPlaying === false) {
-            console.log("Play");
             this.iterations = (this.duration / 1000) * this.framesPerSecond;
             this.currentIteration = 0;
             this.isPlaying = true;
@@ -225,19 +224,16 @@ class IsoAnimation {
     }
 
     stop(): IsoAnimation {
-        console.log("Stop");
         this.isPlaying = false;
         return this;
     }
 
     pause(): IsoAnimation {
-        console.log("Pause");
         this.isPlaying = false;
         return this;
     }
 
     resume(): IsoAnimation {
-        console.log("Resume");
         this.isPlaying = true;
         if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
             this.__playAttribute();

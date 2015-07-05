@@ -37,42 +37,35 @@
             grandpa = firstLayer.addSprite("grandpa", ressources.get("grandpa"), { tile: 1, height: 0, size: { width: 32, height: 48 } });
             grandpa.setAnchor(16, 24);
 
-            tileMap.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
-            tileMap.setSpeed(4);
             tileMap.createMap(100, 100, new Array(0, 0));
-            tileMap.update();
 
-            grandpa.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
-            grandpa.setSpeed(5);
+            firstLayer.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
+            firstLayer.setSpeed(5);
 
             grandpa.addAnimation("rotation", "rotation", 360, 2000, IsoEasing.QuartInOut, IsoAnimation.ENDLESS);
             grandpa.play("rotation");
+            grandpa.setPosition({ x: 200, y: 50 });
             gameloop();
-
         });
 
         function gameloop() {
             if (app.input.keyEventType === IsoInput.EVENT_KEYDOWN) {
                 switch (app.input.keyCode) {
                     case IsoInput.KEYUP:
-                        firstLayer.tileMap.scroll(0, 1);
+                        firstLayer.scroll(0, 1);
                         grandpa.scroll(0, -1);
-                        firstLayer.tileMap.update();
                         break;
                     case IsoInput.KEYDOWN:
-                        firstLayer.tileMap.scroll(0, -1);
+                        firstLayer.scroll(0, -1);
                         grandpa.scroll(0, 1);
-                        firstLayer.tileMap.update();
                         break;
                     case IsoInput.KEYLEFT:
-                        firstLayer.tileMap.scroll(1, 0);
+                        firstLayer.scroll(1, 0);
                         grandpa.scroll(-1, 0);
-                        firstLayer.tileMap.update();
                         break;
                     case IsoInput.KEYRIGHT:
-                        firstLayer.tileMap.scroll(-1, 0);
-                        grandpa.scroll(1, 0);
-                        firstLayer.tileMap.update();
+                        firstLayer.scroll(-1, 0);
+                        grandpa.scroll(1,0);
                         break;
                 }
             }

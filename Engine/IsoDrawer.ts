@@ -27,6 +27,7 @@ class IsoDrawer {
     }
 
     drawTileMap(tileMap: IsoTileMap) {
+        tileMap.update();
         var tiles = tileMap.getTilesInView();
         for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
             for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {

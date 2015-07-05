@@ -514,6 +514,8 @@ declare class IsoLayer {
     zoom(zoom: number): void;
     scroll(deltaX: number, deltaY: number): void;
     rotate(degrees: number): void;
+    setZoomPoint(point: IsoPoint): void;
+    setSpeed(speed: number): void;
 }
 declare class IsoLayers {
     layers: Array<IsoLayer>;

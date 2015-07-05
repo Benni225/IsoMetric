@@ -45,7 +45,9 @@ class IsoMetric {
      * The drawing lib.
      * @see IsoDrawer
      */
-    drawer: IsoDrawer;
+     drawer: IsoDrawer;
+
+     animation: IsoAnimationManager;
     /**
      * The input library.
      * @see IsoInput
@@ -107,6 +109,7 @@ class IsoMetric {
         this.canvas = new IsoCanvas(this);
         this.layers = new IsoLayers(this);
         this.input = new IsoInput(this);
+        this.animation = new IsoAnimationManager();
         this.on = new IsoOn();
         this.ressources = new IsoRessourceManager(this);
 

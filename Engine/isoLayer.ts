@@ -7,7 +7,7 @@ class IsoLayer {
     objects: Array<IsoObject> = new Array();
     tileMap: IsoTileMap;
     sprites: Array<IsoSprite> = new Array();
-    billboards: any; // isoBillboards
+    billboards: any = new Array(); // isoBillboards
 
     name: string;
     index: number;
@@ -22,7 +22,7 @@ class IsoLayer {
         return this;
     }
     addObject(name: string, image: IsoRessource): IsoObject {
-        var o = new IsoObject(image, name);
+        var o = new IsoObject(this.Engine, image, name);
         this.objects.push(o);
         return o;
     }
@@ -69,5 +69,57 @@ class IsoLayer {
 
     getTileMap(): IsoTileMap {
         return this.tileMap;
+    }
+
+    zoom(zoom: number) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.zoom(zoom);
+        }
+        this.tileMap.update();
+
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].zoom(zoom);
+        }
+
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].zoom(zoom);
+        }
+
+        for (var i = 0; i < this.billboards.length; i++) {
+            //this.billboards[i].zoom(zoom);
+        }
+    }
+
+    scroll(deltaX: number, deltaY: number) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.scroll(deltaX, deltaY);
+        }
+
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].scroll(deltaX, deltaY);
+        }
+
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].scroll(deltaX, deltaY);
+        }
+
+        for (var i = 0; i < this.billboards.length; i++) {
+            //this.billboards[i].scroll(deltaX, deltaY);
+        }
+    }
+
+    rotate(degrees: number) {
+
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].rotate(degrees);
+        }
+
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].rotate(degrees);
+        }
+
+        for (var i = 0; i < this.billboards.length; i++) {
+            //this.billboards[i].rotate(degrees);
+        }
     }
 } 

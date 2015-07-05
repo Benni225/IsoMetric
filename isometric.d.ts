@@ -2,6 +2,10 @@ interface IsoOffset {
     x: number;
     y: number;
 }
+interface IsoAnchor {
+    x: number;
+    y: number;
+}
 interface IsoScroll {
     x: number;
     y: number;
@@ -31,13 +35,19 @@ declare class IsoObject {
     zoomLevel: number;
     zoomStrength: number;
     zoomPoint: IsoPoint;
+    /**
+     * Rotation in degrees
+     */
     rotation: number;
     image: IsoRessource;
     collisionType: string;
     collisionResolution: number;
     speed: number;
     name: string;
-    constructor(image: IsoRessource, name?: string);
+    Engine: IsoMetric;
+    anchor: IsoAnchor;
+    constructor(Engine: any, image: IsoRessource, name?: string);
+    addAnimation(name: string, attribute: string, endValue: number, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoObject;
     collide(object: IsoObject): boolean;
     getCoords(): IsoCoords;
     getOffset(): IsoOffset;
@@ -53,6 +63,7 @@ declare class IsoObject {
     move(deltaX: number, deltaY: number): IsoObject;
     rotate(degrees: number): IsoObject;
     scroll(deltaX: number, deltaY: number): IsoObject;
+    setAnchor(x: number, y: number): IsoObject;
     setHeight(height: number): IsoObject;
     setImage(image: IsoRessource): IsoObject;
     setName(name: string): IsoObject;
@@ -67,6 +78,14 @@ declare class IsoObject {
     setZoomLevel(zoomLevel: number): IsoObject;
     setZoomStrength(zoomStrength: number): IsoObject;
     zoom(zoom: number): IsoObject;
+    play(name: string): IsoObject;
+    stop(name: any): IsoObject;
+    resume(): IsoObject;
+    pause(): IsoObject;
+}
+interface IsoTileSize {
+    width: number;
+    height: number;
 }
 interface IsoTileObjectInfo {
     tile: number;
@@ -79,16 +98,12 @@ declare class IsoTileObject extends IsoObject {
     tileHeight: number;
     tile: number;
     startTile: number;
-    constructor(image: IsoRessource, tileInfo?: IsoTileObjectInfo);
+    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo?: IsoTileObjectInfo);
     setTileOffset(offset: IsoOffset): IsoTileObject;
     getRelativPosition(): IsoPoint;
     getTileImage(): IsoTileImage;
     setTile(tile: number): IsoTileObject;
     set(tile: IsoTileObjectInfo): IsoTileObject;
-}
-interface IsoTileSize {
-    width: number;
-    height: number;
 }
 interface IsoTileImage {
     x: number;
@@ -118,7 +133,7 @@ declare class IsoTile extends IsoTileObject {
     mapPosition: IsoMapPosition;
     tile: number;
     updateType: string;
-    constructor(image: IsoRessource, tileInfo: IsoTileInfo);
+    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileInfo);
     setUpdateType(type: string): IsoTile;
     set(tile: IsoTileInfo): IsoTile;
     getMapPosition(): IsoMapPosition;
@@ -191,6 +206,11 @@ declare class IsoTileMap {
      * @retrurn An object with information of all tiles
      */
     getTilesInRadius(x: number, y: number, width: number, height: number): Array<IsoTile>;
+    /**
+     * Checks the tile which the mouse pointer is touching
+     * return The tile.
+     */
+    getTileOnPosition(position: IsoPoint): IsoTile;
     setImage(image: IsoRessource): IsoTileMap;
     setMaxZoomLevel(zoomLevel: number): IsoTileMap;
     setMinZoomLevel(zoomLevel: number): IsoTileMap;
@@ -214,6 +234,10 @@ interface IsoCollisionBody {
     width: number;
     height: number;
 }
+interface IsoFrame {
+    offset: IsoOffset;
+    dimension: IsoDimension;
+}
 declare class IsoSprite extends IsoTileObject {
     Engine: IsoMetric;
     direction: number;
@@ -221,15 +245,99 @@ declare class IsoSprite extends IsoTileObject {
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
     getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
     getTileImage(): IsoTileImage;
+    setFrame(frame: IsoFrame): IsoSprite;
     setDirection(direction: number): IsoSprite;
     setTile(tile: number): IsoSprite;
+    set(tile: IsoTileObjectInfo): IsoTileObject;
+    getRenderDetails(): {
+        position: IsoPoint;
+        tileSize: IsoTileSize;
+        renderSize: {
+            width: number;
+            height: number;
+        };
+        image: HTMLImageElement;
+        offset: IsoOffset;
+        zoomLevel: number;
+    };
 }
 declare class IsoAnimatedSprite extends IsoSprite {
-    stripeLength: number;
-    animations: Array<any>;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
-    setStripeLength(stripeLength: number): IsoAnimatedSprite;
-    setTile(tile: number): IsoAnimatedSprite;
+    addFrameAnimation(name: string, frames: Array<number>, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimatedSprite;
+    play(name: string): IsoAnimatedSprite;
+    stop(name: any): IsoAnimatedSprite;
+    resume(): IsoAnimatedSprite;
+    pause(): IsoAnimatedSprite;
+}
+declare var IsoEasing: {
+    Linear: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuadIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuadOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuadInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    CubicIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    CubicOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    CubicInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuartIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuartOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuartInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuintIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuintOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    QuintInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    SineIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    SineOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    SineInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    ExpoIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    ExpoOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    ExpoInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    CircIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    CircOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+    CircInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
+};
+declare class IsoAnimation {
+    static ONCE: string;
+    static PINGPONG: string;
+    static ENDLESS: string;
+    static ANIMATION_TYPE_FRAME: string;
+    static ANIMATION_TYPE_ATTRIBUTE: string;
+    name: string;
+    duration: number;
+    frames: Array<number>;
+    framesPerSecond: number;
+    startValue: number;
+    endValue: number;
+    actualValue: number;
+    attribute: string;
+    change: number;
+    type: string;
+    easing: Function;
+    isPlaying: boolean;
+    callbacks: Array<IsoCallback>;
+    object: Object;
+    sprite: IsoAnimatedSprite;
+    timerStart: Date;
+    timerActual: Date;
+    iterations: number;
+    currentIteration: number;
+    __debug: number;
+    animationType: string;
+    constructor();
+    createFrameAnimation(name: string, object: IsoAnimatedSprite, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
+    createAnimation(name: string, object: Object, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
+    play(): IsoAnimation;
+    __playAttribute(): void;
+    __playFrame(): void;
+    stop(): IsoAnimation;
+    pause(): IsoAnimation;
+    resume(): IsoAnimation;
+}
+declare class IsoAnimationManager {
+    animations: Array<IsoAnimation>;
+    addFrameAnimation(name: string, object: IsoAnimatedSprite, frames: Array<number>, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
+    addAnimation(name: string, object: Object, attribute: string, endValue: number, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
+    play(name: string, object: Object): void;
+    stop(name: string, object: Object): void;
+    resume(name: string, object: Object): void;
+    pause(name: string, object: Object): void;
 }
 declare class IsoCanvas {
     canvasElement: HTMLCanvasElement;
@@ -264,10 +372,12 @@ declare class IsoDrawer {
     Engine: IsoMetric;
     canvas: IsoCanvas;
     context: any;
+    __DEBUG_SHOW: boolean;
     constructor(Engine: IsoMetric);
     update(): void;
     drawLayer(layer: IsoLayer): void;
     drawTileMap(tileMap: IsoTileMap): void;
+    drawSprites(sprites: Array<IsoSprite>): void;
 }
 declare class IsoEvent {
     type: string;
@@ -396,18 +506,21 @@ declare class IsoLayer {
     addObject(name: string, image: IsoRessource): IsoObject;
     addSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoSprite;
     addAnimatedSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoAnimatedSprite;
-    addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>): void;
+    addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>): IsoTileMap;
     setName(name: string): IsoLayer;
     getObject(name: string): IsoObject;
     getSprite(name: string): IsoSprite;
     getTileMap(): IsoTileMap;
+    zoom(zoom: number): void;
+    scroll(deltaX: number, deltaY: number): void;
+    rotate(degrees: number): void;
 }
 declare class IsoLayers {
     layers: Array<IsoLayer>;
     Engine: IsoMetric;
     length: number;
     constructor(Engine: IsoMetric);
-    add(name: string, index?: number): void;
+    add(name: string, index?: number): IsoLayer;
     get(name: string): IsoLayer;
     sort(): void;
     _sort(layerA: IsoLayer, layerB: IsoLayer): number;
@@ -496,6 +609,7 @@ declare class IsoMetric {
      * @see IsoDrawer
      */
     drawer: IsoDrawer;
+    animation: IsoAnimationManager;
     /**
      * The input library.
      * @see IsoInput

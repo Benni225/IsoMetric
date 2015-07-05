@@ -32,8 +32,8 @@ class IsoTile extends IsoTileObject {
     mapPosition: IsoMapPosition;
     tile: number;
     updateType: string = "automatic";
-    constructor(image: IsoRessource, tileInfo: IsoTileInfo) {
-        super(image);
+    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileInfo) {
+        super(Engine, image);
         try {
             if (tileInfo !== undefined) {
                 this.set(tileInfo);

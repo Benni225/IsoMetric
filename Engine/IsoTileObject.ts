@@ -17,8 +17,8 @@ class IsoTileObject extends IsoObject {
     tileHeight: number = 0;
     tile: number;
     startTile: number = 0;
-    constructor(image: IsoRessource, tileInfo?: IsoTileObjectInfo) {
-        super(image);
+    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo?: IsoTileObjectInfo) {
+        super(Engine, image);
         try {
             if (tileInfo !== undefined) {
                 this.set(tileInfo);

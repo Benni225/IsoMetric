@@ -1,14 +1,7 @@
 ﻿///<reference path="IsoSprite.ts" />
 "use strict";
 
-interface IsoAnimation {
-    name: string;
-    frames: Array<IsoFrame>;
-    speed: number;
-}
 class IsoAnimatedSprite extends IsoSprite {
-    animations: Array<IsoAnimation>;
-
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string) {
         super(Engine, image, tileInfo);
         if (name !== undefined) {
@@ -16,18 +9,29 @@ class IsoAnimatedSprite extends IsoSprite {
         }
         return this;
     }
-    
-    addAnimation(name: string, frames: Array<IsoFrame>, speed: number): IsoAnimatedSprite {
-        if (this.animations === undefined) {
-            this.animations = new Array();
-        }
 
-        this.animations.push({
-            name: name,
-            frames: frames,
-            speed: speed
-        });
+    addFrameAnimation(name: string, frames: Array<number>, speed: number, easing: Function = IsoEasing.Linear, type: string = IsoAnimation.ONCE, callbacks: Array<IsoCallback> = new Array()): IsoAnimatedSprite {
+        this.Engine.animation.addFrameAnimation(name, this, frames, speed, easing, type, callbacks);
+        return this;
+    }
 
+    play(name: string): IsoAnimatedSprite {
+        this.Engine.animation.play(name, this);
+        return this;
+    }
+
+    stop(name): IsoAnimatedSprite {
+        this.Engine.animation.stop(name, this);
+        return this;
+    }
+
+    resume(): IsoAnimatedSprite {
+        this.Engine.animation.resume(name, this);
+        return this;
+    }
+
+    pause(): IsoAnimatedSprite {
+        this.Engine.animation.pause(name, this);
         return this;
     }
 }

@@ -19,7 +19,7 @@ class IsoSprite extends IsoTileObject {
     collisionBody: IsoCollisionBody;
 
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string) {
-        super(image, tileInfo);
+        super(Engine, image, tileInfo);
         this.Engine = Engine;
         if (name !== undefined) {
             this.setName(name);

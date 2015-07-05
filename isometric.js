@@ -1,15 +1,21 @@
 "use strict";
 var IsoObject = (function () {
-    function IsoObject(image, name) {
+    function IsoObject(Engine, image, name) {
         this.position = { x: 0, y: 0 };
         this.scrollPosition = { x: 0, y: 0 };
         this.offset = { x: 0, y: 0 };
         this.zoomLevel = 1;
         this.zoomStrength = 1 / 1000;
         this.zoomPoint = { x: 0, y: 0 };
+        /**
+         * Rotation in degrees
+         */
+        this.rotation = 0;
         this.collisionType = "box";
         this.collisionResolution = 0;
         this.speed = 1;
+        this.anchor = { x: 0, y: 0 };
+        this.Engine = Engine;
         try {
             this.setImage(image);
             this.setWidth(image.image.width);
@@ -23,6 +29,13 @@ var IsoObject = (function () {
             throw ("Can not create object with error message: " + e);
         }
     }
+    IsoObject.prototype.addAnimation = function (name, attribute, endValue, speed, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = "once"; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.Engine.animation.addAnimation(name, this, attribute, endValue, speed, easing, type, callbacks);
+        return this;
+    };
     IsoObject.prototype.collide = function (object) {
         if (this.collisionType === IsoObject.BOX_COLLISION) {
             if (object.collisionType === IsoObject.BOX_COLLISION) {
@@ -110,6 +123,10 @@ var IsoObject = (function () {
         this.scrollPosition.y = this.scrollPosition.y + (deltaY * this.speed);
         return this;
     };
+    IsoObject.prototype.setAnchor = function (x, y) {
+        this.anchor = { x: x, y: y };
+        return this;
+    };
     IsoObject.prototype.setHeight = function (height) {
         this.height = height;
         return this;
@@ -170,6 +187,22 @@ var IsoObject = (function () {
         this.setZoomLevel(this.zoomLevel + (zoom * this.zoomStrength));
         return this;
     };
+    IsoObject.prototype.play = function (name) {
+        this.Engine.animation.play(name, this);
+        return this;
+    };
+    IsoObject.prototype.stop = function (name) {
+        this.Engine.animation.stop(name, this);
+        return this;
+    };
+    IsoObject.prototype.resume = function () {
+        this.Engine.animation.resume(name, this);
+        return this;
+    };
+    IsoObject.prototype.pause = function () {
+        this.Engine.animation.pause(name, this);
+        return this;
+    };
     IsoObject.BOX_COLLISION = "box";
     IsoObject.PIXEL_COLLISION = "pixel";
     return IsoObject;
@@ -184,8 +217,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var IsoTileObject = (function (_super) {
     __extends(IsoTileObject, _super);
-    function IsoTileObject(image, tileInfo) {
-        _super.call(this, image);
+    function IsoTileObject(Engine, image, tileInfo) {
+        _super.call(this, Engine, image);
         this.tileOffset = { x: 0, y: 0 };
         this.tileHeight = 0;
         this.startTile = 0;
@@ -260,8 +293,8 @@ var IsoTileObject = (function (_super) {
 "use strict";
 var IsoTile = (function (_super) {
     __extends(IsoTile, _super);
-    function IsoTile(image, tileInfo) {
-        _super.call(this, image);
+    function IsoTile(Engine, image, tileInfo) {
+        _super.call(this, Engine, image);
         this.tileHeight = 0;
         this.updateType = "automatic";
         try {
@@ -453,7 +486,7 @@ var IsoTileMap = (function () {
                         if (map[y][x][1] !== undefined) {
                             height = map[y][x][1];
                         }
-                        this.tiles[y][x] = new IsoTile(this.image, {
+                        this.tiles[y][x] = new IsoTile(this.Engine, this.image, {
                             tile: tile,
                             height: height,
                             size: this.tileSize,
@@ -719,7 +752,7 @@ var IsoTileMap = (function () {
 var IsoSprite = (function (_super) {
     __extends(IsoSprite, _super);
     function IsoSprite(Engine, image, tileInfo, name) {
-        _super.call(this, image, tileInfo);
+        _super.call(this, Engine, image, tileInfo);
         this.Engine = Engine;
         if (name !== undefined) {
             this.setName(name);
@@ -800,19 +833,311 @@ var IsoAnimatedSprite = (function (_super) {
         }
         return this;
     }
-    IsoAnimatedSprite.prototype.addAnimation = function (name, frames, speed) {
-        if (this.animations === undefined) {
-            this.animations = new Array();
-        }
-        this.animations.push({
-            name: name,
-            frames: frames,
-            speed: speed
-        });
+    IsoAnimatedSprite.prototype.addFrameAnimation = function (name, frames, speed, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = IsoAnimation.ONCE; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.Engine.animation.addFrameAnimation(name, this, frames, speed, easing, type, callbacks);
+        return this;
+    };
+    IsoAnimatedSprite.prototype.play = function (name) {
+        this.Engine.animation.play(name, this);
+        return this;
+    };
+    IsoAnimatedSprite.prototype.stop = function (name) {
+        this.Engine.animation.stop(name, this);
+        return this;
+    };
+    IsoAnimatedSprite.prototype.resume = function () {
+        this.Engine.animation.resume(name, this);
+        return this;
+    };
+    IsoAnimatedSprite.prototype.pause = function () {
+        this.Engine.animation.pause(name, this);
         return this;
     };
     return IsoAnimatedSprite;
 })(IsoSprite);
+var IsoEasing = {
+    Linear: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * currentIteration / iterationCount + startValue;
+    },
+    QuadIn: function (currentIteration, startValue, endValue, iterationCount) {
+        currentIteration = currentIteration / iterationCount;
+        return (endValue - startValue) * currentIteration * currentIteration + startValue;
+    },
+    QuadOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return -(endValue - startValue) * (currentIteration /= iterationCount) * (currentIteration - 2) + startValue;
+    },
+    QuadInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        if ((currentIteration /= iterationCount / 2) < 1) {
+            return (endValue - startValue) / 2 * currentIteration * currentIteration + startValue;
+        }
+        return -(endValue - startValue) / 2 * ((--currentIteration) * (currentIteration - 2) - 1) + startValue;
+    },
+    CubicIn: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * Math.pow(currentIteration / iterationCount, 3) + startValue;
+    },
+    CubicOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * (Math.pow(currentIteration / iterationCount - 1, 3) + 1) + startValue;
+    },
+    CubicInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        if ((currentIteration /= iterationCount / 2) < 1) {
+            return (endValue - startValue) / 2 * Math.pow(currentIteration, 3) + startValue;
+        }
+        return (endValue - startValue) / 2 * (Math.pow(currentIteration - 2, 3) + 2) + startValue;
+    },
+    QuartIn: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * Math.pow(currentIteration / iterationCount, 4) + startValue;
+    },
+    QuartOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return -(endValue - startValue) * (Math.pow(currentIteration / iterationCount - 1, 4) - 1) + startValue;
+    },
+    QuartInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        if ((currentIteration /= iterationCount / 2) < 1) {
+            return (endValue - startValue) / 2 * Math.pow(currentIteration, 4) + startValue;
+        }
+        return -(endValue - startValue) / 2 * (Math.pow(currentIteration - 2, 4) - 2) + startValue;
+    },
+    QuintIn: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * Math.pow(currentIteration / iterationCount, 5) + startValue;
+    },
+    QuintOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * (Math.pow(currentIteration / iterationCount - 1, 5) + 1) + startValue;
+    },
+    QuintInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        if ((currentIteration /= iterationCount / 2) < 1) {
+            return (endValue - startValue) / 2 * Math.pow(currentIteration, 5) + startValue;
+        }
+        return (endValue - startValue) / 2 * (Math.pow(currentIteration - 2, 5) + 2) + startValue;
+    },
+    SineIn: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * (1 - Math.cos(currentIteration / iterationCount * (Math.PI / 2))) + startValue;
+    },
+    SineOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * Math.sin(currentIteration / iterationCount * (Math.PI / 2)) + startValue;
+    },
+    SineInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) / 2 * (1 - Math.cos(Math.PI * currentIteration / iterationCount)) + startValue;
+    },
+    ExpoIn: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * Math.pow(2, 10 * (currentIteration / iterationCount - 1)) + startValue;
+    },
+    ExpoOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * (-Math.pow(2, -10 * currentIteration / iterationCount) + 1) + startValue;
+    },
+    ExpoInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        if ((currentIteration /= iterationCount / 2) < 1) {
+            return (endValue - startValue) / 2 * Math.pow(2, 10 * (currentIteration - 1)) + startValue;
+        }
+        return (endValue - startValue) / 2 * (-Math.pow(2, -10 * --currentIteration) + 2) + startValue;
+    },
+    CircIn: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * (1 - Math.sqrt(1 - (currentIteration /= iterationCount) * currentIteration)) + startValue;
+    },
+    CircOut: function (currentIteration, startValue, endValue, iterationCount) {
+        return (endValue - startValue) * Math.sqrt(1 - (currentIteration = currentIteration / iterationCount - 1) * currentIteration) + startValue;
+    },
+    CircInOut: function (currentIteration, startValue, endValue, iterationCount) {
+        if ((currentIteration /= iterationCount / 2) < 1) {
+            return (endValue - startValue) / 2 * (1 - Math.sqrt(1 - currentIteration * currentIteration)) + startValue;
+        }
+        return (endValue - startValue) / 2 * (Math.sqrt(1 - (currentIteration -= 2) * currentIteration) + 1) + startValue;
+    }
+};
+var IsoAnimation = (function () {
+    function IsoAnimation() {
+        this.framesPerSecond = 60;
+        this.easing = IsoEasing.Linear;
+        this.isPlaying = false;
+        this.currentIteration = 0;
+        this.__debug = 0;
+        this.animationType = "attribute";
+        return this;
+    }
+    IsoAnimation.prototype.createFrameAnimation = function (name, object, frames, duration, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = "once"; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.name = name;
+        this.sprite = object;
+        this.frames = frames;
+        this.startValue = frames[0];
+        this.endValue = frames[frames.length - 1];
+        this.duration = duration;
+        this.easing = easing;
+        this.type = type;
+        this.callbacks = callbacks;
+        this.animationType = IsoAnimation.ANIMATION_TYPE_FRAME;
+        return this;
+    };
+    IsoAnimation.prototype.createAnimation = function (name, object, attribute, endValue, duration, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = "once"; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.name = name;
+        this.object = object;
+        this.attribute = attribute;
+        this.startValue = object[attribute] | 0;
+        this.endValue = endValue;
+        this.duration = duration;
+        this.easing = easing;
+        this.type = type;
+        this.callbacks = callbacks;
+        this.animationType = IsoAnimation.ANIMATION_TYPE_ATTRIBUTE;
+        return this;
+    };
+    IsoAnimation.prototype.play = function () {
+        if (this.isPlaying === false) {
+            console.log("Play");
+            this.iterations = (this.duration / 1000) * this.framesPerSecond;
+            this.currentIteration = 0;
+            this.isPlaying = true;
+            if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
+                this.__playAttribute();
+            }
+            else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
+                this.__playFrame();
+            }
+        }
+        return this;
+    };
+    IsoAnimation.prototype.__playAttribute = function () {
+        var _this = this;
+        if (this.isPlaying === true) {
+            if (this.currentIteration === 0) {
+                this.actualValue = this.startValue;
+            }
+            this.currentIteration++;
+            this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
+            this.object[this.attribute] = this.actualValue;
+            if (this.actualValue === this.endValue) {
+                switch (this.type) {
+                    case IsoAnimation.ONCE:
+                        this.stop();
+                        break;
+                    case IsoAnimation.PINGPONG:
+                        var endValue = this.endValue;
+                        this.endValue = this.startValue;
+                        this.startValue = endValue;
+                        this.actualValue = this.startValue;
+                        this.isPlaying = false;
+                        this.play();
+                        break;
+                    case IsoAnimation.ENDLESS:
+                        this.actualValue = this.startValue;
+                        this.isPlaying = false;
+                        this.play();
+                        break;
+                }
+            }
+            else {
+                if (this.isPlaying === true)
+                    requestAnimationFrame(function () { return _this.__playAttribute(); });
+            }
+        }
+    };
+    IsoAnimation.prototype.__playFrame = function () {
+        if (this.isPlaying !== true) {
+            this.actualValue = this.startValue;
+            this.isPlaying = true;
+        }
+        this.actualValue = Math.floor(this.easing.call(this, this.actualValue, this.startValue, this.endValue, (this.endValue - this.startValue)));
+        this.sprite.setTile(this.actualValue);
+        if (this.actualValue === this.endValue) {
+            switch (this.type) {
+                case IsoAnimation.ONCE:
+                    this.stop();
+                    break;
+                case IsoAnimation.PINGPONG:
+                    var endValue = this.endValue;
+                    this.endValue = this.startValue;
+                    this.startValue = endValue;
+                    break;
+                case IsoAnimation.ENDLESS:
+                    this.actualValue = this.startValue;
+                    break;
+            }
+        }
+    };
+    IsoAnimation.prototype.stop = function () {
+        console.log("Stop");
+        this.isPlaying = false;
+        return this;
+    };
+    IsoAnimation.prototype.pause = function () {
+        console.log("Pause");
+        this.isPlaying = false;
+        return this;
+    };
+    IsoAnimation.prototype.resume = function () {
+        console.log("Resume");
+        this.isPlaying = true;
+        if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
+            this.__playAttribute();
+        }
+        else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
+            this.__playFrame();
+        }
+        return this;
+    };
+    IsoAnimation.ONCE = "once";
+    IsoAnimation.PINGPONG = "pingpong";
+    IsoAnimation.ENDLESS = "endless";
+    IsoAnimation.ANIMATION_TYPE_FRAME = "frame";
+    IsoAnimation.ANIMATION_TYPE_ATTRIBUTE = "attribute";
+    return IsoAnimation;
+})();
+///<reference path="IsoAnimation.ts" />
+"use strict";
+var IsoAnimationManager = (function () {
+    function IsoAnimationManager() {
+        this.animations = new Array();
+    }
+    IsoAnimationManager.prototype.addFrameAnimation = function (name, object, frames, speed, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = "once"; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.animations.push(new IsoAnimation().createFrameAnimation(name, object, frames, speed, easing, type, callbacks));
+        return this;
+    };
+    IsoAnimationManager.prototype.addAnimation = function (name, object, attribute, endValue, speed, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = "once"; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.animations.push(new IsoAnimation().createAnimation(name, object, attribute, endValue, speed, easing, type, callbacks));
+        return this;
+    };
+    IsoAnimationManager.prototype.play = function (name, object) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
+                this.animations[i].play();
+            }
+        }
+    };
+    IsoAnimationManager.prototype.stop = function (name, object) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
+                this.animations[i].stop();
+            }
+        }
+    };
+    IsoAnimationManager.prototype.resume = function (name, object) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
+                this.animations[i].resume();
+            }
+        }
+    };
+    IsoAnimationManager.prototype.pause = function (name, object) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
+                this.animations[i].pause();
+            }
+        }
+    };
+    return IsoAnimationManager;
+})();
 "use strict";
 var IsoCanvas = (function () {
     function IsoCanvas(Engine) {
@@ -959,7 +1284,11 @@ var IsoDrawer = (function () {
         for (var i = 0; i < sprites.length; i++) {
             var s = sprites[i];
             var renderDetails = s.getRenderDetails();
+            this.context.translate(renderDetails.position.x + s.anchor.x, renderDetails.position.y + s.anchor.y);
+            this.context.rotate(s.rotation * Math.PI / 180);
+            this.context.translate(-(renderDetails.position.x + (renderDetails.renderSize.width / 2)), -(renderDetails.position.y + (renderDetails.renderSize.height / 2)));
             this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
+            this.context.setTransform(1, 0, 0, 1, 0, 0);
         }
     };
     return IsoDrawer;
@@ -1170,6 +1499,7 @@ var IsoLayer = (function () {
     function IsoLayer(Engine, index, name) {
         this.objects = new Array();
         this.sprites = new Array();
+        this.billboards = new Array(); // isoBillboards
         this.Engine = Engine;
         this.index = index;
         if (name !== undefined) {
@@ -1178,7 +1508,7 @@ var IsoLayer = (function () {
         return this;
     }
     IsoLayer.prototype.addObject = function (name, image) {
-        var o = new IsoObject(image, name);
+        var o = new IsoObject(this.Engine, image, name);
         this.objects.push(o);
         return o;
     };
@@ -1218,6 +1548,43 @@ var IsoLayer = (function () {
     };
     IsoLayer.prototype.getTileMap = function () {
         return this.tileMap;
+    };
+    IsoLayer.prototype.zoom = function (zoom) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.zoom(zoom);
+        }
+        this.tileMap.update();
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].zoom(zoom);
+        }
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].zoom(zoom);
+        }
+        for (var i = 0; i < this.billboards.length; i++) {
+        }
+    };
+    IsoLayer.prototype.scroll = function (deltaX, deltaY) {
+        if (this.tileMap !== undefined) {
+            this.tileMap.scroll(deltaX, deltaY);
+        }
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].scroll(deltaX, deltaY);
+        }
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].scroll(deltaX, deltaY);
+        }
+        for (var i = 0; i < this.billboards.length; i++) {
+        }
+    };
+    IsoLayer.prototype.rotate = function (degrees) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].rotate(degrees);
+        }
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].rotate(degrees);
+        }
+        for (var i = 0; i < this.billboards.length; i++) {
+        }
     };
     return IsoLayer;
 })();
@@ -1453,6 +1820,7 @@ var IsoMetric = (function () {
         this.canvas = new IsoCanvas(this);
         this.layers = new IsoLayers(this);
         this.input = new IsoInput(this);
+        this.animation = new IsoAnimationManager();
         this.on = new IsoOn();
         this.ressources = new IsoRessourceManager(this);
         if (windowOptions === undefined) {

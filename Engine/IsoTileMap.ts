@@ -91,7 +91,7 @@ class IsoTileMap {
                         if (map[y][x][1] !== undefined) {
                             height = map[y][x][1];
                         }
-                        this.tiles[y][x] = new IsoTile(this.image, {
+                        this.tiles[y][x] = new IsoTile(this.Engine, this.image, {
                             tile: tile,
                             height: height,
                             size: this.tileSize,

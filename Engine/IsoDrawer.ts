@@ -49,7 +49,9 @@ class IsoDrawer {
         for (var i = 0; i < sprites.length; i++) {
             var s = sprites[i];
             var renderDetails = s.getRenderDetails();
-
+            this.context.translate(renderDetails.position.x + s.anchor.x, renderDetails.position.y + s.anchor.y);
+            this.context.rotate(s.rotation * Math.PI / 180);
+            this.context.translate(-(renderDetails.position.x + (renderDetails.renderSize.width / 2)), -(renderDetails.position.y + (renderDetails.renderSize.height /2)));
             this.context.drawImage(
                 renderDetails.image,
                 renderDetails.offset.x,
@@ -61,6 +63,8 @@ class IsoDrawer {
                 renderDetails.renderSize.width,
                 renderDetails.renderSize.height
                 );
+
+            this.context.setTransform(1, 0, 0, 1, 0, 0);
         }
     }
 } 

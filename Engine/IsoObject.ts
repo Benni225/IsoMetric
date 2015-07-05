@@ -5,6 +5,11 @@ interface IsoOffset {
     y: number;
 }
 
+interface IsoAnchor {
+    x: number;
+    y: number;
+}
+
 interface IsoScroll {
     x: number;
     y: number;
@@ -37,15 +42,21 @@ class IsoObject {
     height: number;
     zoomLevel: number = 1;
     zoomStrength: number = 1 / 1000;
-    zoomPoint: IsoPoint = {x: 0, y: 0};
-    rotation: number;
+    zoomPoint: IsoPoint = { x: 0, y: 0 };
+    /**
+     * Rotation in degrees
+     */
+    rotation: number = 0;
     image: IsoRessource;
     collisionType: string = "box";
     collisionResolution: number = 0;
     speed: number = 1;
     name: string;
+    Engine: IsoMetric;
+    anchor: IsoAnchor = {x: 0, y: 0};
 
-    constructor(image: IsoRessource, name?: string) {
+    constructor(Engine, image: IsoRessource, name?: string) {
+        this.Engine = Engine;
         try {
             this.setImage(image);
             this.setWidth(image.image.width);
@@ -57,6 +68,11 @@ class IsoObject {
         } catch (e) {
             throw ("Can not create object with error message: " + e);
         }
+    }
+
+    addAnimation(name: string, attribute: string, endValue: number, speed: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()) {
+        this.Engine.animation.addAnimation(name, this, attribute, endValue, speed, easing, type, callbacks);
+        return this;
     }
 
     collide(object: IsoObject): boolean {
@@ -158,6 +174,11 @@ class IsoObject {
         return this;
     }
 
+    setAnchor(x: number, y: number): IsoObject {
+        this.anchor = { x: x, y: y };
+        return this;
+    }
+
     setHeight(height: number): IsoObject {
         this.height = height;
         return this;
@@ -229,6 +250,26 @@ class IsoObject {
 
     zoom(zoom: number): IsoObject {
         this.setZoomLevel(this.zoomLevel + (zoom * this.zoomStrength));
+        return this;
+    }
+
+    play(name: string): IsoObject {
+        this.Engine.animation.play(name, this);
+        return this;
+    }
+
+    stop(name): IsoObject {
+        this.Engine.animation.stop(name, this);
+        return this;
+    }
+
+    resume(): IsoObject {
+        this.Engine.animation.resume(name, this);
+        return this;
+    }
+
+    pause(): IsoObject {
+        this.Engine.animation.pause(name, this);
         return this;
     }
 } 

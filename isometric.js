@@ -772,9 +772,8 @@ var IsoSprite = (function (_super) {
         }
         return this;
     }
-    /*
-    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile> {
-        var collisionBody: IsoCollisionBody = this.collisionBody;
+    IsoSprite.prototype.getCollidingTiles = function (tilemap) {
+        var collisionBody = this.collisionBody;
         if (collisionBody === undefined) {
             collisionBody = {
                 x: 0,
@@ -783,14 +782,8 @@ var IsoSprite = (function (_super) {
                 height: this.height
             };
         }
-
-        return tilemap.getTilesInRadius(
-                this.position.x + collisionBody.x,
-                this.position.y + collisionBody.y,
-                collisionBody.width,
-                collisionBody.height
-            );
-    }*/
+        return tilemap.getTilesInRadius(this.position.x + collisionBody.x, this.position.y + collisionBody.y, collisionBody.width, collisionBody.height);
+    };
     IsoSprite.prototype.getTileImage = function () {
         var x = this.tileOffset.x;
         var y = this.tileOffset.y;
@@ -805,7 +798,7 @@ var IsoSprite = (function (_super) {
         };
     };
     IsoSprite.prototype.setFrame = function (frame) {
-        //this.tileSize = frame.dimension;
+        this.tileSize = frame.dimension;
         this.tileOffset = frame.offset;
         return this;
     };

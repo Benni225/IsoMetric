@@ -250,6 +250,7 @@ declare class IsoSprite extends IsoTileObject {
     direction: number;
     collisionBody: IsoCollisionBody;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
+    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
     getTileImage(): IsoTileImage;
     setFrame(frame: IsoFrame): IsoSprite;
     setDirection(direction: number): IsoSprite;

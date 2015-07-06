@@ -26,7 +26,7 @@ class IsoSprite extends IsoTileObject {
         }
         return this;
     }
-    /*
+
     getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile> {
         var collisionBody: IsoCollisionBody = this.collisionBody;
         if (collisionBody === undefined) {
@@ -44,7 +44,7 @@ class IsoSprite extends IsoTileObject {
                 collisionBody.width,
                 collisionBody.height
             );
-    }*/
+    }
 
     getTileImage(): IsoTileImage {
         var x = this.tileOffset.x;
@@ -62,7 +62,7 @@ class IsoSprite extends IsoTileObject {
     }
 
     setFrame(frame: IsoFrame): IsoSprite {
-        //this.tileSize = frame.dimension;
+        this.tileSize = frame.dimension;
         this.tileOffset = frame.offset;
         return this;
     }

@@ -72,15 +72,6 @@ class IsoSprite extends IsoTileObject {
         return this;
     }
 
-    setTile(tile: number): IsoSprite {
-        this.tile = tile + this.startTile;
-        this.tileOffset.x =
-        (this.tile % (this.width / this.tileSize.width)) * (this.tileSize.width + this.image.image.offset.x) - this.tileSize.width;
-        this.tileOffset.y =
-            (Math.floor(this.tile / (this.width / this.tileSize.width))) * (this.tileSize.height + this.image.image.offset.y);
-        return this;
-    }
-
     set(tile: IsoTileObjectInfo): IsoTileObject {
         this.tileHeight = tile.height;
         this.tileSize = tile.size;
@@ -90,12 +81,9 @@ class IsoSprite extends IsoTileObject {
 
     getRenderDetails() {
         return {
-            position: this.getRelativPosition(),
+            position: this.getRelativePosition(),
             tileSize: this.tileSize,
-            renderSize: {
-                width: this.tileSize.width * this.zoomLevel,
-                height: this.tileSize.height * this.zoomLevel
-            },
+            renderSize: this.getRelativeDimension(),
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel

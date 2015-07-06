@@ -19,6 +19,9 @@ var IsoObject = (function () {
         this.blendingMode = IsoBlendingModes.NORMAL;
         this.alpha = 1;
         this.hidden = true;
+        this.properties = {};
+        this.mass = 0;
+        this.rigid = false;
         this.Engine = Engine;
         try {
             this.setImage(image);
@@ -33,11 +36,11 @@ var IsoObject = (function () {
             throw ("Can not create object with error message: " + e);
         }
     }
-    IsoObject.prototype.addAnimation = function (name, attribute, endValue, speed, easing, type, callbacks) {
+    IsoObject.prototype.addAnimation = function (name, attribute, endValue, duration, easing, type, callbacks) {
         if (easing === void 0) { easing = IsoEasing.Linear; }
         if (type === void 0) { type = "once"; }
         if (callbacks === void 0) { callbacks = new Array(); }
-        this.Engine.animation.addAnimation(name, this, attribute, endValue, speed, easing, type, callbacks);
+        this.Engine.animation.addAnimation(name, this, attribute, endValue, duration, easing, type, callbacks);
         return this;
     };
     IsoObject.prototype.collide = function (object) {
@@ -59,11 +62,12 @@ var IsoObject = (function () {
         }
     };
     IsoObject.prototype.getCoords = function () {
+        var r = this.getRenderDetails();
         return {
-            x: this.position.x,
-            y: this.position.y,
-            width: this.width,
-            height: this.height
+            x: r.position.x,
+            y: r.position.y,
+            width: r.renderSize.width,
+            height: r.renderSize.height
         };
     };
     IsoObject.prototype.getOffset = function () {
@@ -84,13 +88,35 @@ var IsoObject = (function () {
     IsoObject.prototype.getPosition = function () {
         return this.position;
     };
-    IsoObject.prototype.getRelativPosition = function () {
+    IsoObject.prototype.getProperty = function (name) {
+        return this.properties[name];
+    };
+    IsoObject.prototype.getProperties = function () {
+        return this.properties;
+    };
+    IsoObject.prototype.getRelativePosition = function () {
         var x = 0, y = 0;
         x = (this.position.x * this.zoomLevel) + (this.offset.x * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
         y = (this.position.y * this.zoomLevel) + (this.offset.y * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
         return {
             x: x,
             y: y
+        };
+    };
+    IsoObject.prototype.getRelativeDimension = function () {
+        return {
+            width: this.getOriginalDimension().width * this.zoomLevel,
+            height: this.getOriginalDimension().height * this.zoomLevel
+        };
+    };
+    IsoObject.prototype.getRenderDetails = function () {
+        return {
+            position: this.getRelativePosition(),
+            tileSize: this.getOriginalDimension(),
+            renderSize: this.getRelativeDimension(),
+            image: this.image.image.get(),
+            offset: this.getOffset(),
+            zoomLevel: this.zoomLevel
         };
     };
     IsoObject.prototype.getRotation = function () {
@@ -161,6 +187,14 @@ var IsoObject = (function () {
         this.position.y = position.y;
         return this;
     };
+    IsoObject.prototype.setProperty = function (name, value) {
+        this.properties[name] = value;
+        return this;
+    };
+    IsoObject.prototype.setProperties = function (properties) {
+        this.properties = properties;
+        return this;
+    };
     IsoObject.prototype.setRotation = function (degrees) {
         this.rotation = degrees;
         return this;
@@ -207,11 +241,11 @@ var IsoObject = (function () {
         this.Engine.animation.stop(name, this);
         return this;
     };
-    IsoObject.prototype.resume = function () {
+    IsoObject.prototype.resume = function (name) {
         this.Engine.animation.resume(name, this);
         return this;
     };
-    IsoObject.prototype.pause = function () {
+    IsoObject.prototype.pause = function (name) {
         this.Engine.animation.pause(name, this);
         return this;
     };
@@ -251,22 +285,23 @@ var IsoTileObject = (function (_super) {
     IsoTileObject.prototype.getTileOffset = function () {
         return this.tileOffset;
     };
-    IsoTileObject.prototype.getRelativPosition = function () {
+    IsoTileObject.prototype.getRelativePosition = function () {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-                - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x); /* (this.position.x * this.zoomLevel) +
-    (this.offset.x * this.zoomLevel) +
-    (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x) + this.scrollPosition.x; */
+                - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x);
         y =
             ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
-                - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y); /*(this.position.y * this.zoomLevel) +
-    (this.offset.y * this.zoomLevel) +
-    (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y) -
-    (this.tileHeight * this.zoomLevel) + this.scrollPosition.y;*/
+                - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y);
         return {
             x: x,
             y: y
+        };
+    };
+    IsoTileObject.prototype.getRelativeDimension = function () {
+        return {
+            width: this.tileSize.width * this.zoomLevel,
+            height: this.tileSize.height * this.zoomLevel
         };
     };
     IsoTileObject.prototype.getTileImage = function () {
@@ -322,6 +357,24 @@ var IsoTile = (function (_super) {
             throw ("Can not create tile with following error message: " + e);
         }
     }
+    /**
+     * Create a new frame-animation.
+     *
+     * @param  {string}                name   Name of the new animation.
+     * @param  {Array<number>}         frames An array that includes the frame numbers.
+     * @param  {number}                duration The duration in milliseconds of the animation.
+     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
+     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
+     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @return {IsoAnimatedSprite}            The sprite.
+     */
+    IsoTile.prototype.addFrameAnimation = function (name, frames, duration, easing, type, callbacks) {
+        if (easing === void 0) { easing = IsoEasing.Linear; }
+        if (type === void 0) { type = IsoAnimation.ONCE; }
+        if (callbacks === void 0) { callbacks = new Array(); }
+        this.Engine.animation.addFrameAnimation(name, this, frames, duration, easing, type, callbacks);
+        return this;
+    };
     IsoTile.prototype.setUpdateType = function (type) {
         this.updateType = type;
         return this;
@@ -333,12 +386,21 @@ var IsoTile = (function (_super) {
         this.setTile(tile.tile);
         return this;
     };
+    IsoTile.prototype.getCoords = function () {
+        var r = this.getRenderDetails();
+        return {
+            x: r.position.x + (this.mapPosition.column * this.tileSize.width * this.zoomLevel),
+            y: r.position.y + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight,
+            width: this.tileSize.width * this.zoomLevel,
+            height: this.tileSize.height * this.zoomLevel
+        };
+    };
     IsoTile.prototype.getMapPosition = function () {
         return this.mapPosition;
     };
     IsoTile.prototype.getRenderDetails = function () {
         return {
-            position: this.getRelativPosition(),
+            position: this.getRelativePosition(),
             mapPosition: this.mapPosition,
             tileSize: this.tileSize,
             renderSize: {
@@ -583,9 +645,11 @@ var IsoTileMap = (function () {
      * @retrurn An object with information of all tiles
      */
     IsoTileMap.prototype.getTilesInRadius = function (x, y, width, height) {
-        x = x - this.offset.x + this.scrollPosition.x;
-        y = y - this.offset.y + this.scrollPosition.y;
-        var map = this.map.get(), mapLengthY = map.length, mapLengthX = map[0].length, columnStart = (x - (x % this.tileSize.width)) / this.tileSize.width, columnEnd = ((x + width) - ((x + width) % this.tileSize.width)) / this.tileSize.width, rowStart = (y - (y % this.tileSize.height)) / this.tileSize.height, rowEnd = ((y + height) - ((y + height) % this.tileSize.height)) / this.tileSize.height;
+        x = x - (((this.offset.x + this.scrollPosition.x) * this.zoomLevel)
+            - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x));
+        y = y - (((this.offset.y + this.scrollPosition.y) * this.zoomLevel)
+            - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y));
+        var map = this.map.get(), mapLengthY = map.length, mapLengthX = map[0].length, rowStart = rowStart = Math.floor(y / (this.tileSize.height * this.zoomLevel)), columnStart = Math.floor(x / (this.tileSize.width * this.zoomLevel)), columnEnd = Math.floor((x + width) / (this.tileSize.width * this.zoomLevel)), rowEnd = Math.floor((y + height) / (this.tileSize.height * this.zoomLevel));
         if (columnStart < 0) {
             columnStart = 0;
         }
@@ -806,14 +870,6 @@ var IsoSprite = (function (_super) {
         this.direction = direction;
         return this;
     };
-    IsoSprite.prototype.setTile = function (tile) {
-        this.tile = tile + this.startTile;
-        this.tileOffset.x =
-            (this.tile % (this.width / this.tileSize.width)) * (this.tileSize.width + this.image.image.offset.x) - this.tileSize.width;
-        this.tileOffset.y =
-            (Math.floor(this.tile / (this.width / this.tileSize.width))) * (this.tileSize.height + this.image.image.offset.y);
-        return this;
-    };
     IsoSprite.prototype.set = function (tile) {
         this.tileHeight = tile.height;
         this.tileSize = tile.size;
@@ -822,12 +878,9 @@ var IsoSprite = (function (_super) {
     };
     IsoSprite.prototype.getRenderDetails = function () {
         return {
-            position: this.getRelativPosition(),
+            position: this.getRelativePosition(),
             tileSize: this.tileSize,
-            renderSize: {
-                width: this.tileSize.width * this.zoomLevel,
-                height: this.tileSize.height * this.zoomLevel
-            },
+            renderSize: this.getRelativeDimension(),
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
@@ -839,6 +892,15 @@ var IsoSprite = (function (_super) {
 "use strict";
 var IsoAnimatedSprite = (function (_super) {
     __extends(IsoAnimatedSprite, _super);
+    /**
+     * Creats a new frame-animated sprite
+     *
+     * @param  {IsoMetric}         Engine   An instance of IsoMetric
+     * @param  {IsoRessource}      image    A Ressource file including an image
+     * @param  {IsoTileObjectInfo} tileInfoObject Including all information about the tile. See IsoTileObjectInfo.
+     * @param  {string}            name     Name of the new Sprite.
+     * @return {IsoAnimatedSprite}          The Sprite.
+     */
     function IsoAnimatedSprite(Engine, image, tileInfo, name) {
         _super.call(this, Engine, image, tileInfo);
         if (name !== undefined) {
@@ -846,31 +908,66 @@ var IsoAnimatedSprite = (function (_super) {
         }
         return this;
     }
-    IsoAnimatedSprite.prototype.addFrameAnimation = function (name, frames, speed, easing, type, callbacks) {
+    /**
+     * Create a new frame-animation.
+     *
+     * @param  {string}                name   Name of the new animation.
+     * @param  {Array<number>}         frames An array that includes the frame numbers.
+     * @param  {number}                duration The duration in milliseconds of the animation.
+     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
+     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
+     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @return {IsoAnimatedSprite}            The sprite.
+     */
+    IsoAnimatedSprite.prototype.addFrameAnimation = function (name, frames, duration, easing, type, callbacks) {
         if (easing === void 0) { easing = IsoEasing.Linear; }
         if (type === void 0) { type = IsoAnimation.ONCE; }
         if (callbacks === void 0) { callbacks = new Array(); }
-        this.Engine.animation.addFrameAnimation(name, this, frames, speed, easing, type, callbacks);
+        this.Engine.animation.addFrameAnimation(name, this, frames, duration, easing, type, callbacks);
         return this;
     };
+    /**
+     * Play an animation.
+     * @param  {string} name        Name of th animation.
+     * @return {IsoAnimatedSprite}       The sprite.
+     */
     IsoAnimatedSprite.prototype.play = function (name) {
         this.Engine.animation.play(name, this);
         return this;
     };
+    /**
+     * Stops the animation.
+     * @param  {string} name Name of the animation.
+     * @return {IsoAnimatedSprite}      The sprite.
+     */
     IsoAnimatedSprite.prototype.stop = function (name) {
         this.Engine.animation.stop(name, this);
         return this;
     };
-    IsoAnimatedSprite.prototype.resume = function () {
+    /**
+     * Resumes an animation.
+     * @param  {string} name       Name of the animation.
+     * @return {IsoAnimatedSprite} The sprite.
+     */
+    IsoAnimatedSprite.prototype.resume = function (name) {
         this.Engine.animation.resume(name, this);
         return this;
     };
-    IsoAnimatedSprite.prototype.pause = function () {
+    /**
+     * Pause an animation.
+     * @param  {string} name  Name of the animation.
+     * @return {IsoAnimatedSprite}       The sprite.
+     */
+    IsoAnimatedSprite.prototype.pause = function (name) {
         this.Engine.animation.pause(name, this);
         return this;
     };
     return IsoAnimatedSprite;
 })(IsoSprite);
+/**
+ * A library including all easing-functions.
+ * @type {Object}
+ */
 var IsoEasing = {
     Linear: function (currentIteration, startValue, endValue, iterationCount) {
         return (endValue - startValue) * currentIteration / iterationCount + startValue;
@@ -958,6 +1055,12 @@ var IsoEasing = {
         return (endValue - startValue) / 2 * (Math.sqrt(1 - (currentIteration -= 2) * currentIteration) + 1) + startValue;
     }
 };
+/**
+ * Controls animations.
+ * There are two types of animations:
+ * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be {number}.
+ * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be {IsoAnimatedSprite} or {IsoTile}.
+ */
 var IsoAnimation = (function () {
     function IsoAnimation() {
         this.framesPerSecond = 60;
@@ -975,7 +1078,7 @@ var IsoAnimation = (function () {
         this.name = name;
         this.sprite = object;
         this.frames = frames;
-        this.startValue = frames[0];
+        this.startValue = frames[0] - 1;
         this.endValue = frames[frames.length - 1];
         this.duration = duration;
         this.easing = easing;
@@ -1022,7 +1125,13 @@ var IsoAnimation = (function () {
             }
             this.currentIteration++;
             this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
-            this.object[this.attribute] = this.actualValue;
+            var a = this.attribute.split(".");
+            var s = "";
+            for (var i = 0; i < a.length; i++) {
+                s += "['" + a[i] + "']";
+            }
+            var f = new Function("o", "v", "o" + s + "=  v;");
+            f(this.object, this.actualValue);
             if (this.actualValue === this.endValue) {
                 switch (this.type) {
                     case IsoAnimation.ONCE:
@@ -1050,30 +1159,46 @@ var IsoAnimation = (function () {
         }
     };
     IsoAnimation.prototype.__playFrame = function () {
-        if (this.isPlaying !== true) {
-            this.actualValue = this.startValue;
-            this.isPlaying = true;
-        }
-        this.actualValue = Math.floor(this.easing.call(this, this.actualValue, this.startValue, this.endValue, (this.endValue - this.startValue)));
-        this.sprite.setTile(this.actualValue);
-        if (this.actualValue === this.endValue) {
-            switch (this.type) {
-                case IsoAnimation.ONCE:
-                    this.stop();
-                    break;
-                case IsoAnimation.PINGPONG:
-                    var endValue = this.endValue;
-                    this.endValue = this.startValue;
-                    this.startValue = endValue;
-                    break;
-                case IsoAnimation.ENDLESS:
-                    this.actualValue = this.startValue;
-                    break;
+        var _this = this;
+        if (this.isPlaying === true) {
+            if (this.currentIteration === 0) {
+                this.actualValue = this.startValue;
+            }
+            this.currentIteration++;
+            var __t = Math.floor(this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations));
+            this.actualValue = Math.floor(__t);
+            if (this.actualValue !== this.sprite.tile) {
+                this.sprite.setTile(Math.round(this.actualValue));
+            }
+            if (__t === this.endValue) {
+                switch (this.type) {
+                    case IsoAnimation.ONCE:
+                        this.stop();
+                        break;
+                    case IsoAnimation.PINGPONG:
+                        var endValue = this.endValue;
+                        this.endValue = this.startValue;
+                        this.startValue = endValue;
+                        this.actualValue = this.startValue;
+                        this.isPlaying = false;
+                        this.play();
+                        break;
+                    case IsoAnimation.ENDLESS:
+                        this.actualValue = this.startValue;
+                        this.isPlaying = false;
+                        this.play();
+                        break;
+                }
+            }
+            else {
+                if (this.isPlaying === true)
+                    requestAnimationFrame(function () { return _this.__playFrame(); });
             }
         }
     };
     IsoAnimation.prototype.stop = function () {
         this.isPlaying = false;
+        this.actualValue = this.startValue;
         return this;
     };
     IsoAnimation.prototype.pause = function () {
@@ -1090,8 +1215,20 @@ var IsoAnimation = (function () {
         }
         return this;
     };
+    /**
+     * See animationType. Plays the animation one time.
+     * @type {string}
+     */
     IsoAnimation.ONCE = "once";
+    /**
+     * See animationType. Plays the animation endless as pingpong.
+     * @type {string}
+     */
     IsoAnimation.PINGPONG = "pingpong";
+    /**
+     * See animationType. Plays the animation endless.
+     * @type {string}
+     */
     IsoAnimation.ENDLESS = "endless";
     IsoAnimation.ANIMATION_TYPE_FRAME = "frame";
     IsoAnimation.ANIMATION_TYPE_ATTRIBUTE = "attribute";
@@ -1966,5 +2103,11 @@ var IsoMetric = (function () {
     IsoMetric.BACK = 4;
     IsoMetric.LEFT = 2;
     return IsoMetric;
+})();
+"use strict";
+var IsoPhysicsManagr = (function () {
+    function IsoPhysicsManagr() {
+    }
+    return IsoPhysicsManagr;
 })();
 //# sourceMappingURL=isometric.js.map

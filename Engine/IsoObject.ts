@@ -57,6 +57,9 @@ class IsoObject {
     blendingMode: string = IsoBlendingModes.NORMAL;
     alpha: number = 1;
     hidden: boolean = true;
+    properties: Object = {};
+    mass: number = 0;
+    rigid: boolean = false;
 
     constructor(Engine, image: IsoRessource, name?: string) {
         this.Engine = Engine;
@@ -73,8 +76,8 @@ class IsoObject {
         }
     }
 
-    addAnimation(name: string, attribute: string, endValue: number, speed: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()) {
-        this.Engine.animation.addAnimation(name, this, attribute, endValue, speed, easing, type, callbacks);
+    addAnimation(name: string, attribute: string, endValue: number, duration: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()) {
+        this.Engine.animation.addAnimation(name, this, attribute, endValue, duration, easing, type, callbacks);
         return this;
     }
 
@@ -95,11 +98,12 @@ class IsoObject {
     }
 
     getCoords(): IsoCoords {
+        var r = this.getRenderDetails();
         return {
-            x: this.position.x,
-            y: this.position.y,
-            width: this.width,
-            height: this.height
+            x: r.position.x,
+            y: r.position.y,
+            width: r.renderSize.width,
+            height: r.renderSize.height
         };
     }
 
@@ -126,13 +130,39 @@ class IsoObject {
         return this.position;
     }
 
-    getRelativPosition(): IsoPoint {
+    getProperty(name: string): any {
+        return this.properties[name];
+    }
+
+    getProperties(): Object {
+        return this.properties;
+    }
+
+    getRelativePosition(): IsoPoint {
         var x = 0, y = 0;
         x = (this.position.x * this.zoomLevel) + (this.offset.x * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
         y = (this.position.y * this.zoomLevel) + (this.offset.y * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
         return {
             x: x,
             y: y
+        };
+    }
+
+    getRelativeDimension(): IsoDimension {
+        return {
+            width: this.getOriginalDimension().width * this.zoomLevel,
+            height: this.getOriginalDimension().height * this.zoomLevel
+        };
+    }
+
+    getRenderDetails() {
+        return {
+            position: this.getRelativePosition(),
+            tileSize: this.getOriginalDimension(),
+            renderSize: this.getRelativeDimension(),
+            image: this.image.image.get(),
+            offset: this.getOffset(),
+            zoomLevel: this.zoomLevel
         };
     }
 
@@ -219,6 +249,16 @@ class IsoObject {
         return this;
     }
 
+    setProperty(name: string, value: any): IsoObject {
+        this.properties[name] = value;
+        return this;
+    }
+
+    setProperties(properties: Object): IsoObject {
+        this.properties = properties;
+        return this;
+    }
+
     setRotation(degrees: number): IsoObject {
         this.rotation = degrees;
         return this;
@@ -276,12 +316,12 @@ class IsoObject {
         return this;
     }
 
-    resume(): IsoObject {
+    resume(name: string): IsoObject {
         this.Engine.animation.resume(name, this);
         return this;
     }
 
-    pause(): IsoObject {
+    pause(name: string): IsoObject {
         this.Engine.animation.pause(name, this);
         return this;
     }

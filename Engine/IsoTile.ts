@@ -44,6 +44,22 @@ class IsoTile extends IsoTileObject {
         }
     }
 
+    /**
+     * Create a new frame-animation.
+     *
+     * @param  {string}                name   Name of the new animation.
+     * @param  {Array<number>}         frames An array that includes the frame numbers.
+     * @param  {number}                duration The duration in milliseconds of the animation.
+     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
+     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
+     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @return {IsoAnimatedSprite}            The sprite.
+     */
+    addFrameAnimation(name: string, frames: Array<number>, duration: number, easing: Function = IsoEasing.Linear, type: string = IsoAnimation.ONCE, callbacks: Array<IsoCallback> = new Array()): IsoTile {
+        this.Engine.animation.addFrameAnimation(name, this, frames, duration, easing, type, callbacks);
+        return this;
+    }
+
     setUpdateType(type: string): IsoTile {
         this.updateType = type;
         return this;
@@ -58,13 +74,23 @@ class IsoTile extends IsoTileObject {
         return this;
     }
 
+    getCoords(): IsoCoords {
+        var r = this.getRenderDetails();
+        return {
+            x: r.position.x + (this.mapPosition.column * this.tileSize.width * this.zoomLevel),
+            y: r.position.y + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight,
+            width: this.tileSize.width * this.zoomLevel,
+            height: this.tileSize.height * this.zoomLevel
+        };
+    }
+
     getMapPosition(): IsoMapPosition {
         return this.mapPosition;
     }
 
     getRenderDetails() {
         return {
-            position: this.getRelativPosition(),
+            position: this.getRelativePosition(),
             mapPosition: this.mapPosition,
             tileSize: this.tileSize,
             renderSize: {
@@ -75,5 +101,11 @@ class IsoTile extends IsoTileObject {
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
         };
+    }
+
+    updatePhysics(objects: Array<IsoObject>) {
+        if (this.mass !== 0) {
+
+        }
     }
 } 

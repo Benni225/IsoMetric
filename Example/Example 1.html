@@ -35,9 +35,9 @@
 
             firstLayer = layer.get("firstLayer");
             tileMap = firstLayer.addTileMap("sprite", ressources.get("ground"), 64, 64);
-            grandpa = firstLayer.addSprite("grandpa", ressources.get("grandpa"), { tile: 1, height: 0, size: { width: 32, height: 48 } });
+            grandpa = firstLayer.addAnimatedSprite("grandpa", ressources.get("grandpa"), { tile: 1, height: 0, size: { width: 30, height: 48 } });
             grandpa.setAnchor(16, 24);
-            highLight = firstLayer.addSprite("highLight", ressources.get("ground"), { tile: 31, height: 0, size: { width: 64, height: 64 } });
+            highLight = firstLayer.addSprite("highLight", ressources.get("ground"), { tile: 30, height: 0, size: { width: 64, height: 64 } });
             highLight.hidden = true;
             highLight.setBlendingMode(IsoBlendingModes.LUMINOSITY);
 
@@ -48,8 +48,10 @@
             firstLayer.setSpeed(5);
 
 
-            grandpa.addAnimation("rotation", "rotation", 359, 2000, IsoEasing.QuartInOut, IsoAnimation.ENDLESS);
-            grandpa.play("rotation");
+            grandpa.addFrameAnimation("walk-right", [7, 8, 9], 500, IsoEasing.Linear, IsoAnimation.PINGPONG);
+            grandpa.addFrameAnimation("walk-left", [4, 5, 6], 500, IsoEasing.Linear, IsoAnimation.PINGPONG);
+            grandpa.addFrameAnimation("walk-up", [10, 11, 12], 500, IsoEasing.Linear, IsoAnimation.PINGPONG);
+            grandpa.addFrameAnimation("walk-down", [1, 2, 3], 500, IsoEasing.Linear, IsoAnimation.PINGPONG);
             grandpa.setBlendingMode(IsoBlendingModes.NORMAL);
             grandpa.setAlpha(0.75);
             grandpa.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
@@ -63,20 +65,29 @@
                     case IsoInput.KEYUP:
                         firstLayer.scroll(0, 1);
                         grandpa.scroll(0, -1.5);
+                        grandpa.play("walk-up");
                         break;
                     case IsoInput.KEYDOWN:
                         firstLayer.scroll(0, -1);
                         grandpa.scroll(0, 1.5);
+                        grandpa.play("walk-down");
                         break;
                     case IsoInput.KEYLEFT:
                         firstLayer.scroll(1, 0);
                         grandpa.scroll(-1.5, 0);
+                        grandpa.play("walk-left");
                         break;
                     case IsoInput.KEYRIGHT:
                         firstLayer.scroll(-1, 0);
-                        grandpa.scroll(1.5,0);
+                        grandpa.scroll(1.5, 0);
+                        grandpa.play("walk-right");
                         break;
                 }
+            } else {
+                grandpa.stop("walk-right");
+                grandpa.stop("walk-left");
+                grandpa.stop("walk-up");
+                grandpa.stop("walk-down");
             }
             if (app.input.keyEventType === IsoInput.EVENT_KEYPRESS) {
                 switch (app.input.keyCode) {
@@ -101,7 +112,7 @@
                 highLight.hidden = false;
 
                 if (app.input.mouseEventType === IsoInput.EVENT_MOUSEDOWN) {
-                    tile.addAnimation("rotation2", "rotation", 360, 1000, IsoEasing.SineInOut, IsoAnimation.ONCE).play("rotation2");
+                    tile.addAnimation("rotation2", "rotation", 360, 3000, IsoEasing.SineInOut, IsoAnimation.ONCE).play("rotation2");
                     tile.setAnchor(32, 32);
                     tile.setTile(30);
                 }

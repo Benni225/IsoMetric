@@ -38,22 +38,24 @@ class IsoTileObject extends IsoObject {
         return this.tileOffset;
     }
 
-    getRelativPosition(): IsoPoint {
+    getRelativePosition(): IsoPoint {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-            - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x);/* (this.position.x * this.zoomLevel) +
-        (this.offset.x * this.zoomLevel) +
-        (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x) + this.scrollPosition.x; */
+            - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x);
         y =
             ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
-            - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y); /*(this.position.y * this.zoomLevel) +
-        (this.offset.y * this.zoomLevel) +
-        (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y) -
-        (this.tileHeight * this.zoomLevel) + this.scrollPosition.y;*/
+            - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y);
         return {
             x: x,
             y: y
+        };
+    }
+
+    getRelativeDimension(): IsoDimension {
+        return {
+            width: this.tileSize.width * this.zoomLevel,
+            height: this.tileSize.height * this.zoomLevel
         };
     }
 

@@ -187,16 +187,18 @@ class IsoTileMap {
      * @retrurn An object with information of all tiles
      */
     getTilesInRadius(x: number, y: number, width: number, height: number): Array<IsoTile> {
-        x = x - this.offset.x + this.scrollPosition.x;
-        y = y - this.offset.y + this.scrollPosition.y;
+        x = x - (((this.offset.x + this.scrollPosition.x) * this.zoomLevel)
+            - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x));
+        y = y - (((this.offset.y + this.scrollPosition.y) * this.zoomLevel)
+            - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y));
 
         var map = this.map.get(),
             mapLengthY = map.length,
             mapLengthX = map[0].length,
-            columnStart = (x - (x % this.tileSize.width)) / this.tileSize.width,
-            columnEnd = ((x + width) - ((x + width) % this.tileSize.width)) / this.tileSize.width,
-            rowStart = (y - (y % this.tileSize.height)) / this.tileSize.height,
-            rowEnd = ((y + height) - ((y + height) % this.tileSize.height)) / this.tileSize.height;
+            rowStart = rowStart = Math.floor(y / (this.tileSize.height * this.zoomLevel)),
+            columnStart = Math.floor(x / (this.tileSize.width * this.zoomLevel)),
+            columnEnd = Math.floor((x + width) / (this.tileSize.width * this.zoomLevel)),
+            rowEnd = Math.floor((y + height) / (this.tileSize.height * this.zoomLevel));
 
         if (columnStart < 0) {
             columnStart = 0;

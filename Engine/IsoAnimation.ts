@@ -1,3 +1,7 @@
+﻿/**
+ * A library including all easing-functions.
+ * @type {Object}
+ */
 ﻿var IsoEasing = {
     Linear: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
         return (endValue - startValue) * currentIteration / iterationCount + startValue;
@@ -85,32 +89,84 @@
         return (endValue - startValue) / 2 * (Math.sqrt(1 - (currentIteration -= 2) * currentIteration) + 1) + startValue;
     }
 };
-
+/**
+ * Controls animations.
+ * There are two types of animations:
+ * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be {number}.
+ * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be {IsoAnimatedSprite} or {IsoTile}.
+ */
 class IsoAnimation {
+    /**
+     * See animationType. Plays the animation one time.
+     * @type {string}
+     */
     static ONCE: string = "once";
+    /**
+     * See animationType. Plays the animation endless as pingpong.
+     * @type {string}
+     */
     static PINGPONG: string = "pingpong";
+    /**
+     * See animationType. Plays the animation endless.
+     * @type {string}
+     */
     static ENDLESS: string = "endless";
 
     static ANIMATION_TYPE_FRAME: string = "frame";
     static ANIMATION_TYPE_ATTRIBUTE: string = "attribute";
-
+    /**
+     * Name of the animation.
+     * @type {string}
+     */
     name: string;
+    /**
+     * Duration of the animation in milliseconds.
+     * @type {number}
+     */
     duration: number;
+    /**
+     * Includes all frames of an animation.
+     * @type {Array<number>}
+     */
     frames: Array<number>;
+
     framesPerSecond: number = 60;
+    /**
+     * The initiale value of the animation.
+     * @type {number}
+     */
     startValue: number;
+    /**
+     * The target value of the animation.
+     * @type {number}
+     */
     endValue: number;
+    /**
+     * The current value of the animation, while playing.
+     * @type {number}
+     */
     actualValue: number;
+    /**
+     * The attribute of the specified object, which will be changed.
+     * @example
+     * var object = {
+     * 	position: {x: 0, y: 0},
+     *  other: 0
+     * };
+     * For changing object.position.x:
+     * ...createAnimation('name', object, 'position.x', ...);
+     * For changing object.other:
+     * ...createAnimation('name', object, 'other', ...);
+     * @type {string}
+     */
     attribute: string;
-    change: number;
     type: string;
     easing: Function = IsoEasing.Linear;
     isPlaying: boolean = false;
     callbacks: Array<IsoCallback>;
     object: Object;
-    sprite: IsoAnimatedSprite;
-    timerStart: Date;
-    timerActual: Date;
+    sprite: IsoAnimatedSprite|IsoTile;
+    timeEnd: number;
     iterations: number;
     currentIteration: number = 0;
 
@@ -122,11 +178,11 @@ class IsoAnimation {
         return this;
     }
 
-    createFrameAnimation(name: string, object: IsoAnimatedSprite, frames: Array<number>, duration: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()): IsoAnimation {
+    createFrameAnimation(name: string, object: IsoAnimatedSprite|IsoTile, frames: Array<number>, duration: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()): IsoAnimation {
         this.name = name;
         this.sprite = object;
         this.frames = frames;
-        this.startValue = frames[0];
+        this.startValue = frames[0] - 1;
         this.endValue = frames[frames.length - 1];
         this.duration = duration;
         this.easing = easing;
@@ -172,7 +228,14 @@ class IsoAnimation {
             this.currentIteration++;
             this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
 
-            this.object[this.attribute] = this.actualValue;
+            var a = this.attribute.split(".");
+            var s = "";
+            for (var i = 0; i < a.length; i++) {
+                s += "['" + a[i] + "']";
+            }
+            var f = new Function("o", "v", "o" + s + "=  v;");
+            f(this.object, this.actualValue);
+
             if (this.actualValue === this.endValue) {
                 switch (this.type) {
                     case IsoAnimation.ONCE:
@@ -196,35 +259,52 @@ class IsoAnimation {
                 if (this.isPlaying === true)
                     requestAnimationFrame(() => this.__playAttribute());
             }
-        }        
+        }
     }
 
     __playFrame() {
-        if (this.isPlaying !== true) {
-            this.actualValue = this.startValue;
-            this.isPlaying = true;
-        }
-        this.actualValue = Math.floor(this.easing.call(this, this.actualValue, this.startValue, this.endValue, (this.endValue - this.startValue)));
-        this.sprite.setTile(this.actualValue);
-        if (this.actualValue === this.endValue) {
-            switch (this.type) {
-                case IsoAnimation.ONCE:
-                    this.stop();
-                    break;
-                case IsoAnimation.PINGPONG:
-                    var endValue = this.endValue;
-                    this.endValue = this.startValue;
-                    this.startValue = endValue;
-                    break;
-                case IsoAnimation.ENDLESS:
-                    this.actualValue = this.startValue;
-                    break;
+        if (this.isPlaying === true) {
+            if (this.currentIteration === 0) {
+                this.actualValue = this.startValue;
+            }
+            this.currentIteration++;
+
+            var __t = Math.floor(this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations));
+            this.actualValue = Math.floor(__t);
+
+            if (this.actualValue !== this.sprite.tile) {
+                this.sprite.setTile(Math.round(this.actualValue));
+            }
+
+            if (__t === this.endValue) {
+                switch (this.type) {
+                    case IsoAnimation.ONCE:
+                        this.stop();
+                        break;
+                    case IsoAnimation.PINGPONG:
+                        var endValue = this.endValue;
+                        this.endValue = this.startValue;
+                        this.startValue = endValue;
+                        this.actualValue = this.startValue;
+                        this.isPlaying = false;
+                        this.play();
+                        break;
+                    case IsoAnimation.ENDLESS:
+                        this.actualValue = this.startValue;
+                        this.isPlaying = false;
+                        this.play();
+                        break;
+                }
+            } else {
+                if (this.isPlaying === true)
+                    requestAnimationFrame(() => this.__playFrame());
             }
         }
     }
 
     stop(): IsoAnimation {
         this.isPlaying = false;
+        this.actualValue = this.startValue;
         return this;
     }
 

@@ -49,8 +49,11 @@ declare class IsoObject {
     blendingMode: string;
     alpha: number;
     hidden: boolean;
+    properties: Object;
+    mass: number;
+    rigid: boolean;
     constructor(Engine: any, image: IsoRessource, name?: string);
-    addAnimation(name: string, attribute: string, endValue: number, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoObject;
+    addAnimation(name: string, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoObject;
     collide(object: IsoObject): boolean;
     getCoords(): IsoCoords;
     getOffset(): IsoOffset;
@@ -58,7 +61,18 @@ declare class IsoObject {
     getOriginalHeight(): number;
     getOriginalWidth(): number;
     getPosition(): IsoPoint;
-    getRelativPosition(): IsoPoint;
+    getProperty(name: string): any;
+    getProperties(): Object;
+    getRelativePosition(): IsoPoint;
+    getRelativeDimension(): IsoDimension;
+    getRenderDetails(): {
+        position: IsoPoint;
+        tileSize: IsoDimension;
+        renderSize: IsoDimension;
+        image: HTMLImageElement;
+        offset: IsoOffset;
+        zoomLevel: number;
+    };
     getRotation(): number;
     isBoxCollision(coordsSource: IsoCoords, coordsTarget: IsoCoords): boolean;
     isPixelBoxCollision(sourceObject: IsoObject, targetCoords: IsoCoords): boolean;
@@ -74,6 +88,8 @@ declare class IsoObject {
     setName(name: string): IsoObject;
     setOffset(offsetX: number, offsetY: number): IsoObject;
     setPosition(position: IsoPoint): IsoObject;
+    setProperty(name: string, value: any): IsoObject;
+    setProperties(properties: Object): IsoObject;
     setRotation(degrees: number): IsoObject;
     setScroll(x: number, y: number): IsoObject;
     setSize(width: number, height: number): IsoObject;
@@ -85,8 +101,8 @@ declare class IsoObject {
     zoom(zoom: number): IsoObject;
     play(name: string): IsoObject;
     stop(name: any): IsoObject;
-    resume(): IsoObject;
-    pause(): IsoObject;
+    resume(name: string): IsoObject;
+    pause(name: string): IsoObject;
 }
 interface IsoTileSize {
     width: number;
@@ -106,7 +122,8 @@ declare class IsoTileObject extends IsoObject {
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo?: IsoTileObjectInfo);
     setTileOffset(offset: IsoOffset): IsoTileObject;
     getTileOffset(): IsoOffset;
-    getRelativPosition(): IsoPoint;
+    getRelativePosition(): IsoPoint;
+    getRelativeDimension(): IsoDimension;
     getTileImage(): IsoTileImage;
     setTile(tile: number): IsoTileObject;
     set(tile: IsoTileObjectInfo): IsoTileObject;
@@ -140,8 +157,21 @@ declare class IsoTile extends IsoTileObject {
     tile: number;
     updateType: string;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileInfo);
+    /**
+     * Create a new frame-animation.
+     *
+     * @param  {string}                name   Name of the new animation.
+     * @param  {Array<number>}         frames An array that includes the frame numbers.
+     * @param  {number}                duration The duration in milliseconds of the animation.
+     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
+     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
+     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @return {IsoAnimatedSprite}            The sprite.
+     */
+    addFrameAnimation(name: string, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoTile;
     setUpdateType(type: string): IsoTile;
     set(tile: IsoTileInfo): IsoTile;
+    getCoords(): IsoCoords;
     getMapPosition(): IsoMapPosition;
     getRenderDetails(): {
         position: IsoPoint;
@@ -254,28 +284,68 @@ declare class IsoSprite extends IsoTileObject {
     getTileImage(): IsoTileImage;
     setFrame(frame: IsoFrame): IsoSprite;
     setDirection(direction: number): IsoSprite;
-    setTile(tile: number): IsoSprite;
     set(tile: IsoTileObjectInfo): IsoTileObject;
     getRenderDetails(): {
         position: IsoPoint;
         tileSize: IsoTileSize;
-        renderSize: {
-            width: number;
-            height: number;
-        };
+        renderSize: IsoDimension;
         image: HTMLImageElement;
         offset: IsoOffset;
         zoomLevel: number;
     };
 }
 declare class IsoAnimatedSprite extends IsoSprite {
+    /**
+     * Creats a new frame-animated sprite
+     *
+     * @param  {IsoMetric}         Engine   An instance of IsoMetric
+     * @param  {IsoRessource}      image    A Ressource file including an image
+     * @param  {IsoTileObjectInfo} tileInfoObject Including all information about the tile. See IsoTileObjectInfo.
+     * @param  {string}            name     Name of the new Sprite.
+     * @return {IsoAnimatedSprite}          The Sprite.
+     */
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
-    addFrameAnimation(name: string, frames: Array<number>, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimatedSprite;
+    /**
+     * Create a new frame-animation.
+     *
+     * @param  {string}                name   Name of the new animation.
+     * @param  {Array<number>}         frames An array that includes the frame numbers.
+     * @param  {number}                duration The duration in milliseconds of the animation.
+     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
+     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
+     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @return {IsoAnimatedSprite}            The sprite.
+     */
+    addFrameAnimation(name: string, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimatedSprite;
+    /**
+     * Play an animation.
+     * @param  {string} name        Name of th animation.
+     * @return {IsoAnimatedSprite}       The sprite.
+     */
     play(name: string): IsoAnimatedSprite;
-    stop(name: any): IsoAnimatedSprite;
-    resume(): IsoAnimatedSprite;
-    pause(): IsoAnimatedSprite;
+    /**
+     * Stops the animation.
+     * @param  {string} name Name of the animation.
+     * @return {IsoAnimatedSprite}      The sprite.
+     */
+    stop(name: string): IsoAnimatedSprite;
+    /**
+     * Resumes an animation.
+     * @param  {string} name       Name of the animation.
+     * @return {IsoAnimatedSprite} The sprite.
+     */
+    resume(name: string): IsoAnimatedSprite;
+    /**
+     * Pause an animation.
+     * @param  {string} name  Name of the animation.
+     * @return {IsoAnimatedSprite}       The sprite.
+     */
+    pause(name: string): IsoAnimatedSprite;
 }
+/**
+ * A library including all easing-functions.
+ * @type {Object}
+ */
 declare var IsoEasing: {
     Linear: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
     QuadIn: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
@@ -300,35 +370,88 @@ declare var IsoEasing: {
     CircOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
     CircInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
 };
+/**
+ * Controls animations.
+ * There are two types of animations:
+ * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be {number}.
+ * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be {IsoAnimatedSprite} or {IsoTile}.
+ */
 declare class IsoAnimation {
+    /**
+     * See animationType. Plays the animation one time.
+     * @type {string}
+     */
     static ONCE: string;
+    /**
+     * See animationType. Plays the animation endless as pingpong.
+     * @type {string}
+     */
     static PINGPONG: string;
+    /**
+     * See animationType. Plays the animation endless.
+     * @type {string}
+     */
     static ENDLESS: string;
     static ANIMATION_TYPE_FRAME: string;
     static ANIMATION_TYPE_ATTRIBUTE: string;
+    /**
+     * Name of the animation.
+     * @type {string}
+     */
     name: string;
+    /**
+     * Duration of the animation in milliseconds.
+     * @type {number}
+     */
     duration: number;
+    /**
+     * Includes all frames of an animation.
+     * @type {Array<number>}
+     */
     frames: Array<number>;
     framesPerSecond: number;
+    /**
+     * The initiale value of the animation.
+     * @type {number}
+     */
     startValue: number;
+    /**
+     * The target value of the animation.
+     * @type {number}
+     */
     endValue: number;
+    /**
+     * The current value of the animation, while playing.
+     * @type {number}
+     */
     actualValue: number;
+    /**
+     * The attribute of the specified object, which will be changed.
+     * @example
+     * var object = {
+     * 	position: {x: 0, y: 0},
+     *  other: 0
+     * };
+     * For changing object.position.x:
+     * ...createAnimation('name', object, 'position.x', ...);
+     * For changing object.other:
+     * ...createAnimation('name', object, 'other', ...);
+     * @type {string}
+     */
     attribute: string;
-    change: number;
     type: string;
     easing: Function;
     isPlaying: boolean;
     callbacks: Array<IsoCallback>;
     object: Object;
-    sprite: IsoAnimatedSprite;
-    timerStart: Date;
-    timerActual: Date;
+    sprite: IsoAnimatedSprite | IsoTile;
+    timeEnd: number;
     iterations: number;
     currentIteration: number;
     __debug: number;
     animationType: string;
     constructor();
-    createFrameAnimation(name: string, object: IsoAnimatedSprite, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
+    createFrameAnimation(name: string, object: IsoAnimatedSprite | IsoTile, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
     createAnimation(name: string, object: Object, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
     play(): IsoAnimation;
     __playAttribute(): void;
@@ -339,7 +462,7 @@ declare class IsoAnimation {
 }
 declare class IsoAnimationManager {
     animations: Array<IsoAnimation>;
-    addFrameAnimation(name: string, object: IsoAnimatedSprite, frames: Array<number>, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
+    addFrameAnimation(name: string, object: IsoAnimatedSprite | IsoTile, frames: Array<number>, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
     addAnimation(name: string, object: Object, attribute: string, endValue: number, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
     play(name: string, object: Object): void;
     stop(name: string, object: Object): void;
@@ -712,4 +835,7 @@ declare class IsoMetric {
      * [deprecated] Sets the global direction.
      */
     setDirection(direction: number): void;
+}
+declare class IsoPhysicsManagr {
+    objects: Array<IsoObject>;
 }

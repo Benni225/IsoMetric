@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <style>
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../isometric.js"></script>
+    <script>
+        var app = new IsoMetric({
+            width: 640,
+            height: 480,
+            fullscreen: true
+        });
+        var ressources = app.ressources,
+            layer = app.layers,
+            firstLayer = layer.add("firstLayer", 1),
+            tileMap,
+            grandpa,
+            shown = 0;
+
+        
+
+        ressources.add("ground", "../images/ground.png", IsoRessource.IMAGE);
+        ressources.add("grandpa", "../images/grandpa.png", IsoRessource.IMAGE);
+
+        ressources.load().then(function () {
+
+            firstLayer = layer.get("firstLayer");
+            tileMap = firstLayer.addTileMap("sprite", ressources.get("ground"), 32, 32);
+            grandpa = firstLayer.addSprite("grandpa", ressources.get("grandpa"), { tile: 1, height: 0, size: { width: 32, height: 48 } });
+            grandpa.setAnchor(16, 24);
+
+            tileMap.createMap(100, 100, new Array(0, 0));
+
+            firstLayer.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
+            firstLayer.setSpeed(5);
+
+            grandpa.addAnimation("rotation", "rotation", 360, 2000, IsoEasing.QuartInOut, IsoAnimation.ENDLESS);
+            grandpa.play("rotation");
+            grandpa.setPosition({ x: 200, y: 50 });
+            gameloop();
+        });
+
+        function gameloop() {
+            if (app.input.keyEventType === IsoInput.EVENT_KEYDOWN) {
+                switch (app.input.keyCode) {
+                    case IsoInput.KEYUP:
+                        firstLayer.scroll(0, 1);
+                        grandpa.scroll(0, -1);
+                        break;
+                    case IsoInput.KEYDOWN:
+                        firstLayer.scroll(0, -1);
+                        grandpa.scroll(0, 1);
+                        break;
+                    case IsoInput.KEYLEFT:
+                        firstLayer.scroll(1, 0);
+                        grandpa.scroll(-1, 0);
+                        break;
+                    case IsoInput.KEYRIGHT:
+                        firstLayer.scroll(-1, 0);
+                        grandpa.scroll(1,0);
+                        break;
+                }
+            }
+            if (app.input.keyEventType === IsoInput.EVENT_KEYPRESS) {
+                switch (app.input.keyCode) {
+                    case 43:
+                        firstLayer.zoom(4);
+                        grandpa.stop("rotation");
+                        break;
+                    case 45:
+                        firstLayer.zoom(-4);
+                        grandpa.play("rotation");
+                        break;
+                }
+            }
+            app.update();
+
+            tile = tileMap.getTileOnPosition({
+                x: app.input.mouseX,
+                y: app.input.mouseY
+            });
+
+            if (tile !== undefined && tile !== null) {
+                var renderDetails = tile.getRenderDetails();
+                if (shown < 100) {
+                    shown++;
+                }
+                app.canvas.context.strokeRect(
+                    renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel),
+                    renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel),
+                    renderDetails.renderSize.width,
+                    renderDetails.renderSize.height
+                );
+            }
+
+            //After drawing the maps and sprites:
+            app.canvas.context.fillStyle = "#fff";
+            app.canvas.context.font = "14px Arial";
+            //Draw ing the FPS to the screen
+            app.canvas.context.fillText("FPS: " + app.FPS, 10, 30);
+            app.canvas.context.fillText("Use the arrow-keys for scrolling and the mousewheel for zooming.", 10, 50);
+            requestAnimationFrame(function () {
+                gameloop()
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div></div>
+</body>
+</html>

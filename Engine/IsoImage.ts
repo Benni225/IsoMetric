@@ -15,7 +15,9 @@ class IsoImage {
    /**
     * A callback when the image loaded
     */
-    onLoad: Function;
+    __onLoad: Function;
+
+    isLoaded: boolean = false;
     /**
      * The width of the image
      */
@@ -25,11 +27,17 @@ class IsoImage {
      */
     height: number;
 
+    offset: IsoOffset = {
+        x: 0,
+        y: 0
+    };
+
     constructor(name?: string, src?: string) {
         if (name !== undefined && src !== undefined) {
             this.create(name, src);
         }
     }
+
     /**
      * Creates a new image.
      * @param src Source to the imagefile.
@@ -47,7 +55,8 @@ class IsoImage {
     load() {
         this.image = new Image();
         this.image.src = this.src;
-        this.image.onload = (event: Event) => this._onLoad(event);
+
+        this.image.addEventListener("load", (e: Event) => this._onLoad(e));
     }
     /**
      * Called when the image file was loaded.
@@ -56,9 +65,20 @@ class IsoImage {
     _onLoad(event: Event) {
         this.width = this.image.width;
         this.height = this.image.height;
-        if (typeof this.onLoad === "function") {
-            this.onLoad.call(this, event);
+        this.isLoaded = true;
+
+        
+
+        if (typeof this.__onLoad === "function") {
+            this.__onLoad.call(this, event);
         }
+
+        var e = new IsoEvent(IsoRessource.ISO_EVENT_RESSOURCE_LOADED);
+        e.trigger();
+    }
+
+    onLoad(callback: Function) {
+        this.__onLoad = callback;
     }
     /**
      * Returns the image.
@@ -73,5 +93,9 @@ class IsoImage {
     free() {
         this.image = null;
         delete (this);
+    }
+
+    setOffset(offset: IsoOffset) {
+        this.offset = offset;
     }
 } 

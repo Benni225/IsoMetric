@@ -1,4 +1,5 @@
 "use strict";
+///<reference path="IsoBlendingModes.ts" />
 var IsoObject = (function () {
     function IsoObject(Engine, image, name) {
         this.position = { x: 0, y: 0 };
@@ -15,6 +16,9 @@ var IsoObject = (function () {
         this.collisionResolution = 0;
         this.speed = 1;
         this.anchor = { x: 0, y: 0 };
+        this.blendingMode = IsoBlendingModes.NORMAL;
+        this.alpha = 1;
+        this.hidden = true;
         this.Engine = Engine;
         try {
             this.setImage(image);
@@ -123,8 +127,16 @@ var IsoObject = (function () {
         this.scrollPosition.y = this.scrollPosition.y + (deltaY * this.speed);
         return this;
     };
+    IsoObject.prototype.setAlpha = function (alpha) {
+        this.alpha = alpha;
+        return this;
+    };
     IsoObject.prototype.setAnchor = function (x, y) {
         this.anchor = { x: x, y: y };
+        return this;
+    };
+    IsoObject.prototype.setBlendingMode = function (blendingMode) {
+        this.blendingMode = blendingMode;
         return this;
     };
     IsoObject.prototype.setHeight = function (height) {
@@ -160,7 +172,7 @@ var IsoObject = (function () {
     };
     IsoObject.prototype.setSize = function (width, height) {
         this.width = width;
-        this.height = height;
+        // this.height = height;
         return this;
     };
     IsoObject.prototype.setSpeed = function (speed) {
@@ -236,6 +248,9 @@ var IsoTileObject = (function (_super) {
         this.tileOffset = offset;
         return this;
     };
+    IsoTileObject.prototype.getTileOffset = function () {
+        return this.tileOffset;
+    };
     IsoTileObject.prototype.getRelativPosition = function () {
         var x = 0, y = 0;
         x =
@@ -244,7 +259,7 @@ var IsoTileObject = (function (_super) {
     (this.offset.x * this.zoomLevel) +
     (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x) + this.scrollPosition.x; */
         y =
-            ((this.position.y + this.offset.y + this.scrollPosition.y + this.height) * this.zoomLevel)
+            ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
                 - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y); /*(this.position.y * this.zoomLevel) +
     (this.offset.y * this.zoomLevel) +
     (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y) -
@@ -331,7 +346,7 @@ var IsoTile = (function (_super) {
                 height: this.tileSize.height * this.zoomLevel
             },
             image: this.image.image.get(),
-            offset: this.getOffset(),
+            offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
         };
     };
@@ -358,6 +373,7 @@ var IsoTile = (function (_super) {
 var IsoMap = (function () {
     function IsoMap(map, name) {
         this.properties = new Array();
+        this.updated = false;
         if (map !== undefined) {
             this.set(map);
         }
@@ -680,7 +696,6 @@ var IsoTileMap = (function () {
         if (this.tiles === undefined || this.tiles.length === 0) {
             this.createTiles();
         }
-        this.tilesInView = this.getTilesInView();
         for (var y = 0; y < this.tiles.length; y++) {
             for (var x = 0; x < this.tiles[0].length; x++) {
                 this.updateTile(this.tiles[y][x]);
@@ -703,10 +718,8 @@ var IsoTileMap = (function () {
                 tile.setZoomLevel(this.zoomLevel);
                 tile.setZoomPoint(this.zoomPoint);
             }
-            tile.tile = this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0];
-            tile.height = 0;
-            if (this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0][1] !== undefined) {
-                tile.height = this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0][1];
+            if (tile.tileHeight === undefined || typeof tile.tileHeight === "NaN") {
+                tile.tileHeight = 0;
             }
         }
     };
@@ -759,8 +772,9 @@ var IsoSprite = (function (_super) {
         }
         return this;
     }
-    IsoSprite.prototype.getCollidingTiles = function (tilemap) {
-        var collisionBody = this.collisionBody;
+    /*
+    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile> {
+        var collisionBody: IsoCollisionBody = this.collisionBody;
         if (collisionBody === undefined) {
             collisionBody = {
                 x: 0,
@@ -769,8 +783,14 @@ var IsoSprite = (function (_super) {
                 height: this.height
             };
         }
-        return tilemap.getTilesInRadius(this.position.x + collisionBody.x, this.position.y + collisionBody.y, collisionBody.width, collisionBody.height);
-    };
+
+        return tilemap.getTilesInRadius(
+                this.position.x + collisionBody.x,
+                this.position.y + collisionBody.y,
+                collisionBody.width,
+                collisionBody.height
+            );
+    }*/
     IsoSprite.prototype.getTileImage = function () {
         var x = this.tileOffset.x;
         var y = this.tileOffset.y;
@@ -785,7 +805,7 @@ var IsoSprite = (function (_super) {
         };
     };
     IsoSprite.prototype.setFrame = function (frame) {
-        this.tileSize = frame.dimension;
+        //this.tileSize = frame.dimension;
         this.tileOffset = frame.offset;
         return this;
     };
@@ -816,7 +836,7 @@ var IsoSprite = (function (_super) {
                 height: this.tileSize.height * this.zoomLevel
             },
             image: this.image.image.get(),
-            offset: this.getOffset(),
+            offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
         };
     };
@@ -1134,6 +1154,24 @@ var IsoAnimationManager = (function () {
     };
     return IsoAnimationManager;
 })();
+var IsoBlendingModes = {
+    NORMAL: "noraml",
+    MULTIPLY: "multiply",
+    SCREEN: "screen",
+    OVERLAY: "overlay",
+    DARKEN: "darken",
+    LIGHTEN: "lighten",
+    COLOR_DODGE: "color-dodge",
+    COLOR_BURN: "color-burn",
+    HARD_LIGHT: "hard-light",
+    SOFT_LIGHT: "soft-light",
+    DIFFERENCE: "difference",
+    EXCLUSION: "exclusion",
+    HUE: "hue",
+    SATURATION: "saturation",
+    COLOR: "color",
+    LUMINOSITY: "luminosity"
+};
 "use strict";
 var IsoCanvas = (function () {
     function IsoCanvas(Engine) {
@@ -1260,6 +1298,7 @@ var IsoDrawer = (function () {
         for (var i = 0; i < this.Engine.layers.layers.length; i++) {
             this.drawLayer(this.Engine.layers.layers[i]);
         }
+        this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
         new IsoEvent("drawComplete").trigger();
         this.Engine.endLoop();
     };
@@ -1273,20 +1312,64 @@ var IsoDrawer = (function () {
         for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
             for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {
                 var detail = tiles.tiles[y][x].getRenderDetails();
-                this.context.drawImage(detail.image, detail.offset.x, detail.offset.y, detail.tileSize.width, detail.tileSize.height, detail.position.x + (detail.mapPosition.column * detail.tileSize.width * detail.zoomLevel), detail.position.y + (detail.mapPosition.row * detail.tileSize.height * detail.zoomLevel), detail.renderSize.width, detail.renderSize.height);
+                if (tiles.tiles[y][x].rotation !== 0) {
+                    this.translateTile(tiles.tiles[y][x], detail);
+                    this.rotateTile(tiles.tiles[y][x], detail);
+                    this.resetTranslationTile(tiles.tiles[y][x], detail);
+                }
+                this.context.globalCompositeOperation = tiles.tiles[y][x].blendingMode;
+                this.context.globalAlpha = tiles.tiles[y][x].alpha;
+                this.context.drawImage(detail.image, detail.offset.x, detail.offset.y, detail.tileSize.width, detail.tileSize.height, detail.position.x + (detail.mapPosition.column * detail.tileSize.width * detail.zoomLevel), detail.position.y + (detail.mapPosition.row * detail.tileSize.height * detail.zoomLevel) - tiles.tiles[y][x].tileHeight, detail.renderSize.width, detail.renderSize.height);
+                this.context.setTransform(1, 0, 0, 1, 0, 0);
+                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
+                this.context.globalAlpha = 1;
             }
         }
     };
     IsoDrawer.prototype.drawSprites = function (sprites) {
         for (var i = 0; i < sprites.length; i++) {
             var s = sprites[i];
-            var renderDetails = s.getRenderDetails();
-            this.context.translate(renderDetails.position.x + s.anchor.x, renderDetails.position.y + s.anchor.y);
-            this.context.rotate(s.rotation * Math.PI / 180);
-            this.context.translate(-(renderDetails.position.x + (renderDetails.renderSize.width / 2)), -(renderDetails.position.y + (renderDetails.renderSize.height / 2)));
-            this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
-            this.context.setTransform(1, 0, 0, 1, 0, 0);
+            if (s.hidden === true) {
+                var renderDetails = s.getRenderDetails();
+                if (s.rotation !== 0) {
+                    this.translate(s, renderDetails);
+                    this.rotate(s, renderDetails);
+                    this.resetTranslation(s, renderDetails);
+                }
+                this.context.globalCompositeOperation = s.blendingMode;
+                this.context.globalAlpha = s.alpha;
+                this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
+                this.context.setTransform(1, 0, 0, 1, 0, 0);
+                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
+                this.context.globalAlpha = 1;
+            }
         }
+    };
+    IsoDrawer.prototype.translate = function (object, renderDetails) {
+        var fx = object.anchor.x / renderDetails.tileSize.width;
+        var fy = object.anchor.y / renderDetails.tileSize.height;
+        this.context.translate(renderDetails.position.x + (renderDetails.renderSize.width * fx), renderDetails.position.y + (renderDetails.renderSize.height * fy));
+    };
+    IsoDrawer.prototype.resetTranslation = function (object, renderDetails) {
+        var fx = object.anchor.x / renderDetails.tileSize.width;
+        var fy = object.anchor.y / renderDetails.tileSize.height;
+        this.context.translate(-(renderDetails.position.x + (renderDetails.renderSize.width * fx)), -(renderDetails.position.y + (renderDetails.renderSize.height * fy)));
+    };
+    IsoDrawer.prototype.translateTile = function (object, renderDetails) {
+        var fx = object.anchor.x / renderDetails.tileSize.width;
+        var fy = object.anchor.y / renderDetails.tileSize.height;
+        this.context.translate(renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel) + (renderDetails.renderSize.width * fx), renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel) + (renderDetails.renderSize.height * fy) - object.tileHeight);
+    };
+    IsoDrawer.prototype.resetTranslationTile = function (object, renderDetails) {
+        var fx = object.anchor.x / renderDetails.tileSize.width;
+        var fy = object.anchor.y / renderDetails.tileSize.height;
+        this.context.translate(-(renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel) + (renderDetails.renderSize.width * fx)), -(renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel) + (renderDetails.renderSize.height * fy)) + object.tileHeight);
+    };
+    IsoDrawer.prototype.rotate = function (object, renderDetails) {
+        this.context.rotate(object.rotation * Math.PI / 180);
+    };
+    IsoDrawer.prototype.rotateTile = function (object, renderDetails) {
+        this.context.rotate(object.rotation * Math.PI / 180);
     };
     return IsoDrawer;
 })();

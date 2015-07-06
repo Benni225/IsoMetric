@@ -72,7 +72,7 @@ class IsoTile extends IsoTileObject {
                 height: this.tileSize.height * this.zoomLevel
             },
             image: this.image.image.get(),
-            offset: this.getOffset(),
+            offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
         };
     }

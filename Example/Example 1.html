@@ -23,7 +23,8 @@
             firstLayer = layer.add("firstLayer", 1),
             tileMap,
             grandpa,
-            shown = 0;
+            shown = 0,
+            highLight;
 
         
 
@@ -33,17 +34,25 @@
         ressources.load().then(function () {
 
             firstLayer = layer.get("firstLayer");
-            tileMap = firstLayer.addTileMap("sprite", ressources.get("ground"), 32, 32);
+            tileMap = firstLayer.addTileMap("sprite", ressources.get("ground"), 64, 64);
             grandpa = firstLayer.addSprite("grandpa", ressources.get("grandpa"), { tile: 1, height: 0, size: { width: 32, height: 48 } });
             grandpa.setAnchor(16, 24);
+            highLight = firstLayer.addSprite("highLight", ressources.get("ground"), { tile: 31, height: 0, size: { width: 64, height: 64 } });
+            highLight.hidden = true;
+            highLight.setBlendingMode(IsoBlendingModes.LUMINOSITY);
 
             tileMap.createMap(100, 100, new Array(0, 0));
+            tileMap.update();
 
             firstLayer.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
             firstLayer.setSpeed(5);
 
-            grandpa.addAnimation("rotation", "rotation", 360, 2000, IsoEasing.QuartInOut, IsoAnimation.ENDLESS);
+
+            grandpa.addAnimation("rotation", "rotation", 359, 2000, IsoEasing.QuartInOut, IsoAnimation.ENDLESS);
             grandpa.play("rotation");
+            grandpa.setBlendingMode(IsoBlendingModes.NORMAL);
+            grandpa.setAlpha(0.75);
+            grandpa.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
             grandpa.setPosition({ x: 200, y: 50 });
             gameloop();
         });
@@ -53,19 +62,19 @@
                 switch (app.input.keyCode) {
                     case IsoInput.KEYUP:
                         firstLayer.scroll(0, 1);
-                        grandpa.scroll(0, -1);
+                        grandpa.scroll(0, -1.5);
                         break;
                     case IsoInput.KEYDOWN:
                         firstLayer.scroll(0, -1);
-                        grandpa.scroll(0, 1);
+                        grandpa.scroll(0, 1.5);
                         break;
                     case IsoInput.KEYLEFT:
                         firstLayer.scroll(1, 0);
-                        grandpa.scroll(-1, 0);
+                        grandpa.scroll(-1.5, 0);
                         break;
                     case IsoInput.KEYRIGHT:
                         firstLayer.scroll(-1, 0);
-                        grandpa.scroll(1,0);
+                        grandpa.scroll(1.5,0);
                         break;
                 }
             }
@@ -89,18 +98,37 @@
             });
 
             if (tile !== undefined && tile !== null) {
-                var renderDetails = tile.getRenderDetails();
-                if (shown < 100) {
-                    shown++;
+                highLight.hidden = false;
+
+                if (app.input.mouseEventType === IsoInput.EVENT_MOUSEDOWN) {
+                    tile.addAnimation("rotation2", "rotation", 360, 1000, IsoEasing.SineInOut, IsoAnimation.ONCE).play("rotation2");
+                    tile.setAnchor(32, 32);
+                    tile.setTile(30);
                 }
+                var renderDetails = tile.getRenderDetails();
+                var hRenderDetails = highLight.getRenderDetails();
                 app.canvas.context.strokeRect(
                     renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel),
                     renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel),
                     renderDetails.renderSize.width,
                     renderDetails.renderSize.height
                 );
+                app.canvas.context.globalCompositeOperation = highLight.blendingMode;
+                app.canvas.context.drawImage(
+                    hRenderDetails.image,
+                    hRenderDetails.offset.x,
+                    hRenderDetails.offset.y,
+                    hRenderDetails.tileSize.width,
+                    hRenderDetails.tileSize.height,
+                    renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel),
+                    renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel),
+                    renderDetails.renderSize.width,
+                    renderDetails.renderSize.height
+                );
+            } else {
+                highLight.hidden = true;
             }
-
+            app.canvas.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
             //After drawing the maps and sprites:
             app.canvas.context.fillStyle = "#fff";
             app.canvas.context.font = "14px Arial";

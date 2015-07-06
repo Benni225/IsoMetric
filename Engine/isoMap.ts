@@ -16,6 +16,7 @@ class IsoMap {
     name: string;
     map: Array<Array<Array<number>>>;
     properties: Array<number> = new Array();
+    updated: boolean = false;
 
     constructor(map?: Array<Array<Array<number>>>, name?: string) {
         if (map !== undefined) {

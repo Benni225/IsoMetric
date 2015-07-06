@@ -325,7 +325,7 @@ class IsoTileMap {
         if (this.tiles === undefined || this.tiles.length === 0) {
             this.createTiles();
         }
-        this.tilesInView = this.getTilesInView();
+
         for (var y = 0; y < this.tiles.length; y++) {
             for (var x = 0; x < this.tiles[0].length; x++) {
                 this.updateTile(this.tiles[y][x]);
@@ -347,11 +347,8 @@ class IsoTileMap {
                 tile.setZoomLevel(this.zoomLevel);
                 tile.setZoomPoint(this.zoomPoint);
             }
-
-            tile.tile = this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0];
-            tile.height = 0;
-            if (this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0][1] !== undefined) {
-                tile.height = this.map.get()[tile.mapPosition.row][tile.mapPosition.column][0][1];
+            if (tile.tileHeight === undefined || typeof tile.tileHeight === "NaN") {
+                tile.tileHeight = 0;
             }
         }
     }

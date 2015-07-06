@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+///<reference path="IsoBlendingModes.ts" />
 interface IsoOffset {
     x: number;
     y: number;
@@ -53,7 +53,10 @@ class IsoObject {
     speed: number = 1;
     name: string;
     Engine: IsoMetric;
-    anchor: IsoAnchor = {x: 0, y: 0};
+    anchor: IsoAnchor = { x: 0, y: 0 };
+    blendingMode: string = IsoBlendingModes.NORMAL;
+    alpha: number = 1;
+    hidden: boolean = true;
 
     constructor(Engine, image: IsoRessource, name?: string) {
         this.Engine = Engine;
@@ -174,8 +177,18 @@ class IsoObject {
         return this;
     }
 
+    setAlpha(alpha: number): IsoObject {
+        this.alpha = alpha;
+        return this;
+    }
+
     setAnchor(x: number, y: number): IsoObject {
         this.anchor = { x: x, y: y };
+        return this;
+    }
+
+    setBlendingMode(blendingMode: string): IsoObject {
+        this.blendingMode = blendingMode;
         return this;
     }
 
@@ -219,7 +232,7 @@ class IsoObject {
 
     setSize(width: number, height: number): IsoObject {
         this.width = width;
-        this.height = height;
+        // this.height = height;
         return this;
     }
 

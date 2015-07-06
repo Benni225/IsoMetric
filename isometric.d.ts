@@ -46,6 +46,9 @@ declare class IsoObject {
     name: string;
     Engine: IsoMetric;
     anchor: IsoAnchor;
+    blendingMode: string;
+    alpha: number;
+    hidden: boolean;
     constructor(Engine: any, image: IsoRessource, name?: string);
     addAnimation(name: string, attribute: string, endValue: number, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoObject;
     collide(object: IsoObject): boolean;
@@ -63,7 +66,9 @@ declare class IsoObject {
     move(deltaX: number, deltaY: number): IsoObject;
     rotate(degrees: number): IsoObject;
     scroll(deltaX: number, deltaY: number): IsoObject;
+    setAlpha(alpha: number): IsoObject;
     setAnchor(x: number, y: number): IsoObject;
+    setBlendingMode(blendingMode: string): IsoObject;
     setHeight(height: number): IsoObject;
     setImage(image: IsoRessource): IsoObject;
     setName(name: string): IsoObject;
@@ -100,6 +105,7 @@ declare class IsoTileObject extends IsoObject {
     startTile: number;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo?: IsoTileObjectInfo);
     setTileOffset(offset: IsoOffset): IsoTileObject;
+    getTileOffset(): IsoOffset;
     getRelativPosition(): IsoPoint;
     getTileImage(): IsoTileImage;
     setTile(tile: number): IsoTileObject;
@@ -154,6 +160,7 @@ declare class IsoMap {
     name: string;
     map: Array<Array<Array<number>>>;
     properties: Array<number>;
+    updated: boolean;
     constructor(map?: Array<Array<Array<number>>>, name?: string);
     set(map: Array<Array<Array<number>>>): IsoMap;
     setName(name: string): IsoMap;
@@ -243,7 +250,6 @@ declare class IsoSprite extends IsoTileObject {
     direction: number;
     collisionBody: IsoCollisionBody;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
-    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
     getTileImage(): IsoTileImage;
     setFrame(frame: IsoFrame): IsoSprite;
     setDirection(direction: number): IsoSprite;
@@ -339,6 +345,24 @@ declare class IsoAnimationManager {
     resume(name: string, object: Object): void;
     pause(name: string, object: Object): void;
 }
+declare var IsoBlendingModes: {
+    NORMAL: string;
+    MULTIPLY: string;
+    SCREEN: string;
+    OVERLAY: string;
+    DARKEN: string;
+    LIGHTEN: string;
+    COLOR_DODGE: string;
+    COLOR_BURN: string;
+    HARD_LIGHT: string;
+    SOFT_LIGHT: string;
+    DIFFERENCE: string;
+    EXCLUSION: string;
+    HUE: string;
+    SATURATION: string;
+    COLOR: string;
+    LUMINOSITY: string;
+};
 declare class IsoCanvas {
     canvasElement: HTMLCanvasElement;
     context: any;
@@ -378,6 +402,12 @@ declare class IsoDrawer {
     drawLayer(layer: IsoLayer): void;
     drawTileMap(tileMap: IsoTileMap): void;
     drawSprites(sprites: Array<IsoSprite>): void;
+    translate(object: IsoObject, renderDetails: any): void;
+    resetTranslation(object: IsoObject, renderDetails: any): void;
+    translateTile(object: IsoTile, renderDetails: any): void;
+    resetTranslationTile(object: IsoTile, renderDetails: any): void;
+    rotate(object: IsoObject, renderDetails: any): void;
+    rotateTile(object: IsoTile, renderDetails: any): void;
 }
 declare class IsoEvent {
     type: string;

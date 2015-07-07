@@ -46,7 +46,7 @@ class IsoMetric {
      * @see IsoDrawer
      */
      drawer: IsoDrawer;
-
+     physics: IsoPhysicsManager;
      animation: IsoAnimationManager;
     /**
      * The input library.
@@ -112,6 +112,7 @@ class IsoMetric {
         this.animation = new IsoAnimationManager();
         this.on = new IsoOn();
         this.ressources = new IsoRessourceManager(this);
+        this.physics = new IsoPhysicsManager();
 
         if (windowOptions === undefined) {
             windowOptions = this.defaultWindowOptions;

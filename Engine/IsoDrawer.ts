@@ -32,6 +32,7 @@ class IsoDrawer {
         var tiles = tileMap.getTilesInView();
         for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
             for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {
+                tiles.tiles[y][x].updatePosition();
                 var detail = tiles.tiles[y][x].getRenderDetails();
 
                 if (tiles.tiles[y][x].rotation !== 0) {
@@ -62,7 +63,8 @@ class IsoDrawer {
     drawSprites(sprites: Array<IsoSprite>) {
         for (var i = 0; i < sprites.length; i++) {
             var s = sprites[i];
-            if (s.hidden === true) {
+            if (s.hidden === false) {
+                s.updatePosition();
                 var renderDetails = s.getRenderDetails();
                 if (s.rotation !== 0) {
                     this.translate(s, renderDetails);

@@ -196,7 +196,7 @@ class IsoAnimation {
         this.name = name;
         this.object = object;
         this.attribute = attribute;
-        this.startValue = object[attribute]|0;
+        this.startValue = this.getObjectValue();
         this.endValue = endValue;
         this.duration = duration;
         this.easing = easing;
@@ -227,14 +227,7 @@ class IsoAnimation {
             }
             this.currentIteration++;
             this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
-
-            var a = this.attribute.split(".");
-            var s = "";
-            for (var i = 0; i < a.length; i++) {
-                s += "['" + a[i] + "']";
-            }
-            var f = new Function("o", "v", "o" + s + "=  v;");
-            f(this.object, this.actualValue);
+            this.setObjectValue(this.actualValue);
 
             if (this.actualValue === this.endValue) {
                 switch (this.type) {
@@ -321,6 +314,26 @@ class IsoAnimation {
             this.__playFrame();
         }
         return this;
+    }
+
+    getObjectValue() {
+        var a = this.attribute.split("."),
+            s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
+        }
+        var f = new Function("o", "return o" + s + ";");
+        return f(this.object);
+    }
+
+    setObjectValue(value: number) {
+        var a = this.attribute.split(".");
+        var s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
+        }
+        var f = new Function("o", "v", "o" + s + "+=  v;");
+        f(this.object, value - this.getObjectValue());
     }
 
 }

@@ -91,7 +91,19 @@ class IsoTileObject extends IsoObject {
     set(tile: IsoTileObjectInfo): IsoTileObject {
         this.tileHeight = tile.height;
         this.tileSize = tile.size;
+        this.rigidBody.width = tile.size.width;
+        this.rigidBody.height = tile.size.height;
         this.setTile(tile.tile);
         return this;
+    }
+
+    updatePosition() {
+        this.velocity.x *= this.friction;
+        if (this.mass === 0) {
+            this.velocity.y *= this.friction;
+        }
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.rigidBody = this.getCoords();
     }
 }  

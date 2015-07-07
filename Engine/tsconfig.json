@@ -16,6 +16,9 @@
     ],
     "files": [
         "./IsoAnimatedSprite.ts",
+        "./IsoAnimation.ts",
+        "./IsoAnimationManager.ts",
+        "./IsoBlendingModes.ts",
         "./IsoCanvas.ts",
         "./IsoConfig.ts",
         "./IsoDrawer.ts",

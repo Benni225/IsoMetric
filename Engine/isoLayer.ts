@@ -94,18 +94,6 @@ class IsoLayer {
         if (this.tileMap !== undefined) {
             this.tileMap.scroll(deltaX, deltaY);
         }
-
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].scroll(deltaX, deltaY);
-        }
-
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].scroll(deltaX, deltaY);
-        }
-
-        for (var i = 0; i < this.billboards.length; i++) {
-            //this.billboards[i].scroll(deltaX, deltaY);
-        }
     }
 
     rotate(degrees: number) {

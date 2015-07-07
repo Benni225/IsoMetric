@@ -54,8 +54,11 @@
             grandpa.addFrameAnimation("walk-down", [1, 2, 3], 500, IsoEasing.Linear, IsoAnimation.PINGPONG);
             grandpa.setBlendingMode(IsoBlendingModes.NORMAL);
             grandpa.setAlpha(0.75);
+            grandpa.setSpeed(5);
+            grandpa.setFriction(0.8);
             grandpa.setZoomPoint({ x: app.canvas.canvasElement.width / 2, y: app.canvas.canvasElement.height / 2 });
             grandpa.setPosition({ x: 200, y: 50 });
+
             gameloop();
         });
 
@@ -63,24 +66,28 @@
             if (app.input.keyEventType === IsoInput.EVENT_KEYDOWN) {
                 switch (app.input.keyCode) {
                     case IsoInput.KEYUP:
-                        firstLayer.scroll(0, 1);
-                        grandpa.scroll(0, -1.5);
+                        firstLayer.scroll(0, 2);
+                        grandpa.move(0, -2);
                         grandpa.play("walk-up");
                         break;
                     case IsoInput.KEYDOWN:
-                        firstLayer.scroll(0, -1);
-                        grandpa.scroll(0, 1.5);
+                        firstLayer.scroll(0, -2);
+                        grandpa.move(0, 2);
                         grandpa.play("walk-down");
                         break;
                     case IsoInput.KEYLEFT:
-                        firstLayer.scroll(1, 0);
-                        grandpa.scroll(-1.5, 0);
+                        firstLayer.scroll(2, 0);
+                        grandpa.move(-2, 0);
                         grandpa.play("walk-left");
                         break;
                     case IsoInput.KEYRIGHT:
-                        firstLayer.scroll(-1, 0);
-                        grandpa.scroll(1.5, 0);
+                        firstLayer.scroll(-2, 0);
+                        grandpa.move(2, 0);
                         grandpa.play("walk-right");
+                        break;
+                    case 17:
+                        if(grandpa.velocity.y === 0)
+                            grandpa.move(0, -15);
                         break;
                 }
             } else {
@@ -89,6 +96,7 @@
                 grandpa.stop("walk-up");
                 grandpa.stop("walk-down");
             }
+
             if (app.input.keyEventType === IsoInput.EVENT_KEYPRESS) {
                 switch (app.input.keyCode) {
                     case 43:
@@ -110,35 +118,28 @@
 
             if (tile !== undefined && tile !== null) {
                 highLight.hidden = false;
-
                 if (app.input.mouseEventType === IsoInput.EVENT_MOUSEDOWN) {
+                    app.physics.addRigidBody(tile);
                     tile.addAnimation("rotation2", "rotation", 360, 3000, IsoEasing.SineInOut, IsoAnimation.ONCE).play("rotation2");
                     tile.setAnchor(32, 32);
                     tile.setTile(30);
                 }
                 var renderDetails = tile.getRenderDetails();
-                var hRenderDetails = highLight.getRenderDetails();
+                highLight.setPosition({
+                    x: (renderDetails.mapPosition.column * renderDetails.tileSize.width) + tile.scrollPosition.x,
+                    y: (renderDetails.mapPosition.row * renderDetails.tileSize.height) + tile.scrollPosition.y,
+                });
                 app.canvas.context.strokeRect(
                     renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel),
                     renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel),
                     renderDetails.renderSize.width,
                     renderDetails.renderSize.height
                 );
-                app.canvas.context.globalCompositeOperation = highLight.blendingMode;
-                app.canvas.context.drawImage(
-                    hRenderDetails.image,
-                    hRenderDetails.offset.x,
-                    hRenderDetails.offset.y,
-                    hRenderDetails.tileSize.width,
-                    hRenderDetails.tileSize.height,
-                    renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel),
-                    renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel),
-                    renderDetails.renderSize.width,
-                    renderDetails.renderSize.height
-                );
+
             } else {
                 highLight.hidden = true;
             }
+            app.physics.update();
             app.canvas.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
             //After drawing the maps and sprites:
             app.canvas.context.fillStyle = "#fff";

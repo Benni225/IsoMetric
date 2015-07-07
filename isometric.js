@@ -18,10 +18,11 @@ var IsoObject = (function () {
         this.anchor = { x: 0, y: 0 };
         this.blendingMode = IsoBlendingModes.NORMAL;
         this.alpha = 1;
-        this.hidden = true;
+        this.hidden = false;
         this.properties = {};
         this.mass = 0;
-        this.rigid = false;
+        this.friction = 1;
+        this.velocity = { x: 0, y: 0 };
         this.Engine = Engine;
         try {
             this.setImage(image);
@@ -30,6 +31,12 @@ var IsoObject = (function () {
             if (name !== undefined) {
                 this.setName(name);
             }
+            this.rigidBody = {
+                x: 0,
+                y: 0,
+                width: image.image.width,
+                height: image.image.height
+            };
             return this;
         }
         catch (e) {
@@ -96,8 +103,8 @@ var IsoObject = (function () {
     };
     IsoObject.prototype.getRelativePosition = function () {
         var x = 0, y = 0;
-        x = (this.position.x * this.zoomLevel) + (this.offset.x * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
-        y = (this.position.y * this.zoomLevel) + (this.offset.y * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
+        x = ((this.position.x + this.offset.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
+        y = ((this.position.y + this.offset.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
         return {
             x: x,
             y: y
@@ -123,8 +130,8 @@ var IsoObject = (function () {
         return this.rotation;
     };
     IsoObject.prototype.isBoxCollision = function (coordsSource, coordsTarget) {
-        if ((coordsSource.x > coordsTarget.x || (coordsSource.x + coordsSource.width) < (coordsTarget.x + coordsTarget.width)) &&
-            (coordsSource.y > coordsTarget.y || (coordsSource.y + coordsSource.height) < (coordsTarget.y + coordsTarget.height))) {
+        if ((coordsSource.x < coordsTarget.x && coordsSource.x + coordsSource.width > coordsTarget.x || coordsSource.x < coordsTarget.x + coordsTarget.width && coordsSource.x + coordsSource.width > coordsTarget.x) &&
+            (coordsSource.y < coordsTarget.y + coordsTarget.height && coordsSource.y + coordsSource.height > coordsTarget.y)) {
             return true;
         }
         else {
@@ -140,8 +147,22 @@ var IsoObject = (function () {
         return false;
     };
     IsoObject.prototype.move = function (deltaX, deltaY) {
-        this.position.x = this.position.x + (deltaX * this.speed);
-        this.position.y = this.position.y + (deltaY * this.speed);
+        this.velocity.x += deltaX;
+        this.velocity.y += deltaY;
+        if (this.velocity.x > this.speed) {
+            this.velocity.x = this.speed;
+        }
+        if (this.velocity.x < -this.speed) {
+            this.velocity.x = -this.speed;
+        }
+        if (this.mass === 0) {
+            if (this.velocity.y > this.speed) {
+                this.velocity.y = this.speed;
+            }
+            if (this.velocity.y < -this.speed) {
+                this.velocity.y = -this.speed;
+            }
+        }
         return this;
     };
     IsoObject.prototype.rotate = function (degrees) {
@@ -171,6 +192,10 @@ var IsoObject = (function () {
     };
     IsoObject.prototype.setImage = function (image) {
         this.image = image;
+        return this;
+    };
+    IsoObject.prototype.setFriction = function (friction) {
+        this.friction = friction;
         return this;
     };
     IsoObject.prototype.setName = function (name) {
@@ -248,6 +273,15 @@ var IsoObject = (function () {
     IsoObject.prototype.pause = function (name) {
         this.Engine.animation.pause(name, this);
         return this;
+    };
+    IsoObject.prototype.updatePosition = function () {
+        this.velocity.x *= this.friction;
+        if (this.mass === 0) {
+            this.velocity.y *= this.friction;
+        }
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.rigidBody = this.getCoords();
     };
     IsoObject.BOX_COLLISION = "box";
     IsoObject.PIXEL_COLLISION = "pixel";
@@ -334,8 +368,19 @@ var IsoTileObject = (function (_super) {
     IsoTileObject.prototype.set = function (tile) {
         this.tileHeight = tile.height;
         this.tileSize = tile.size;
+        this.rigidBody.width = tile.size.width;
+        this.rigidBody.height = tile.size.height;
         this.setTile(tile.tile);
         return this;
+    };
+    IsoTileObject.prototype.updatePosition = function () {
+        this.velocity.x *= this.friction;
+        if (this.mass === 0) {
+            this.velocity.y *= this.friction;
+        }
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.rigidBody = this.getCoords();
     };
     return IsoTileObject;
 })(IsoObject);
@@ -389,8 +434,8 @@ var IsoTile = (function (_super) {
     IsoTile.prototype.getCoords = function () {
         var r = this.getRenderDetails();
         return {
-            x: r.position.x + (this.mapPosition.column * this.tileSize.width * this.zoomLevel),
-            y: r.position.y + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight,
+            x: r.position.x + (r.mapPosition.column * r.tileSize.width * r.zoomLevel),
+            y: r.position.y + (r.mapPosition.row * r.tileSize.height * r.zoomLevel) - this.tileHeight,
             width: this.tileSize.width * this.zoomLevel,
             height: this.tileSize.height * this.zoomLevel
         };
@@ -411,6 +456,12 @@ var IsoTile = (function (_super) {
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
         };
+    };
+    IsoTile.prototype.updatePosition = function () {
+        this.velocity.x *= this.friction;
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.rigidBody = this.getCoords();
     };
     IsoTile.AUTOMATIC = "automatic";
     IsoTile.MANUAL = "manual";
@@ -732,8 +783,8 @@ var IsoTileMap = (function () {
         return this;
     };
     IsoTileMap.prototype.scroll = function (x, y) {
-        x = (x * this.speed) + this.scrollPosition.x;
-        y = (y * this.speed) + this.scrollPosition.y;
+        x = x + this.scrollPosition.x;
+        y = y + this.scrollPosition.y;
         this.scrollPosition = {
             x: x,
             y: y
@@ -1094,7 +1145,7 @@ var IsoAnimation = (function () {
         this.name = name;
         this.object = object;
         this.attribute = attribute;
-        this.startValue = object[attribute] | 0;
+        this.startValue = this.getObjectValue();
         this.endValue = endValue;
         this.duration = duration;
         this.easing = easing;
@@ -1125,13 +1176,7 @@ var IsoAnimation = (function () {
             }
             this.currentIteration++;
             this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
-            var a = this.attribute.split(".");
-            var s = "";
-            for (var i = 0; i < a.length; i++) {
-                s += "['" + a[i] + "']";
-            }
-            var f = new Function("o", "v", "o" + s + "=  v;");
-            f(this.object, this.actualValue);
+            this.setObjectValue(this.actualValue);
             if (this.actualValue === this.endValue) {
                 switch (this.type) {
                     case IsoAnimation.ONCE:
@@ -1214,6 +1259,23 @@ var IsoAnimation = (function () {
             this.__playFrame();
         }
         return this;
+    };
+    IsoAnimation.prototype.getObjectValue = function () {
+        var a = this.attribute.split("."), s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
+        }
+        var f = new Function("o", "return o" + s + ";");
+        return f(this.object);
+    };
+    IsoAnimation.prototype.setObjectValue = function (value) {
+        var a = this.attribute.split(".");
+        var s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
+        }
+        var f = new Function("o", "v", "o" + s + "+=  v;");
+        f(this.object, value - this.getObjectValue());
     };
     /**
      * See animationType. Plays the animation one time.
@@ -1441,6 +1503,7 @@ var IsoDrawer = (function () {
         var tiles = tileMap.getTilesInView();
         for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
             for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {
+                tiles.tiles[y][x].updatePosition();
                 var detail = tiles.tiles[y][x].getRenderDetails();
                 if (tiles.tiles[y][x].rotation !== 0) {
                     this.translateTile(tiles.tiles[y][x], detail);
@@ -1459,7 +1522,8 @@ var IsoDrawer = (function () {
     IsoDrawer.prototype.drawSprites = function (sprites) {
         for (var i = 0; i < sprites.length; i++) {
             var s = sprites[i];
-            if (s.hidden === true) {
+            if (s.hidden === false) {
+                s.updatePosition();
                 var renderDetails = s.getRenderDetails();
                 if (s.rotation !== 0) {
                     this.translate(s, renderDetails);
@@ -1777,14 +1841,6 @@ var IsoLayer = (function () {
         if (this.tileMap !== undefined) {
             this.tileMap.scroll(deltaX, deltaY);
         }
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].scroll(deltaX, deltaY);
-        }
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].scroll(deltaX, deltaY);
-        }
-        for (var i = 0; i < this.billboards.length; i++) {
-        }
     };
     IsoLayer.prototype.rotate = function (degrees) {
         for (var i = 0; i < this.sprites.length; i++) {
@@ -2059,6 +2115,7 @@ var IsoMetric = (function () {
         this.animation = new IsoAnimationManager();
         this.on = new IsoOn();
         this.ressources = new IsoRessourceManager(this);
+        this.physics = new IsoPhysicsManager();
         if (windowOptions === undefined) {
             windowOptions = this.defaultWindowOptions;
         }
@@ -2105,9 +2162,75 @@ var IsoMetric = (function () {
     return IsoMetric;
 })();
 "use strict";
-var IsoPhysicsManagr = (function () {
-    function IsoPhysicsManagr() {
+var IsoPhysicsManager = (function () {
+    function IsoPhysicsManager() {
+        this.rigidBodies = new Array();
+        this.massBodies = new Array();
+        this.gravity = 0.2;
     }
-    return IsoPhysicsManagr;
+    IsoPhysicsManager.prototype.addMassBody = function (object) {
+        this.massBodies.push(object);
+    };
+    IsoPhysicsManager.prototype.addRigidBody = function (object) {
+        this.rigidBodies.push(object);
+    };
+    IsoPhysicsManager.prototype.removeRigidBody = function (object) {
+        var __i;
+        for (var i = 0; i < this.rigidBodies.length; i++) {
+            if (this.rigidBodies[i] === object) {
+                __i = i;
+            }
+            if (__i !== undefined) {
+                if (this.rigidBodies[i + 1] !== undefined) {
+                    this.rigidBodies[i] = this.rigidBodies[i + 1];
+                }
+            }
+        }
+    };
+    IsoPhysicsManager.prototype.removeMassBody = function (object) {
+        var __i;
+        for (var i = 0; i < this.massBodies.length; i++) {
+            if (this.massBodies[i] === object) {
+                __i = i;
+            }
+            if (__i !== undefined) {
+                if (this.massBodies[i + 1] !== undefined) {
+                    this.massBodies[i] = this.massBodies[i + 1];
+                }
+            }
+        }
+    };
+    IsoPhysicsManager.prototype.setGravity = function (g) {
+        this.gravity = g;
+    };
+    IsoPhysicsManager.prototype.update = function () {
+        for (var i = 0; i < this.massBodies.length; i++) {
+            if (this.massBodies[i] !== undefined) {
+                this.massBodies[i].velocity.y += this.gravity * 2;
+                var collides = false;
+                for (var j = 0; j < this.rigidBodies.length; j++) {
+                    if (this.rigidBodies[j] !== undefined && this.massBodies[i].collide(this.rigidBodies[j])) {
+                        this.massBodies[i].velocity.y = 0;
+                        if ((this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) > this.rigidBodies[j].rigidBody.y) {
+                            if ((this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) - this.rigidBodies[j].rigidBody.y < 5) {
+                                this.massBodies[i].position.y -= (this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) - this.rigidBodies[j].rigidBody.y;
+                            }
+                            else if ((this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) - this.rigidBodies[j].rigidBody.y >= 5) {
+                                if ((this.massBodies[i].rigidBody.x < this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width) &&
+                                    (this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width > this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width)) {
+                                    this.massBodies[i].position.x += (this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width) - this.massBodies[i].rigidBody.x;
+                                }
+                                else if ((this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width > this.rigidBodies[j].rigidBody.x) &&
+                                    (this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width < this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width)) {
+                                    this.massBodies[i].position.x += this.rigidBodies[j].rigidBody.x - (this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+    return IsoPhysicsManager;
 })();
 //# sourceMappingURL=isometric.js.map

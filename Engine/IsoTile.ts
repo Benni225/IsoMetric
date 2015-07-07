@@ -77,8 +77,8 @@ class IsoTile extends IsoTileObject {
     getCoords(): IsoCoords {
         var r = this.getRenderDetails();
         return {
-            x: r.position.x + (this.mapPosition.column * this.tileSize.width * this.zoomLevel),
-            y: r.position.y + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight,
+            x: r.position.x + (r.mapPosition.column * r.tileSize.width * r.zoomLevel),
+            y: r.position.y + (r.mapPosition.row * r.tileSize.height * r.zoomLevel) - this.tileHeight,
             width: this.tileSize.width * this.zoomLevel,
             height: this.tileSize.height * this.zoomLevel
         };
@@ -103,9 +103,12 @@ class IsoTile extends IsoTileObject {
         };
     }
 
-    updatePhysics(objects: Array<IsoObject>) {
-        if (this.mass !== 0) {
+    updatePosition() {
+        this.velocity.x *= this.friction;
 
-        }
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.rigidBody = this.getCoords();
+
     }
 } 

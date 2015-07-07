@@ -294,8 +294,8 @@ class IsoTileMap {
     }
 
     scroll(x: number, y: number): IsoTileMap {
-        x = (x * this.speed) + this.scrollPosition.x;
-        y = (y * this.speed) + this.scrollPosition.y;
+        x = x + this.scrollPosition.x;
+        y = y + this.scrollPosition.y;
         this.scrollPosition = {
             x: x,
             y: y

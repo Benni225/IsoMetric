@@ -10,6 +10,10 @@ interface IsoScroll {
     x: number;
     y: number;
 }
+interface IsoVelocity {
+    x: number;
+    y: number;
+}
 interface IsoDimension {
     width: number;
     height: number;
@@ -51,7 +55,9 @@ declare class IsoObject {
     hidden: boolean;
     properties: Object;
     mass: number;
-    rigid: boolean;
+    friction: number;
+    velocity: IsoVelocity;
+    rigidBody: IsoCoords;
     constructor(Engine: any, image: IsoRessource, name?: string);
     addAnimation(name: string, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoObject;
     collide(object: IsoObject): boolean;
@@ -85,6 +91,7 @@ declare class IsoObject {
     setBlendingMode(blendingMode: string): IsoObject;
     setHeight(height: number): IsoObject;
     setImage(image: IsoRessource): IsoObject;
+    setFriction(friction: number): IsoObject;
     setName(name: string): IsoObject;
     setOffset(offsetX: number, offsetY: number): IsoObject;
     setPosition(position: IsoPoint): IsoObject;
@@ -103,6 +110,7 @@ declare class IsoObject {
     stop(name: any): IsoObject;
     resume(name: string): IsoObject;
     pause(name: string): IsoObject;
+    updatePosition(): void;
 }
 interface IsoTileSize {
     width: number;
@@ -127,6 +135,7 @@ declare class IsoTileObject extends IsoObject {
     getTileImage(): IsoTileImage;
     setTile(tile: number): IsoTileObject;
     set(tile: IsoTileObjectInfo): IsoTileObject;
+    updatePosition(): void;
 }
 interface IsoTileImage {
     x: number;
@@ -185,6 +194,7 @@ declare class IsoTile extends IsoTileObject {
         offset: IsoOffset;
         zoomLevel: number;
     };
+    updatePosition(): void;
 }
 declare class IsoMap {
     name: string;
@@ -459,6 +469,8 @@ declare class IsoAnimation {
     stop(): IsoAnimation;
     pause(): IsoAnimation;
     resume(): IsoAnimation;
+    getObjectValue(): any;
+    setObjectValue(value: number): void;
 }
 declare class IsoAnimationManager {
     animations: Array<IsoAnimation>;
@@ -765,6 +777,7 @@ declare class IsoMetric {
      * @see IsoDrawer
      */
     drawer: IsoDrawer;
+    physics: IsoPhysicsManager;
     animation: IsoAnimationManager;
     /**
      * The input library.
@@ -836,6 +849,14 @@ declare class IsoMetric {
      */
     setDirection(direction: number): void;
 }
-declare class IsoPhysicsManagr {
-    objects: Array<IsoObject>;
+declare class IsoPhysicsManager {
+    rigidBodies: Array<IsoObject>;
+    massBodies: Array<IsoObject>;
+    gravity: number;
+    addMassBody(object: IsoObject): void;
+    addRigidBody(object: IsoObject): void;
+    removeRigidBody(object: IsoObject): void;
+    removeMassBody(object: IsoObject): void;
+    setGravity(g: number): void;
+    update(): void;
 }

@@ -15,6 +15,11 @@ interface IsoScroll {
     y: number;
 }
 
+interface IsoVelocity {
+    x: number;
+    y: number;
+}
+
 interface IsoDimension {
     width: number;
     height: number;
@@ -56,11 +61,12 @@ class IsoObject {
     anchor: IsoAnchor = { x: 0, y: 0 };
     blendingMode: string = IsoBlendingModes.NORMAL;
     alpha: number = 1;
-    hidden: boolean = true;
+    hidden: boolean = false;
     properties: Object = {};
     mass: number = 0;
-    rigid: boolean = false;
-
+    friction: number = 1;
+    velocity: IsoVelocity = { x: 0, y: 0 };
+    rigidBody: IsoCoords;
     constructor(Engine, image: IsoRessource, name?: string) {
         this.Engine = Engine;
         try {
@@ -70,6 +76,12 @@ class IsoObject {
             if (name !== undefined) {
                 this.setName(name);
             }
+            this.rigidBody = {
+                x: 0,
+                y: 0,
+                width: image.image.width,
+                height: image.image.height
+            };
             return this;
         } catch (e) {
             throw ("Can not create object with error message: " + e);
@@ -140,8 +152,8 @@ class IsoObject {
 
     getRelativePosition(): IsoPoint {
         var x = 0, y = 0;
-        x = (this.position.x * this.zoomLevel) + (this.offset.x * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
-        y = (this.position.y * this.zoomLevel) + (this.offset.y * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
+        x = ((this.position.x + this.offset.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
+        y = ((this.position.y + this.offset.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
         return {
             x: x,
             y: y
@@ -172,8 +184,9 @@ class IsoObject {
 
     isBoxCollision(coordsSource: IsoCoords, coordsTarget: IsoCoords): boolean {
         if (
-            (coordsSource.x > coordsTarget.x || (coordsSource.x + coordsSource.width) < (coordsTarget.x + coordsTarget.width)) &&
-            (coordsSource.y > coordsTarget.y || (coordsSource.y + coordsSource.height) < (coordsTarget.y + coordsTarget.height))) {
+            (coordsSource.x < coordsTarget.x && coordsSource.x + coordsSource.width > coordsTarget.x || coordsSource.x < coordsTarget.x + coordsTarget.width && coordsSource.x + coordsSource.width > coordsTarget.x) &&
+            (coordsSource.y < coordsTarget.y + coordsTarget.height && coordsSource.y + coordsSource.height > coordsTarget.y)
+            ) {
             return true;
         } else {
             return false;
@@ -191,8 +204,22 @@ class IsoObject {
     }
 
     move(deltaX: number, deltaY: number): IsoObject {
-        this.position.x = this.position.x + (deltaX * this.speed);
-        this.position.y = this.position.y + (deltaY * this.speed);
+        this.velocity.x += deltaX;
+        this.velocity.y += deltaY;
+        if (this.velocity.x > this.speed) {
+            this.velocity.x = this.speed;
+        }
+        if (this.velocity.x < -this.speed) {
+            this.velocity.x = - this.speed;
+        }
+        if (this.mass === 0) {
+            if (this.velocity.y > this.speed) {
+                this.velocity.y = this.speed;
+            }
+            if (this.velocity.y < -this.speed) {
+                this.velocity.y = - this.speed;
+            }
+        }
         return this;
     }
 
@@ -229,6 +256,11 @@ class IsoObject {
 
     setImage(image: IsoRessource): IsoObject {
         this.image = image;
+        return this;
+    }
+
+    setFriction(friction: number): IsoObject {
+        this.friction = friction;
         return this;
     }
 
@@ -324,5 +356,16 @@ class IsoObject {
     pause(name: string): IsoObject {
         this.Engine.animation.pause(name, this);
         return this;
+    }
+
+    updatePosition() {
+        this.velocity.x *= this.friction;
+        if (this.mass === 0) {
+            this.velocity.y *= this.friction;
+        }
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.rigidBody = this.getCoords();
+        
     }
 } 

@@ -1,249 +1,4 @@
-﻿/**
- * A library including all easing-functions. 
- */
-﻿var IsoEasing = {
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    Linear: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * currentIteration / iterationCount + startValue;
-     },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuadIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        currentIteration = currentIteration / iterationCount;
-        return (endValue - startValue) * currentIteration * currentIteration + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static
-     */
-    QuadOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return -(endValue - startValue) * (currentIteration /= iterationCount) * (currentIteration - 2) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuadInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        if ((currentIteration /= iterationCount / 2) < 1) {
-            return (endValue - startValue) / 2 * currentIteration * currentIteration + startValue;
-        }
-        return -(endValue - startValue) / 2 * ((--currentIteration) * (currentIteration - 2) - 1) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    CubicIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * Math.pow(currentIteration / iterationCount, 3) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    CubicOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * (Math.pow(currentIteration / iterationCount - 1, 3) + 1) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    CubicInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        if ((currentIteration /= iterationCount / 2) < 1) {
-            return (endValue - startValue) / 2 * Math.pow(currentIteration, 3) + startValue;
-        }
-        return (endValue - startValue) / 2 * (Math.pow(currentIteration - 2, 3) + 2) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuartIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * Math.pow(currentIteration / iterationCount, 4) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuartOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return -(endValue - startValue) * (Math.pow(currentIteration / iterationCount - 1, 4) - 1) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuartInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        if ((currentIteration /= iterationCount / 2) < 1) {
-            return (endValue - startValue) / 2 * Math.pow(currentIteration, 4) + startValue;
-        }
-        return -(endValue - startValue) / 2 * (Math.pow(currentIteration - 2, 4) - 2) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuintIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * Math.pow(currentIteration / iterationCount, 5) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    QuintOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * (Math.pow(currentIteration / iterationCount - 1, 5) + 1) + startValue;
-    },
-    /**
-     * @method IsoEasing.QuintInOut
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static
-     */
-    QuintInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        if ((currentIteration /= iterationCount / 2) < 1) {
-            return (endValue - startValue) / 2 * Math.pow(currentIteration, 5) + startValue;
-        }
-        return (endValue - startValue) / 2 * (Math.pow(currentIteration - 2, 5) + 2) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    SineIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * (1 - Math.cos(currentIteration / iterationCount * (Math.PI / 2))) + startValue;
-    },
-    /**
-     * @method IsoEasing.SineOut
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    SineOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * Math.sin(currentIteration / iterationCount * (Math.PI / 2)) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    SineInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) / 2 * (1 - Math.cos(Math.PI * currentIteration / iterationCount)) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    ExpoIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * Math.pow(2, 10 * (currentIteration / iterationCount - 1)) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    ExpoOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * (-Math.pow(2, -10 * currentIteration / iterationCount) + 1) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    ExpoInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        if ((currentIteration /= iterationCount / 2) < 1) {
-            return (endValue - startValue) / 2 * Math.pow(2, 10 * (currentIteration - 1)) + startValue;
-        }
-        return (endValue - startValue) / 2 * (-Math.pow(2, -10 * --currentIteration) + 2) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    CircIn: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * (1 - Math.sqrt(1 - (currentIteration /= iterationCount) * currentIteration)) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    CircOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        return (endValue - startValue) * Math.sqrt(1 - (currentIteration = currentIteration / iterationCount - 1) * currentIteration) + startValue;
-    },
-    /**
-     * @param {number} currentIteration The current iteration.
-     * @param {number} startValue The starting value of an animation
-     * @param {number} endValue The target value of an animation
-     * @param {number} iterationCount The number of iterations
-     * @static 
-     */
-    CircInOut: function (currentIteration: number, startValue: number, endValue: number, iterationCount: number) {
-        if ((currentIteration /= iterationCount / 2) < 1) {
-            return (endValue - startValue) / 2 * (1 - Math.sqrt(1 - currentIteration * currentIteration)) + startValue;
-        }
-        return (endValue - startValue) / 2 * (Math.sqrt(1 - (currentIteration -= 2) * currentIteration) + 1) + startValue;
-    }
-};
+﻿///<reference path="IsoEasing.ts" />
 /**
  * Controls an animations.
  * There are two types of animations:
@@ -281,14 +36,6 @@ class IsoAnimation {
     
     /**
      * Creates a new frame-based animation.
-     * @param {string} name Name of the new animation.
-     * @param {IsoAnimatedSprite|IsoTile} object The animated sprite or tile.
-     * @param {Array<number>} frames The frames of the animation.
-     * @param {number} duration The duration of the animation in milliseconds.
-     * @param {function} [easing=IsoEasing.Linear] The easing of the animation.
-     * @param {string} [type=IsoEasing.Linear] Sets if the animation played once, endless or endless in pingpong.
-     * @param {Array<IsoCallbacks>} [callbacks=new Array()] Callbacks.
-     * @return {IsoAnimation} The new animation.
      */
     createFrameAnimation(name: string, object: IsoAnimatedSprite|IsoTile, frames: Array<number>, duration: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()): IsoAnimation {
         this.name = name;
@@ -305,15 +52,6 @@ class IsoAnimation {
     }
     /**
      * Creates a new frame-based animation.
-     * @param {string} name Name of the new animation.
-     * @param {object} object The animated object.
-     * @param {string} attribute The attribute of the object, that the animation will change.
-     * @param {number} endValue The target value of the attribute.
-     * @param {number} duration The duration of the animation in milliseconds.
-     * @param {function} [easing=IsoEasing.Linear] The easing of the animation.
-     * @param {string} [type=IsoEasing.Linear] Sets if the animation played once, endless or endless in pingpong.
-     * @param {Array<IsoCallbacks>} [callbacks=new Array()] Callbacks.
-     * @return {IsoAnimation} The new animation.
      */
     createAnimation(name: string, object: Object, attribute: string, endValue: number, duration: number, easing: Function = IsoEasing.Linear, type: string = "once", callbacks: Array<IsoCallback> = new Array()): IsoAnimation {
         this.name = name;
@@ -330,7 +68,6 @@ class IsoAnimation {
     }
     /**
      * Starts the animation. 
-     * @return {IsoAnimation} The new animation.
      */
     play(): IsoAnimation {
         if (this.isPlaying === false) {
@@ -347,7 +84,6 @@ class IsoAnimation {
     }
     /**
      * Starts an animation of the type "attribute". 
-     * @private 
      */
     private __playAttribute() {
         if (this.isPlaying === true) {
@@ -385,7 +121,6 @@ class IsoAnimation {
     }
     /**
      * Starts an animation of the type "frame". 
-     * @private 
      */
     private __playFrame() {
         if (this.isPlaying === true) {
@@ -455,7 +190,6 @@ class IsoAnimation {
     }
     /**
      * Parse the object and return the given attribute.
-     * @private 
      */
     private getObjectValue() {
         var a = this.attribute.split("."),
@@ -468,7 +202,6 @@ class IsoAnimation {
     }
     /**
      * Parse the object and set the given attribute.
-     * @private
      */
     setObjectValue(value: number) {
         var a = this.attribute.split(".");

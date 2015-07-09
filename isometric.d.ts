@@ -561,42 +561,22 @@ declare class IsoAnimation {
     constructor();
     /**
      * Creates a new frame-based animation.
-     * @param {string} name Name of the new animation.
-     * @param {IsoAnimatedSprite|IsoTile} object The animated sprite or tile.
-     * @param {Array<number>} frames The frames of the animation.
-     * @param {number} duration The duration of the animation in milliseconds.
-     * @param {function} [easing=IsoEasing.Linear] The easing of the animation.
-     * @param {string} [type=IsoEasing.Linear] Sets if the animation played once, endless or endless in pingpong.
-     * @param {Array<IsoCallbacks>} [callbacks=new Array()] Callbacks.
-     * @return {IsoAnimation} The new animation.
      */
     createFrameAnimation(name: string, object: IsoAnimatedSprite | IsoTile, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
     /**
      * Creates a new frame-based animation.
-     * @param {string} name Name of the new animation.
-     * @param {object} object The animated object.
-     * @param {string} attribute The attribute of the object, that the animation will change.
-     * @param {number} endValue The target value of the attribute.
-     * @param {number} duration The duration of the animation in milliseconds.
-     * @param {function} [easing=IsoEasing.Linear] The easing of the animation.
-     * @param {string} [type=IsoEasing.Linear] Sets if the animation played once, endless or endless in pingpong.
-     * @param {Array<IsoCallbacks>} [callbacks=new Array()] Callbacks.
-     * @return {IsoAnimation} The new animation.
      */
     createAnimation(name: string, object: Object, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
     /**
      * Starts the animation.
-     * @return {IsoAnimation} The new animation.
      */
     play(): IsoAnimation;
     /**
      * Starts an animation of the type "attribute".
-     * @private
      */
     private __playAttribute();
     /**
      * Starts an animation of the type "frame".
-     * @private
      */
     private __playFrame();
     /**
@@ -613,12 +593,10 @@ declare class IsoAnimation {
     resume(): IsoAnimation;
     /**
      * Parse the object and return the given attribute.
-     * @private
      */
     private getObjectValue();
     /**
      * Parse the object and set the given attribute.
-     * @private
      */
     setObjectValue(value: number): void;
 }

@@ -1,6 +1,10 @@
 ﻿///<reference path="IsoTile" />
 ///<reference path="IsoTileMap" />
 "use strict";
+/** 
+ * @interface IsoCollisionBody
+ * @static
+ */
 interface IsoCollisionBody {
     x: number;
     y: number;
@@ -15,8 +19,6 @@ interface IsoFrame {
 
 class IsoSprite extends IsoTileObject {
     Engine: IsoMetric;
-    direction: number;
-    collisionBody: IsoCollisionBody;
 
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string) {
         super(Engine, image, tileInfo);
@@ -25,25 +27,6 @@ class IsoSprite extends IsoTileObject {
             this.setName(name);
         }
         return this;
-    }
-
-    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile> {
-        var collisionBody: IsoCollisionBody = this.collisionBody;
-        if (collisionBody === undefined) {
-            collisionBody = {
-                x: 0,
-                y: 0,
-                width: this.width,
-                height: this.height
-            };
-        }
-
-        return tilemap.getTilesInRadius(
-                this.position.x + collisionBody.x,
-                this.position.y + collisionBody.y,
-                collisionBody.width,
-                collisionBody.height
-            );
     }
 
     getTileImage(): IsoTileImage {
@@ -67,11 +50,6 @@ class IsoSprite extends IsoTileObject {
         return this;
     }
 
-    setDirection(direction: number): IsoSprite {
-        this.direction = direction;
-        return this;
-    }
-
     set(tile: IsoTileObjectInfo): IsoTileObject {
         this.tileHeight = tile.height;
         this.tileSize = tile.size;
@@ -80,10 +58,16 @@ class IsoSprite extends IsoTileObject {
     }
 
     getRenderDetails() {
+        var fx = this.anchor.x / this.tileSize.width,
+            fy = this.anchor.y / this.tileSize.height
         return {
             position: this.getRelativePosition(),
             tileSize: this.tileSize,
-            renderSize: this.getRelativeDimension(),
+            renderSize: {
+                width: this.tileSize.width * this.zoomLevel,
+                height: this.tileSize.height * this.zoomLevel
+            },
+            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel

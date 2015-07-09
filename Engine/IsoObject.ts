@@ -168,10 +168,16 @@ class IsoObject {
     }
 
     getRenderDetails() {
+        var fx = this.anchor.x / this.width,
+            fy = this.anchor.y / this.height
         return {
             position: this.getRelativePosition(),
             tileSize: this.getOriginalDimension(),
-            renderSize: this.getRelativeDimension(),
+            renderSize: {
+                width: this.width * this.zoomLevel,
+                height: this.height * this.zoomLevel
+            },
+            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx)), y: (this.position.y + (this.height * this.zoomLevel * fy)) },
             image: this.image.image.get(),
             offset: this.getOffset(),
             zoomLevel: this.zoomLevel
@@ -367,5 +373,24 @@ class IsoObject {
         this.position.y += this.velocity.y;
         this.rigidBody = this.getCoords();
         
+    }
+
+    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile> {
+        var collisionBody = this.rigidBody;
+        if (collisionBody === undefined) {
+            collisionBody = {
+                x: 0,
+                y: 0,
+                width: this.width,
+                height: this.height
+            };
+        }
+
+        return tilemap.getTilesInRadius(
+            this.position.x + collisionBody.x,
+            this.position.y + collisionBody.y,
+            collisionBody.width,
+            collisionBody.height
+        );
     }
 } 

@@ -59,6 +59,23 @@ class IsoTileObject extends IsoObject {
         };
     }
 
+    getRenderDetails() {
+        var fx = this.anchor.x / this.tileSize.width,
+            fy = this.anchor.y / this.tileSize.height
+        return {
+            position: this.getRelativePosition(),
+            tileSize: this.tileSize,
+            renderSize: {
+                width: this.tileSize.width * this.zoomLevel,
+                height: this.tileSize.height * this.zoomLevel
+            },
+            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
+            image: this.image.image.get(),
+            offset: this.getTileOffset(),
+            zoomLevel: this.zoomLevel
+        };
+    }
+
     getTileImage(): IsoTileImage {
         var x = this.tileOffset.x;
         var y = this.tileOffset.y;
@@ -95,15 +112,5 @@ class IsoTileObject extends IsoObject {
         this.rigidBody.height = tile.size.height;
         this.setTile(tile.tile);
         return this;
-    }
-
-    updatePosition() {
-        this.velocity.x *= this.friction;
-        if (this.mass === 0) {
-            this.velocity.y *= this.friction;
-        }
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
-        this.rigidBody = this.getCoords();
     }
 }  

@@ -50,9 +50,9 @@ class IsoTile extends IsoTileObject {
      * @param  {string}                name   Name of the new animation.
      * @param  {Array<number>}         frames An array that includes the frame numbers.
      * @param  {number}                duration The duration in milliseconds of the animation.
-     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
-     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
-     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @param  {Function}  easing    The animation-easing. For more information see IsoEasing. By default: IsoEasing.Linear.
+     * @param  {string} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG. By Default: IsoAnimation.ONCE.
+     * @param  {Array<IsoCallback>} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
      * @return {IsoAnimatedSprite}            The sprite.
      */
     addFrameAnimation(name: string, frames: Array<number>, duration: number, easing: Function = IsoEasing.Linear, type: string = IsoAnimation.ONCE, callbacks: Array<IsoCallback> = new Array()): IsoTile {
@@ -88,7 +88,23 @@ class IsoTile extends IsoTileObject {
         return this.mapPosition;
     }
 
+    getRelativePosition(): IsoPoint {
+        var x = 0, y = 0;
+        x =
+        ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
+        - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x) + (this.mapPosition.column * this.tileSize.width * this.zoomLevel);
+        y =
+        ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
+        - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y) + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight;
+        return {
+            x: x,
+            y: y
+        };
+    }
+
     getRenderDetails() {
+        var fx = this.anchor.x / this.tileSize.width,
+            fy = this.anchor.y / this.tileSize.height;
         return {
             position: this.getRelativePosition(),
             mapPosition: this.mapPosition,
@@ -97,6 +113,7 @@ class IsoTile extends IsoTileObject {
                 width: this.tileSize.width * this.zoomLevel,
                 height: this.tileSize.height * this.zoomLevel
             },
+            anchor: { x: (this.getRelativePosition().x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.getRelativePosition().y + (this.tileSize.height * this.zoomLevel * fy)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel

@@ -74,7 +74,14 @@ declare class IsoObject {
     getRenderDetails(): {
         position: IsoPoint;
         tileSize: IsoDimension;
-        renderSize: IsoDimension;
+        renderSize: {
+            width: number;
+            height: number;
+        };
+        anchor: {
+            x: number;
+            y: number;
+        };
         image: HTMLImageElement;
         offset: IsoOffset;
         zoomLevel: number;
@@ -111,6 +118,7 @@ declare class IsoObject {
     resume(name: string): IsoObject;
     pause(name: string): IsoObject;
     updatePosition(): void;
+    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
 }
 interface IsoTileSize {
     width: number;
@@ -132,10 +140,24 @@ declare class IsoTileObject extends IsoObject {
     getTileOffset(): IsoOffset;
     getRelativePosition(): IsoPoint;
     getRelativeDimension(): IsoDimension;
+    getRenderDetails(): {
+        position: IsoPoint;
+        tileSize: IsoTileSize;
+        renderSize: {
+            width: number;
+            height: number;
+        };
+        anchor: {
+            x: number;
+            y: number;
+        };
+        image: HTMLImageElement;
+        offset: IsoOffset;
+        zoomLevel: number;
+    };
     getTileImage(): IsoTileImage;
     setTile(tile: number): IsoTileObject;
     set(tile: IsoTileObjectInfo): IsoTileObject;
-    updatePosition(): void;
 }
 interface IsoTileImage {
     x: number;
@@ -172,9 +194,9 @@ declare class IsoTile extends IsoTileObject {
      * @param  {string}                name   Name of the new animation.
      * @param  {Array<number>}         frames An array that includes the frame numbers.
      * @param  {number}                duration The duration in milliseconds of the animation.
-     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
-     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
-     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @param  {Function}  easing    The animation-easing. For more information see IsoEasing. By default: IsoEasing.Linear.
+     * @param  {string} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG. By Default: IsoAnimation.ONCE.
+     * @param  {Array<IsoCallback>} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
      * @return {IsoAnimatedSprite}            The sprite.
      */
     addFrameAnimation(name: string, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoTile;
@@ -182,6 +204,7 @@ declare class IsoTile extends IsoTileObject {
     set(tile: IsoTileInfo): IsoTile;
     getCoords(): IsoCoords;
     getMapPosition(): IsoMapPosition;
+    getRelativePosition(): IsoPoint;
     getRenderDetails(): {
         position: IsoPoint;
         mapPosition: IsoMapPosition;
@@ -189,6 +212,10 @@ declare class IsoTile extends IsoTileObject {
         renderSize: {
             width: number;
             height: number;
+        };
+        anchor: {
+            x: number;
+            y: number;
         };
         image: HTMLImageElement;
         offset: IsoOffset;
@@ -211,6 +238,9 @@ declare class IsoMap {
     editProperty(name: string, valueIndex: number): void;
     edit(x: number, y: number, value: Array<number>): IsoMap;
 }
+/**
+ * @interface IsoTilesInView
+ */
 interface IsoTilesInView {
     rowStart: number;
     rowEnd: number;
@@ -218,6 +248,9 @@ interface IsoTilesInView {
     columnEnd: number;
     tiles: Array<Array<IsoTile>>;
 }
+/**
+ * IsoTileMap draws a tile-based map on the screen.
+ */
 declare class IsoTileMap {
     map: IsoMap;
     tiles: Array<Array<IsoTile>>;
@@ -234,47 +267,159 @@ declare class IsoTileMap {
     zoomPoint: IsoPoint;
     name: string;
     Engine: IsoMetric;
+    /**
+     * @param {IsoMetric} Engine
+     * @param {string} [name]
+     * @param {number} [tileWidth]
+     * @param {number} [tileHeight]
+     * @param {IsoRessource} [image]
+     * @param {Array<Array<Array<number>>>} [map]
+     * @chainable
+     */
     constructor(Engine: IsoMetric, name?: string, tileWidth?: number, tileHeight?: number, image?: IsoRessource, map?: Array<Array<Array<number>>>);
+    /**
+     * Sets the map of the tilemap
+     * @param {Array<Array<Array<number>>>} map The new map
+     * @chainable
+     */
     setMap(map: Array<Array<Array<number>>>): IsoTileMap;
+    /**
+     * Create a new empty map
+     * @param {number} numTilesX The number of tiles on the X-axis
+     * @param {number} numTilesY The number of tiles on the Y-axis
+     * @param {Array<number>} [defaultValue] The default value of each new tile.
+     * @chainable
+     */
     createMap(numTilesX: number, numTilesY: number, defaultValue?: Array<number>): IsoTileMap;
+    /**
+     * Creates all tile for the tilemap based on the map.
+     * @chainable
+     */
     createTiles(): IsoTileMap;
+    /**
+     * Get a tile given by its name.
+     * @param {string} name Name of the tile.
+     * @return {IsoTIle} The tile.
+     */
     getTile(name: string): IsoTile;
     /**
-     * @todo
-     * find a solution for columnStart, columnEnd, rowStart and rowEnd in connection with zooming.
+     * Returns all tiles which are visible on the screen
+     * @return {IsoTilesInView} All tiles wich are visible on the screen.
      */
     getTilesInView(): IsoTilesInView;
     /**
-     * Gets all tiles in specified area
+     * Gets all tiles in specified area.
      * @param x The position on the X-axis of the area
      * @param y The position on the Y-axis of the area
      * @param width The width of the area
      * @param height The height of the area
-     * @retrurn An object with information of all tiles
+     * @return An object with information of all tiles
      */
     getTilesInRadius(x: number, y: number, width: number, height: number): Array<IsoTile>;
     /**
-     * Checks the tile which the mouse pointer is touching
-     * return The tile.
+     * Return the tile placed on the given position.
+     * @param {IsoPoint} position The position to check.
+     * @return {IsoTile} The tile on the given position.
      */
     getTileOnPosition(position: IsoPoint): IsoTile;
+    /**
+     * Sets the image ressource for the tilemap.
+     * @param {IsoRessource} image
+     * @chainable
+     */
     setImage(image: IsoRessource): IsoTileMap;
+    /**
+     * Sets the maximum value for zooming.
+     * @param {number} zoomLevel
+     * @chainable
+     */
     setMaxZoomLevel(zoomLevel: number): IsoTileMap;
+    /**
+     * Sets the minimum value for zooming.
+     * @param {number} zoomLevel
+     * @chainable
+     */
     setMinZoomLevel(zoomLevel: number): IsoTileMap;
+    /**
+     * Sets the name of the tilemap
+     * @param {string} name
+     * @chainable
+     */
     setName(name: string): IsoTileMap;
+    /**
+     * Sets the offset of the tilemap
+     * @param {IsoOffset} offset
+     * @chainable
+     */
     setOffset(o: IsoOffset): IsoTileMap;
+    /**
+     * Sets the scroll-position of the tilemap.
+     * @param {number} x The x-position.
+     * @param {number} y The y-position.
+     * @chainable
+     */
     setScroll(x: number, y: number): IsoTileMap;
+    /**
+     * Sets the speed  for scrolling and moving for the tilemap.
+     * @param {number} speed
+     * @chainable
+     */
     setSpeed(speed: number): IsoTileMap;
+    /**
+     * Scrolls the tilemap relative to the actual position.
+     * @param {number} x The relative position on the x-axis.
+     * @param {number} y The relative position on the y-axis.
+     * @chainable
+     */
     scroll(x: number, y: number): IsoTileMap;
+    /**
+     * Sets the tilesize of the tilemap.
+     * @param {IsoTileSize} size The new size.
+     * @chainable
+     */
     setTileSize(size: IsoTileSize): IsoTileMap;
+    /**
+     * Sets the zoomLevel of the tilemap.
+     * @param {number} zoomLevel
+     * @chainable
+     */
     setZoomLevel(zoomLevel: number): IsoTileMap;
+    /**
+     * Sets the zooming point of the tilemap.
+     * @param {IsoPoint} point
+     * @chainable
+     */
     setZoomPoint(point: IsoPoint): IsoTileMap;
+    /**
+     * Sets the strength of zooming.
+     * @param {number} zoomStrength
+     * @chainable
+     */
     setZoomStrength(zoomStrength: number): IsoTileMap;
+    /**
+     * Update the tilemap and with this all the tiles of the tilemap.
+     */
     update(): void;
+    /**
+     * Update all tiles of the tilemap.
+     */
     updateTile(tile: IsoTile): void;
-    verify(): boolean;
+    /**
+     * Verify the tilemap.
+     * @private
+     */
+    private verify();
+    /**
+     * Set te zoom of the tilemap relative to the current zoom.
+     * @param {number} zoom
+     * @chainable
+     */
     zoom(zoom: number): IsoTileMap;
 }
+/**
+ * @interface IsoCollisionBody
+ * @static
+ */
 interface IsoCollisionBody {
     x: number;
     y: number;
@@ -287,74 +432,77 @@ interface IsoFrame {
 }
 declare class IsoSprite extends IsoTileObject {
     Engine: IsoMetric;
-    direction: number;
-    collisionBody: IsoCollisionBody;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
-    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
     getTileImage(): IsoTileImage;
     setFrame(frame: IsoFrame): IsoSprite;
-    setDirection(direction: number): IsoSprite;
     set(tile: IsoTileObjectInfo): IsoTileObject;
     getRenderDetails(): {
         position: IsoPoint;
         tileSize: IsoTileSize;
-        renderSize: IsoDimension;
+        renderSize: {
+            width: number;
+            height: number;
+        };
+        anchor: {
+            x: number;
+            y: number;
+        };
         image: HTMLImageElement;
         offset: IsoOffset;
         zoomLevel: number;
     };
 }
+/**
+ * This sprite type is an animated sprite, which uses frames of a tileset for animations.
+ */
 declare class IsoAnimatedSprite extends IsoSprite {
     /**
      * Creats a new frame-animated sprite
-     *
-     * @param  {IsoMetric}         Engine   An instance of IsoMetric
-     * @param  {IsoRessource}      image    A Ressource file including an image
+     * @param  {IsoMetric} Engine An instance of IsoMetric
+     * @param  {IsoRessource} image  A Ressource file including an image
      * @param  {IsoTileObjectInfo} tileInfoObject Including all information about the tile. See IsoTileObjectInfo.
-     * @param  {string}            name     Name of the new Sprite.
-     * @return {IsoAnimatedSprite}          The Sprite.
+     * @param  {string} name Name of the new Sprite.
+     * @return {IsoAnimatedSprite} The Sprite.
      */
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
     /**
-     * Create a new frame-animation.
-     *
-     * @param  {string}                name   Name of the new animation.
-     * @param  {Array<number>}         frames An array that includes the frame numbers.
-     * @param  {number}                duration The duration in milliseconds of the animation.
-     * @param  {Function = IsoEasing.Linear}  easing    The animation-easing. For more information see IsoEasing.
-     * @param  {string = IsoAnimation.ONCE} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG.
-     * @param  {Array<IsoCallback> = new Array()} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
-     * @return {IsoAnimatedSprite}            The sprite.
+     * Create a new frame-based animation.
+     * @param  {string} name Name of the new animation.
+     * @param  {Array<number>} frames An array that includes the frame numbers.
+     * @param  {number} duration The duration in milliseconds of the animation.
+     * @param  {Function} easing The animation-easing. For more information see IsoEasing. By default: IsoEasing.Linear.
+     * @param  {string} type The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG. By Default: IsoAnimation.ONCE.
+     * @param  {Array<IsoCallback>} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
+     * @return {IsoAnimatedSprite} The sprite.
      */
     addFrameAnimation(name: string, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimatedSprite;
     /**
-     * Play an animation.
-     * @param  {string} name        Name of th animation.
-     * @return {IsoAnimatedSprite}       The sprite.
+     * Plays an animation given by its name.
+     * @param  {string} name Name of th animation.
+     * @return {IsoAnimatedSprite} The sprite.
      */
     play(name: string): IsoAnimatedSprite;
     /**
-     * Stops the animation.
+     * Stops an animation given by its name.
      * @param  {string} name Name of the animation.
-     * @return {IsoAnimatedSprite}      The sprite.
+     * @return {IsoAnimatedSprite} The sprite.
      */
     stop(name: string): IsoAnimatedSprite;
     /**
-     * Resumes an animation.
-     * @param  {string} name       Name of the animation.
+     * Resumes an animation given by its name.
+     * @param  {string} name Name of the animation.
      * @return {IsoAnimatedSprite} The sprite.
      */
     resume(name: string): IsoAnimatedSprite;
     /**
-     * Pause an animation.
+     * Pause an animation given by its name.
      * @param  {string} name  Name of the animation.
-     * @return {IsoAnimatedSprite}       The sprite.
+     * @return {IsoAnimatedSprite} The sprite.
      */
     pause(name: string): IsoAnimatedSprite;
 }
 /**
  * A library including all easing-functions.
- * @type {Object}
  */
 declare var IsoEasing: {
     Linear: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
@@ -381,73 +529,23 @@ declare var IsoEasing: {
     CircInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
 };
 /**
- * Controls animations.
+ * Controls an animations.
  * There are two types of animations:
- * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be {number}.
- * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be {IsoAnimatedSprite} or {IsoTile}.
+ * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be a number.
+ * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be an IsoAnimatedSprite or IsoTile.W
  */
 declare class IsoAnimation {
-    /**
-     * See animationType. Plays the animation one time.
-     * @type {string}
-     */
     static ONCE: string;
-    /**
-     * See animationType. Plays the animation endless as pingpong.
-     * @type {string}
-     */
     static PINGPONG: string;
-    /**
-     * See animationType. Plays the animation endless.
-     * @type {string}
-     */
     static ENDLESS: string;
     static ANIMATION_TYPE_FRAME: string;
     static ANIMATION_TYPE_ATTRIBUTE: string;
-    /**
-     * Name of the animation.
-     * @type {string}
-     */
     name: string;
-    /**
-     * Duration of the animation in milliseconds.
-     * @type {number}
-     */
     duration: number;
-    /**
-     * Includes all frames of an animation.
-     * @type {Array<number>}
-     */
     frames: Array<number>;
-    framesPerSecond: number;
-    /**
-     * The initiale value of the animation.
-     * @type {number}
-     */
     startValue: number;
-    /**
-     * The target value of the animation.
-     * @type {number}
-     */
     endValue: number;
-    /**
-     * The current value of the animation, while playing.
-     * @type {number}
-     */
     actualValue: number;
-    /**
-     * The attribute of the specified object, which will be changed.
-     * @example
-     * var object = {
-     * 	position: {x: 0, y: 0},
-     *  other: 0
-     * };
-     * For changing object.position.x:
-     * ...createAnimation('name', object, 'position.x', ...);
-     * For changing object.other:
-     * ...createAnimation('name', object, 'other', ...);
-     * @type {string}
-     */
     attribute: string;
     type: string;
     easing: Function;
@@ -455,21 +553,73 @@ declare class IsoAnimation {
     callbacks: Array<IsoCallback>;
     object: Object;
     sprite: IsoAnimatedSprite | IsoTile;
-    timeEnd: number;
     iterations: number;
     currentIteration: number;
+    framesPerSecond: number;
     __debug: number;
     animationType: string;
     constructor();
+    /**
+     * Creates a new frame-based animation.
+     * @param {string} name Name of the new animation.
+     * @param {IsoAnimatedSprite|IsoTile} object The animated sprite or tile.
+     * @param {Array<number>} frames The frames of the animation.
+     * @param {number} duration The duration of the animation in milliseconds.
+     * @param {function} [easing=IsoEasing.Linear] The easing of the animation.
+     * @param {string} [type=IsoEasing.Linear] Sets if the animation played once, endless or endless in pingpong.
+     * @param {Array<IsoCallbacks>} [callbacks=new Array()] Callbacks.
+     * @return {IsoAnimation} The new animation.
+     */
     createFrameAnimation(name: string, object: IsoAnimatedSprite | IsoTile, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
+    /**
+     * Creates a new frame-based animation.
+     * @param {string} name Name of the new animation.
+     * @param {object} object The animated object.
+     * @param {string} attribute The attribute of the object, that the animation will change.
+     * @param {number} endValue The target value of the attribute.
+     * @param {number} duration The duration of the animation in milliseconds.
+     * @param {function} [easing=IsoEasing.Linear] The easing of the animation.
+     * @param {string} [type=IsoEasing.Linear] Sets if the animation played once, endless or endless in pingpong.
+     * @param {Array<IsoCallbacks>} [callbacks=new Array()] Callbacks.
+     * @return {IsoAnimation} The new animation.
+     */
     createAnimation(name: string, object: Object, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
+    /**
+     * Starts the animation.
+     * @return {IsoAnimation} The new animation.
+     */
     play(): IsoAnimation;
-    __playAttribute(): void;
-    __playFrame(): void;
+    /**
+     * Starts an animation of the type "attribute".
+     * @private
+     */
+    private __playAttribute();
+    /**
+     * Starts an animation of the type "frame".
+     * @private
+     */
+    private __playFrame();
+    /**
+     * Stop playing the animation.
+     */
     stop(): IsoAnimation;
+    /**
+     * Pause the animation
+     */
     pause(): IsoAnimation;
+    /**
+     * Resume the animation.
+     */
     resume(): IsoAnimation;
-    getObjectValue(): any;
+    /**
+     * Parse the object and return the given attribute.
+     * @private
+     */
+    private getObjectValue();
+    /**
+     * Parse the object and set the given attribute.
+     * @private
+     */
     setObjectValue(value: number): void;
 }
 declare class IsoAnimationManager {
@@ -540,8 +690,6 @@ declare class IsoDrawer {
     drawSprites(sprites: Array<IsoSprite>): void;
     translate(object: IsoObject, renderDetails: any): void;
     resetTranslation(object: IsoObject, renderDetails: any): void;
-    translateTile(object: IsoTile, renderDetails: any): void;
-    resetTranslationTile(object: IsoTile, renderDetails: any): void;
     rotate(object: IsoObject, renderDetails: any): void;
     rotateTile(object: IsoTile, renderDetails: any): void;
 }
@@ -751,103 +899,138 @@ interface IsoCallback {
 }
 /**
  * The mainclass of IsoMetric and the starting point for the gameloop.
+ * @class IsoMetric
+ * @constructor
+ *
  */
 declare class IsoMetric {
-    static FRONT: number;
-    static RIGHT: number;
-    static BACK: number;
-    static LEFT: number;
     /**
+     * @property config
      * The configuration.
-     * @see IsoConfig
+     * @type {IsoConfig}
      */
     config: IsoConfig;
     /**
+     * @property canvas
+     * @type {IsoCanvas}
      * The canvas object
-     * @see IsoCanvas
      */
     canvas: IsoCanvas;
     /**
-     * All layers of the actual game
-     * @see IsoLayers
+    * @property layers
+     * @description All layers of the actual game
+     * @type {IsoLayers}
      */
     layers: IsoLayers;
     /**
+     * @property drawer
+     * @type {IsoDrawer}
      * The drawing lib.
-     * @see IsoDrawer
      */
     drawer: IsoDrawer;
+    /**
+     * @property physics
+     * @type {IsoPhysicsManager}
+     */
     physics: IsoPhysicsManager;
+    /**
+     * @property animation
+     * @type {IsoAnimationManager}
+     */
     animation: IsoAnimationManager;
     /**
-     * The input library.
-     * @see IsoInput
+     * @property input
+     * @type {IsoInput}
      */
     input: IsoInput;
     /**
      * Handles all ressources of a project.
+     * @property ressource
+     * @type {IsoRessourceManager}
      * @see IsoRessourceManager
      */
     ressources: IsoRessourceManager;
     /**
-     * [deprecated] The global direction of all layers.
-     */
-    direction: number;
-    /**
      * The time one frames needs to draw.
+     * @property frameTime
+     * @type {number}
      */
     frameTime: number;
     /**
      * A counter for frames.
+     * @property frameCount
+     * @type {number}
+     * @default 0
      */
     frameCount: number;
     /**
      * An inteval for reseting the FPS
+     * @property frameCountInterval
+     * @type {any}
      */
     frameCountInteral: any;
     /**
      * The time in milliseconds at the begin of a loop.
+     * @property startLoopTime
+     * @type {Date}
      */
     startLoopTime: Date;
     /**
      * The frames per second
+     * @property FPS
+     * @type {number}
+     * @default 0
      */
     FPS: number;
+    /**
+     * @property on
+     * @type {IsoOn}
+     */
     on: IsoOn;
     /**
      * The default canvas configuration.
+     * @property defaultWIndowOptions
+     * @type {IIsoConfigWindowOptions}
+     * @default {fullscreen: true, width: window.innerWidth, height: window.innerHeight}
      */
     defaultWindowOptions: IIsoConfigWindowOptions;
     /**
      * An inteval for the drawing and game loop
+     * @property interval
+     * @type {Object}
      */
     interval: Object;
     /**
-     *
+     * @property animationFrame
+     * @type {Object}
      */
     animationFrame: Object;
     /**
      * Creates a new instance of IsoMetric
-     * @param windowOptions (optional) The canvas configuration.
+     * @method constructor
+     * @param {object} [windowOptions] The canvas configuration.
      */
     constructor(windowOptions?: Object);
     /**
      * Reset and set the FPS
+     * @method setFPS
      */
     setFPS(): void;
     /**
      * Starts the game- and drawing-loop.
+     * @method startLoop
      */
     startLoop(): void;
+    /**
+     * Sets the FPS after the drawing-loop completed.
+     * @method endLoop
+     */
     endLoop(): void;
     /**
      * The game- and drawing-loop.
+     * @method update()
      */
     update(): void;
-    /**
-     * [deprecated] Sets the global direction.
-     */
-    setDirection(direction: number): void;
 }
 declare class IsoPhysicsManager {
     rigidBodies: Array<IsoObject>;

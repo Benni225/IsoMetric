@@ -36,9 +36,9 @@ class IsoDrawer {
                 var detail = tiles.tiles[y][x].getRenderDetails();
 
                 if (tiles.tiles[y][x].rotation !== 0) {
-                    this.translateTile(tiles.tiles[y][x], detail);
+                    this.translate(tiles.tiles[y][x], detail);
                     this.rotateTile(tiles.tiles[y][x], detail);
-                    this.resetTranslationTile(tiles.tiles[y][x], detail);
+                    this.resetTranslation(tiles.tiles[y][x], detail);
                 }
                 this.context.globalCompositeOperation = tiles.tiles[y][x].blendingMode;
                 this.context.globalAlpha = tiles.tiles[y][x].alpha;
@@ -48,8 +48,8 @@ class IsoDrawer {
                     detail.offset.y,
                     detail.tileSize.width,
                     detail.tileSize.height,
-                    detail.position.x + (detail.mapPosition.column * detail.tileSize.width * detail.zoomLevel),
-                    detail.position.y + (detail.mapPosition.row * detail.tileSize.height * detail.zoomLevel) - tiles.tiles[y][x].tileHeight,
+                    detail.position.x,
+                    detail.position.y,
                     detail.renderSize.width,
                     detail.renderSize.height);
 
@@ -92,31 +92,12 @@ class IsoDrawer {
     }
 
     translate(object: IsoObject, renderDetails: any) {
-        var fx = object.anchor.x / renderDetails.tileSize.width;
-        var fy = object.anchor.y / renderDetails.tileSize.height;
-        this.context.translate(renderDetails.position.x + (renderDetails.renderSize.width * fx), renderDetails.position.y + (renderDetails.renderSize.height * fy));
+
+        this.context.translate(renderDetails.anchor.x, renderDetails.anchor.y);
     }
 
     resetTranslation(object: IsoObject, renderDetails: any) {
-        var fx = object.anchor.x / renderDetails.tileSize.width;
-        var fy = object.anchor.y / renderDetails.tileSize.height;
-        this.context.translate(-(renderDetails.position.x + (renderDetails.renderSize.width * fx)), -(renderDetails.position.y + (renderDetails.renderSize.height * fy)));
-    }
-
-    translateTile(object: IsoTile, renderDetails) {
-        var fx = object.anchor.x / renderDetails.tileSize.width;
-        var fy = object.anchor.y / renderDetails.tileSize.height;
-        this.context.translate(
-            renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel) + (renderDetails.renderSize.width * fx),
-            renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel) + (renderDetails.renderSize.height * fy) - object.tileHeight);
-    }
-
-    resetTranslationTile(object: IsoTile, renderDetails: any) {
-        var fx = object.anchor.x / renderDetails.tileSize.width;
-        var fy = object.anchor.y / renderDetails.tileSize.height;
-        this.context.translate(
-            -(renderDetails.position.x + (renderDetails.mapPosition.column * renderDetails.tileSize.width * renderDetails.zoomLevel) + (renderDetails.renderSize.width * fx)),
-            -(renderDetails.position.y + (renderDetails.mapPosition.row * renderDetails.tileSize.height * renderDetails.zoomLevel) + (renderDetails.renderSize.height * fy)) + object.tileHeight);
+        this.context.translate(-renderDetails.anchor.x, -renderDetails.anchor.y);
     }
 
     rotate(object: IsoObject, renderDetails: any) {

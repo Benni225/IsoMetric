@@ -86,24 +86,24 @@ class IsoDrawer {
                 this.context.globalAlpha = o.alpha;
                 if (o.repeat !== IsoBillboard.NOREPEAT) {
                     if (o.repeat === IsoBillboard.REPEAT) {
-                        if (o.scrollPosition.x < -o.width || o.scrollPosition.x > o.width) {
+                        if (o.scrollPosition.x <= -o.width || o.scrollPosition.x >= o.width) {
                             o.scrollPosition.x = 0;
                         }
-                        if (o.scrollPosition.y < -o.height || o.scrollPosition.y > o.height) {
+                        if (o.scrollPosition.y <= -o.height || o.scrollPosition.y >= o.height) {
                             o.scrollPosition.y = 0;
                         }
                     }
                     if (o.repeat === IsoBillboard.REPEATX) {
-                        if (o.scrollPosition.x < -o.width || o.scrollPosition.x > o.width) {
+                        if (o.scrollPosition.x <= -o.width || o.scrollPosition.x >= o.width) {
                             o.scrollPosition.x = 0;
                         }
                     }
                     if (o.repeat === IsoBillboard.REPEATY) {
-                        if (o.scrollPosition.y < -o.height || o.scrollPosition.y > o.height) {
+                        if (o.scrollPosition.y <= -o.height || o.scrollPosition.y >= o.height) {
                             o.scrollPosition.y = 0;
                         }
                     }
-
+                    o.updatePosition();
                     for (var ii = 0; ii < Math.ceil(this.canvas.canvasElement.height / o.height) + 1; ii++) {
                         for (var i = 0; i < Math.ceil(this.canvas.canvasElement.width / o.width) + 1; i++) {
                             var rx = renderDetails.position.x,

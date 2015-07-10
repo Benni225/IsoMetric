@@ -148,12 +148,12 @@ var IsoObject = (function () {
     };
     /** Gets all important information for rendering an object. */
     IsoObject.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.width, fy = this.anchor.y / this.height;
+        var fx = this.anchor.x / this.width * this.scale.factorX, fy = this.anchor.y / this.height * this.scale.factorY;
         return {
             position: this.getAbsolutePosition(),
             tileSize: this.getOriginalDimension(),
             renderSize: this.getAbsoluteDimension(),
-            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY)) },
+            anchor: { x: (this.position.x + (this.width * this.scale.factorX * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.scale.factorY * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getOffset(),
             zoomLevel: this.zoomLevel
@@ -342,6 +342,11 @@ var IsoObject = (function () {
         this.Engine.animation.pause(name, this);
         return this;
     };
+    /** Checks whether an animation is playing or not. */
+    IsoObject.prototype.isPlaying = function (name) {
+        return this.Engine.animation.isPlaying(name, this);
+        ;
+    };
     /** Calculat the new position. */
     IsoObject.prototype.updatePosition = function () {
         this.velocity.x *= this.friction;
@@ -421,7 +426,7 @@ var IsoTileObject = (function (_super) {
         };
     };
     IsoTileObject.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.tileSize.width, fy = this.anchor.y / this.tileSize.height;
+        var fx = this.anchor.x / this.tileSize.width * this.scale.factorX, fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
         return {
             position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
@@ -429,7 +434,7 @@ var IsoTileObject = (function (_super) {
                 width: this.tileSize.width * this.zoomLevel,
                 height: this.tileSize.height * this.zoomLevel
             },
-            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
+            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
@@ -1133,12 +1138,12 @@ var IsoSprite = (function (_super) {
         };
     };
     IsoSprite.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.tileSize.width, fy = this.anchor.y / this.tileSize.height;
+        var fx = this.anchor.x / this.tileSize.width * this.scale.factorX, fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
         return {
             position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
             renderSize: this.getAbsoluteDimension(),
-            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
+            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
@@ -1570,6 +1575,13 @@ var IsoAnimationManager = (function () {
             }
         }
     };
+    IsoAnimationManager.prototype.isPlaying = function (name, object) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
+                return this.animations[i].isPlaying;
+            }
+        }
+    };
     return IsoAnimationManager;
 })();
 "use strict";
@@ -1795,23 +1807,24 @@ var IsoDrawer = (function () {
                 this.context.globalAlpha = o.alpha;
                 if (o.repeat !== IsoBillboard.NOREPEAT) {
                     if (o.repeat === IsoBillboard.REPEAT) {
-                        if (o.scrollPosition.x < -o.width || o.scrollPosition.x > o.width) {
+                        if (o.scrollPosition.x <= -o.width || o.scrollPosition.x >= o.width) {
                             o.scrollPosition.x = 0;
                         }
-                        if (o.scrollPosition.y < -o.height || o.scrollPosition.y > o.height) {
+                        if (o.scrollPosition.y <= -o.height || o.scrollPosition.y >= o.height) {
                             o.scrollPosition.y = 0;
                         }
                     }
                     if (o.repeat === IsoBillboard.REPEATX) {
-                        if (o.scrollPosition.x < -o.width || o.scrollPosition.x > o.width) {
+                        if (o.scrollPosition.x <= -o.width || o.scrollPosition.x >= o.width) {
                             o.scrollPosition.x = 0;
                         }
                     }
                     if (o.repeat === IsoBillboard.REPEATY) {
-                        if (o.scrollPosition.y < -o.height || o.scrollPosition.y > o.height) {
+                        if (o.scrollPosition.y <= -o.height || o.scrollPosition.y >= o.height) {
                             o.scrollPosition.y = 0;
                         }
                     }
+                    o.updatePosition();
                     for (var ii = 0; ii < Math.ceil(this.canvas.canvasElement.height / o.height) + 1; ii++) {
                         for (var i = 0; i < Math.ceil(this.canvas.canvasElement.width / o.width) + 1; i++) {
                             var rx = renderDetails.position.x, ry = renderDetails.position.y, fx = o.scrollPosition.x > 0 ? -1 : 1, fy = o.scrollPosition.y > 0 ? -1 : 1;

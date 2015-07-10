@@ -60,8 +60,8 @@ class IsoTileObject extends IsoObject {
     }
 
     getRenderDetails() {
-        var fx = this.anchor.x / this.tileSize.width,
-            fy = this.anchor.y / this.tileSize.height
+        var fx = this.anchor.x / this.tileSize.width * this.scale.factorX,
+            fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
         return {
             position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
@@ -69,7 +69,7 @@ class IsoTileObject extends IsoObject {
                 width: this.tileSize.width * this.zoomLevel,
                 height: this.tileSize.height * this.zoomLevel
             },
-            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
+            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel

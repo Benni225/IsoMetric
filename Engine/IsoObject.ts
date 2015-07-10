@@ -197,13 +197,13 @@ class IsoObject {
     }
     /** Gets all important information for rendering an object. */
     getRenderDetails() {
-        var fx = this.anchor.x / this.width,
-            fy = this.anchor.y / this.height
+        var fx = this.anchor.x / this.width * this.scale.factorX,
+            fy = this.anchor.y / this.height * this.scale.factorY;
         return {
             position: this.getAbsolutePosition(),
             tileSize: this.getOriginalDimension(),
             renderSize: this.getAbsoluteDimension(),
-            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY)) },
+            anchor: { x: (this.position.x + (this.width * this.scale.factorX * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.scale.factorY * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getOffset(),
             zoomLevel: this.zoomLevel
@@ -394,6 +394,10 @@ class IsoObject {
     pause(name: string): IsoObject {
         this.Engine.animation.pause(name, this);
         return this;
+    }
+    /** Checks whether an animation is playing or not. */
+    isPlaying(name: string): boolean {
+        return this.Engine.animation.isPlaying(name, this);;
     }
     /** Calculat the new position. */
     updatePosition() {

@@ -188,6 +188,8 @@ declare class IsoObject {
     resume(name: string): IsoObject;
     /** Pause an animation. */
     pause(name: string): IsoObject;
+    /** Checks whether an animation is playing or not. */
+    isPlaying(name: string): boolean;
     /** Calculat the new position. */
     updatePosition(): void;
     /** Gets all tiles of a given tilemap where the object collides with. */
@@ -680,6 +682,7 @@ declare class IsoAnimationManager {
     stop(name: string, object: Object): void;
     resume(name: string, object: Object): void;
     pause(name: string, object: Object): void;
+    isPlaying(name: string, object: Object): boolean;
 }
 declare class IsoBillboard extends IsoObject {
     static REPEATX: string;

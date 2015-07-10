@@ -46,4 +46,12 @@ class IsoAnimationManager {
         }
     }
 
+    isPlaying(name: string, object: Object): boolean {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
+                return this.animations[i].isPlaying
+            }
+        }
+    }
+
 }

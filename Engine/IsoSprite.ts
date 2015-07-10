@@ -66,13 +66,13 @@ class IsoSprite extends IsoTileObject {
     }
 
     getRenderDetails() {
-        var fx = this.anchor.x / this.tileSize.width,
-            fy = this.anchor.y / this.tileSize.height
+        var fx = this.anchor.x / this.tileSize.width * this.scale.factorX,
+            fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
         return {
             position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
             renderSize: this.getAbsoluteDimension(),
-            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
+            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel

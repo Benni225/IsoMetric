@@ -22,14 +22,13 @@ window.onload = function () {
         // ... and create a new animated sprite with our image.
         bird = layer.addAnimatedSprite("bird", ressources.get("ourStripe"), {
             tile: 1,
-            height: 0,
-            size: { width: 717, height: 610 }
+            size: { width: 717, height: 610 } //is the dimension of each frame in our stripe
         });
         // add our sky 
         sky = layer.addBillboard("sky", ressources.get("sky"));
         // set repeating type.
         sky.setRepeat(IsoBillboard.REPEAT);
-        // Now we add an animation. In this animation we want to rotate our bird endless.
+        // Now we add an animation. In this animation we want to let our bird fly. 
         bird.addFrameAnimation("fly", [1, 2, 3, 4], 400, IsoEasing.QuadIn, IsoAnimation.PINGPONG);
         // Set the scale of the bird
         bird.setScale(0.3, 0.3);

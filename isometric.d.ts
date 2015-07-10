@@ -199,7 +199,7 @@ interface IsoTileSize {
 }
 interface IsoTileObjectInfo {
     tile: number;
-    height: number;
+    height?: number;
     size: IsoTileSize;
 }
 declare class IsoTileObject extends IsoObject {

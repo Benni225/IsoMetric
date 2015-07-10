@@ -28,56 +28,94 @@ interface IsoCoords {
     width: number;
     height: number;
 }
+interface IsoScale {
+    factorX: number;
+    factorY: number;
+}
 declare class IsoObject {
     static BOX_COLLISION: string;
     static PIXEL_COLLISION: string;
+    /** The position of the object */
     position: IsoPoint;
+    /** The scroll-position of the object */
     scrollPosition: IsoScroll;
+    /** An offset relative to the position */
     offset: IsoOffset;
+    /** The original width */
     width: number;
+    /** The original height */
     height: number;
+    /** The scale of an object given as a factor */
+    scale: IsoScale;
+    /** The zooming level of an object */
     zoomLevel: number;
+    /** By using the method zoom, this factor controls the zooming level */
     zoomStrength: number;
+    /** A point on the screen where zoomed to */
     zoomPoint: IsoPoint;
-    /**
-     * Rotation in degrees
-     */
+    /** Rotation in degrees */
     rotation: number;
+    /** The image ressource of the object */
     image: IsoRessource;
+    /** The collsion type of the object */
     collisionType: string;
+    /** If the object has the collisiontype "pixel" this property controls the accuracy of the collision. */
     collisionResolution: number;
+    /** When moving this factor controls the speed of moving */
     speed: number;
+    /** Name of the object */
     name: string;
+    /** An instance of IsoMetric */
     Engine: IsoMetric;
+    /** The anchor of the object for rotation */
     anchor: IsoAnchor;
+    /** The blending mode. See IsoBlendingModes */
     blendingMode: string;
+    /** The alpha of the object */
     alpha: number;
+    /** If hidden is true, the object will not be drawn. */
     hidden: boolean;
+    /** Optional additional properties */
     properties: Object;
+    /** Mass of the object for physics */
     mass: number;
+    /** Controls the friction when moving */
     friction: number;
+    /** Controls the velocity when moving */
     velocity: IsoVelocity;
+    /** The rigidbody of the object */
     rigidBody: IsoCoords;
+    /** Creates a new object */
     constructor(Engine: any, image: IsoRessource, name?: string);
+    /** Adds an animation. The animation will animate a given attribute of the object. */
     addAnimation(name: string, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoObject;
+    /** Checks if the object collides with an another given object. */
     collide(object: IsoObject): boolean;
+    /** Get the position of the object on the screen. */
     getCoords(): IsoCoords;
+    /** Gets the offset of the object */
     getOffset(): IsoOffset;
+    /** Gets the original dimension of the object. */
     getOriginalDimension(): IsoDimension;
+    /** Gets the originall height of the object */
     getOriginalHeight(): number;
+    /** Gets the original width of the obect */
     getOriginalWidth(): number;
+    /** Gets the position value. Its not equal to the position on the screen. */
     getPosition(): IsoPoint;
+    /** Gets one of the additional properties. */
     getProperty(name: string): any;
+    /** Gets all the additional properties. */
     getProperties(): Object;
-    getRelativePosition(): IsoPoint;
-    getRelativeDimension(): IsoDimension;
+    /** Gets the position on the screen. */
+    getAbsolutePosition(): IsoPoint;
+    /** Gets the dimension of the object on the screen. */
+    getAbsoluteDimension(): IsoDimension;
+    /** Gets all important information for rendering an object. */
     getRenderDetails(): {
         position: IsoPoint;
         tileSize: IsoDimension;
-        renderSize: {
-            width: number;
-            height: number;
-        };
+        renderSize: IsoDimension;
         anchor: {
             x: number;
             y: number;
@@ -86,38 +124,73 @@ declare class IsoObject {
         offset: IsoOffset;
         zoomLevel: number;
     };
+    /** Gets the rotation of an object in dregrees. */
     getRotation(): number;
+    /** Checks the collision of two object with collision type "box". */
     isBoxCollision(coordsSource: IsoCoords, coordsTarget: IsoCoords): boolean;
+    /** @todo implement pixel-box-collision */
     isPixelBoxCollision(sourceObject: IsoObject, targetCoords: IsoCoords): boolean;
+    /** @todo implement pixel-collision */
     isPixelCollision(sourceObject: IsoObject, targetObject: IsoObject): boolean;
+    /** Move an object relative to the current position. */
     move(deltaX: number, deltaY: number): IsoObject;
+    /** Rotates an object relative to the current rotation. */
     rotate(degrees: number): IsoObject;
+    /** Set the scrolling position relative to the current scroll position. */
     scroll(deltaX: number, deltaY: number): IsoObject;
+    /** Sets the alpha of an object. */
     setAlpha(alpha: number): IsoObject;
+    /** Sets the anchor of an object. */
     setAnchor(x: number, y: number): IsoObject;
+    /** Sets the blending mode. See IsoBlending. */
     setBlendingMode(blendingMode: string): IsoObject;
-    setHeight(height: number): IsoObject;
+    /** Sets the width. */
+    private setHeight(height);
+    /** sets the image-ressource */
     setImage(image: IsoRessource): IsoObject;
+    /** Sets the friction of an object. */
     setFriction(friction: number): IsoObject;
+    /** Sets the name of an object. */
     setName(name: string): IsoObject;
+    /** Sets the offset of an object. */
     setOffset(offsetX: number, offsetY: number): IsoObject;
+    /** Sets the position of an object. */
     setPosition(position: IsoPoint): IsoObject;
+    /** Sets an additional property. */
     setProperty(name: string, value: any): IsoObject;
+    /** Sets all properties. */
     setProperties(properties: Object): IsoObject;
+    /** Sets the rotation of an object in degrees. */
     setRotation(degrees: number): IsoObject;
+    /** Sets the scale of an object. */
+    setScale(factorX: number, factorY: number): IsoObject;
+    /** Sets the scroll-position. */
     setScroll(x: number, y: number): IsoObject;
-    setSize(width: number, height: number): IsoObject;
+    /** Sets the width and height of an object. */
+    private setSize(width, height);
+    /** Sets the speed for moving of an object. */
     setSpeed(speed: number): IsoObject;
-    setWidth(width: number): IsoObject;
+    /** Sets the width of an object. */
+    private setWidth(width);
+    /** Sets the zooming-point of an object on the screen where zoomed to. */
     setZoomPoint(position: IsoPoint): IsoObject;
+    /** Sets the absolute zooming-level. */
     setZoomLevel(zoomLevel: number): IsoObject;
+    /** Sets the strength of zooming, when using the method IsoObject.zoom */
     setZoomStrength(zoomStrength: number): IsoObject;
+    /** Calculate the zoom level */
     zoom(zoom: number): IsoObject;
+    /** Plays an animation. */
     play(name: string): IsoObject;
+    /** Stops an animation. */
     stop(name: any): IsoObject;
+    /** Resumes an animation. */
     resume(name: string): IsoObject;
+    /** Pause an animation. */
     pause(name: string): IsoObject;
+    /** Calculat the new position. */
     updatePosition(): void;
+    /** Gets all tiles of a given tilemap where the object collides with. */
     getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
 }
 interface IsoTileSize {
@@ -138,7 +211,7 @@ declare class IsoTileObject extends IsoObject {
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo?: IsoTileObjectInfo);
     setTileOffset(offset: IsoOffset): IsoTileObject;
     getTileOffset(): IsoOffset;
-    getRelativePosition(): IsoPoint;
+    getAbsolutePosition(): IsoPoint;
     getRelativeDimension(): IsoDimension;
     getRenderDetails(): {
         position: IsoPoint;
@@ -204,7 +277,7 @@ declare class IsoTile extends IsoTileObject {
     set(tile: IsoTileInfo): IsoTile;
     getCoords(): IsoCoords;
     getMapPosition(): IsoMapPosition;
-    getRelativePosition(): IsoPoint;
+    getAbsolutePosition(): IsoPoint;
     getRenderDetails(): {
         position: IsoPoint;
         mapPosition: IsoMapPosition;
@@ -436,13 +509,12 @@ declare class IsoSprite extends IsoTileObject {
     getTileImage(): IsoTileImage;
     setFrame(frame: IsoFrame): IsoSprite;
     set(tile: IsoTileObjectInfo): IsoTileObject;
+    /** Gets the dimension of the object on the screen. */
+    getAbsoluteDimension(): IsoDimension;
     getRenderDetails(): {
         position: IsoPoint;
         tileSize: IsoTileSize;
-        renderSize: {
-            width: number;
-            height: number;
-        };
+        renderSize: IsoDimension;
         anchor: {
             x: number;
             y: number;
@@ -609,6 +681,15 @@ declare class IsoAnimationManager {
     resume(name: string, object: Object): void;
     pause(name: string, object: Object): void;
 }
+declare class IsoBillboard extends IsoObject {
+    static REPEATX: string;
+    static REPEATY: string;
+    static REPEAT: string;
+    static NOREPEAT: string;
+    repeat: string;
+    /** Sets if the billboard will repeated. */
+    setRepeat(repeat: string): IsoBillboard;
+}
 declare var IsoBlendingModes: {
     NORMAL: string;
     MULTIPLY: string;
@@ -657,19 +738,30 @@ declare class IsoConfig {
     get(name: string): any;
 }
 declare class IsoDrawer {
+    /** An instance of IsoMetric */
     Engine: IsoMetric;
+    /** An instance of IsoCanvas */
     canvas: IsoCanvas;
+    /** The context of the canvas-element */
     context: any;
-    __DEBUG_SHOW: boolean;
+    private __DEBUG_SHOW;
     constructor(Engine: IsoMetric);
+    /** Redraw all elements on the screen */
     update(): void;
+    /** Draws a single layer. */
     drawLayer(layer: IsoLayer): void;
+    /** Draws a tilemap of a layer. */
     drawTileMap(tileMap: IsoTileMap): void;
-    drawSprites(sprites: Array<IsoSprite>): void;
-    translate(object: IsoObject, renderDetails: any): void;
-    resetTranslation(object: IsoObject, renderDetails: any): void;
-    rotate(object: IsoObject, renderDetails: any): void;
-    rotateTile(object: IsoTile, renderDetails: any): void;
+    /** Draws all given objects. */
+    drawBillboards(objects: Array<IsoBillboard>): void;
+    /** Draws all given objects. */
+    drawObjects(objects: Array<IsoObject>): void;
+    /** Sets the anchor of an object. */
+    private translate(object, renderDetails);
+    /** Reset the anchor of an object. */
+    private resetTranslation(object, renderDetails);
+    /** Rotates an object. */
+    private rotate(object, renderDetails);
 }
 declare class IsoEvent {
     type: string;
@@ -789,19 +881,19 @@ declare class IsoInput {
 declare class IsoLayer {
     objects: Array<IsoObject>;
     tileMap: IsoTileMap;
-    sprites: Array<IsoSprite>;
-    billboards: any;
+    billboards: Array<IsoBillboard>;
     name: string;
     index: number;
     Engine: IsoMetric;
     constructor(Engine: IsoMetric, index: number, name?: string);
     addObject(name: string, image: IsoRessource): IsoObject;
     addSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoSprite;
+    addBillboard(name: string, image: IsoRessource): IsoBillboard;
     addAnimatedSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoAnimatedSprite;
     addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>): IsoTileMap;
     setName(name: string): IsoLayer;
     getObject(name: string): IsoObject;
-    getSprite(name: string): IsoSprite;
+    getSprite(name: string): IsoObject | IsoSprite | IsoAnimatedSprite;
     getTileMap(): IsoTileMap;
     zoom(zoom: number): void;
     scroll(deltaX: number, deltaY: number): void;

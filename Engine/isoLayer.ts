@@ -6,8 +6,7 @@
 class IsoLayer {
     objects: Array<IsoObject> = new Array();
     tileMap: IsoTileMap;
-    sprites: Array<IsoSprite> = new Array();
-    billboards: any = new Array(); // isoBillboards
+    billboards: Array<IsoBillboard> = new Array(); // isoBillboards
 
     name: string;
     index: number;
@@ -29,13 +28,20 @@ class IsoLayer {
 
     addSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoSprite {
         var s = new IsoSprite(this.Engine, image, tileObjectInfo, name);
-        this.sprites.push(s);
+        this.objects.push(s);
         return s;
     }
 
+    addBillboard(name: string, image: IsoRessource): IsoBillboard {
+        var b = new IsoBillboard(this.Engine, image, name);
+        this.billboards.push(b);
+        return b;
+    }
+
+
     addAnimatedSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoAnimatedSprite {
         var s = new IsoAnimatedSprite(this.Engine, image, tileObjectInfo, name);
-        this.sprites.push(s);
+        this.objects.push(s);
         return s;
     }
 
@@ -58,10 +64,10 @@ class IsoLayer {
         return undefined;
     }
 
-    getSprite(name: string): IsoSprite {
-        for (var i = 0; i < this.sprites.length; i++) {
-            if (this.sprites[i].name === name) {
-                return this.sprites[i];
+    getSprite(name: string): IsoObject|IsoSprite|IsoAnimatedSprite {
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].name === name) {
+                return this.objects[i];
             }
         }
         return undefined;
@@ -77,16 +83,12 @@ class IsoLayer {
         }
         this.tileMap.update();
 
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].zoom(zoom);
-        }
-
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].zoom(zoom);
         }
 
         for (var i = 0; i < this.billboards.length; i++) {
-            //this.billboards[i].zoom(zoom);
+            this.billboards[i].zoom(zoom);
         }
     }
 
@@ -98,16 +100,12 @@ class IsoLayer {
 
     rotate(degrees: number) {
 
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].rotate(degrees);
-        }
-
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].rotate(degrees);
         }
 
         for (var i = 0; i < this.billboards.length; i++) {
-            //this.billboards[i].rotate(degrees);
+            this.billboards[i].rotate(degrees);
         }
     }
 
@@ -116,16 +114,12 @@ class IsoLayer {
             this.tileMap.setZoomPoint(point);
         }
 
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].setZoomPoint(point);
-        }
-
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].setZoomPoint(point);
         }
 
         for (var i = 0; i < this.billboards.length; i++) {
-            //this.billboards[i].setZoomPoint(point);
+            this.billboards[i].setZoomPoint(point);
         }
     }
 
@@ -134,16 +128,12 @@ class IsoLayer {
             this.tileMap.setSpeed(speed);
         }
 
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].setSpeed(speed);
-        }
-
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].setSpeed(speed);
         }
 
         for (var i = 0; i < this.billboards.length; i++) {
-            //this.billboards[i].setSpeed(speed);
+            this.billboards[i].setSpeed(speed);
         }
     }
 } 

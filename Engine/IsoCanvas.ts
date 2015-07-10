@@ -27,9 +27,13 @@ class IsoCanvas {
         }
         this.canvasElement.width = this.options.width;
         this.canvasElement.height = this.options.height;
+        this.canvasElement.style.width = this.options.width + "px";
+        this.canvasElement.style.height = this.options.height + "px";
         if (this.options.fullscreen === true) {
             this.canvasElement.width = window.innerWidth;
-            this.canvasElement.height = window.innerWidth;
+            this.canvasElement.height = window.innerHeight;
+            this.canvasElement.style.width = window.innerWidth + "px";
+            this.canvasElement.style.height = window.innerHeight + "px";
             window.onresize = window.onload = () => this.updateScreen();
             this.canvasElement.style.overflow = "hidden";
         }
@@ -59,7 +63,9 @@ class IsoCanvas {
 
     updateScreen() : IsoCanvas {
         this.canvasElement.width = window.innerWidth;
-        this.canvasElement.height = window.innerWidth;
+        this.canvasElement.height = window.innerHeight;
+        this.canvasElement.style.width = this.canvasElement.width + "px";
+        this.canvasElement.style.height = this.canvasElement.height + "px";
         new IsoEvent("IsoCanvasUpdate").trigger();
         return this;
     }

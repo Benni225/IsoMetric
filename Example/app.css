@@ -1,0 +1,15 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+}
+
+span {
+    font-style: italic;
+}
+
+canvas {
+    margin: auto;
+    display: block;
+}

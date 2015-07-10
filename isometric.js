@@ -1,27 +1,45 @@
 "use strict";
 ///<reference path="IsoBlendingModes.ts" />
 var IsoObject = (function () {
+    /** Creates a new object */
     function IsoObject(Engine, image, name) {
+        /** The position of the object */
         this.position = { x: 0, y: 0 };
+        /** The scroll-position of the object */
         this.scrollPosition = { x: 0, y: 0 };
+        /** An offset relative to the position */
         this.offset = { x: 0, y: 0 };
+        /** The scale of an object given as a factor */
+        this.scale = { factorX: 1, factorY: 1 };
+        /** The zooming level of an object */
         this.zoomLevel = 1;
+        /** By using the method zoom, this factor controls the zooming level */
         this.zoomStrength = 1 / 1000;
+        /** A point on the screen where zoomed to */
         this.zoomPoint = { x: 0, y: 0 };
-        /**
-         * Rotation in degrees
-         */
+        /** Rotation in degrees */
         this.rotation = 0;
+        /** The collsion type of the object */
         this.collisionType = "box";
+        /** If the object has the collisiontype "pixel" this property controls the accuracy of the collision. */
         this.collisionResolution = 0;
+        /** When moving this factor controls the speed of moving */
         this.speed = 1;
+        /** The anchor of the object for rotation */
         this.anchor = { x: 0, y: 0 };
+        /** The blending mode. See IsoBlendingModes */
         this.blendingMode = IsoBlendingModes.NORMAL;
+        /** The alpha of the object */
         this.alpha = 1;
+        /** If hidden is true, the object will not be drawn. */
         this.hidden = false;
+        /** Optional additional properties */
         this.properties = {};
+        /** Mass of the object for physics */
         this.mass = 0;
+        /** Controls the friction when moving */
         this.friction = 1;
+        /** Controls the velocity when moving */
         this.velocity = { x: 0, y: 0 };
         this.Engine = Engine;
         try {
@@ -43,6 +61,7 @@ var IsoObject = (function () {
             throw ("Can not create object with error message: " + e);
         }
     }
+    /** Adds an animation. The animation will animate a given attribute of the object. */
     IsoObject.prototype.addAnimation = function (name, attribute, endValue, duration, easing, type, callbacks) {
         if (easing === void 0) { easing = IsoEasing.Linear; }
         if (type === void 0) { type = "once"; }
@@ -50,6 +69,7 @@ var IsoObject = (function () {
         this.Engine.animation.addAnimation(name, this, attribute, endValue, duration, easing, type, callbacks);
         return this;
     };
+    /** Checks if the object collides with an another given object. */
     IsoObject.prototype.collide = function (object) {
         if (this.collisionType === IsoObject.BOX_COLLISION) {
             if (object.collisionType === IsoObject.BOX_COLLISION) {
@@ -68,6 +88,7 @@ var IsoObject = (function () {
             }
         }
     };
+    /** Get the position of the object on the screen. */
     IsoObject.prototype.getCoords = function () {
         var r = this.getRenderDetails();
         return {
@@ -77,63 +98,72 @@ var IsoObject = (function () {
             height: r.renderSize.height
         };
     };
+    /** Gets the offset of the object */
     IsoObject.prototype.getOffset = function () {
         return this.offset;
     };
+    /** Gets the original dimension of the object. */
     IsoObject.prototype.getOriginalDimension = function () {
         return {
             width: this.width,
             height: this.height
         };
     };
+    /** Gets the originall height of the object */
     IsoObject.prototype.getOriginalHeight = function () {
         return this.height;
     };
+    /** Gets the original width of the obect */
     IsoObject.prototype.getOriginalWidth = function () {
         return this.image.image.width;
     };
+    /** Gets the position value. Its not equal to the position on the screen. */
     IsoObject.prototype.getPosition = function () {
         return this.position;
     };
+    /** Gets one of the additional properties. */
     IsoObject.prototype.getProperty = function (name) {
         return this.properties[name];
     };
+    /** Gets all the additional properties. */
     IsoObject.prototype.getProperties = function () {
         return this.properties;
     };
-    IsoObject.prototype.getRelativePosition = function () {
+    /** Gets the position on the screen. */
+    IsoObject.prototype.getAbsolutePosition = function () {
         var x = 0, y = 0;
-        x = ((this.position.x + this.offset.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
-        y = ((this.position.y + this.offset.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
+        x = ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
+        y = ((this.position.y + this.offset.y + this.scrollPosition.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
         return {
             x: x,
             y: y
         };
     };
-    IsoObject.prototype.getRelativeDimension = function () {
+    /** Gets the dimension of the object on the screen. */
+    IsoObject.prototype.getAbsoluteDimension = function () {
         return {
-            width: this.getOriginalDimension().width * this.zoomLevel,
-            height: this.getOriginalDimension().height * this.zoomLevel
+            width: this.getOriginalDimension().width * this.zoomLevel * this.scale.factorX,
+            height: this.getOriginalDimension().height * this.zoomLevel * this.scale.factorY
         };
     };
+    /** Gets all important information for rendering an object. */
     IsoObject.prototype.getRenderDetails = function () {
         var fx = this.anchor.x / this.width, fy = this.anchor.y / this.height;
         return {
-            position: this.getRelativePosition(),
+            position: this.getAbsolutePosition(),
             tileSize: this.getOriginalDimension(),
-            renderSize: {
-                width: this.width * this.zoomLevel,
-                height: this.height * this.zoomLevel
-            },
-            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx)), y: (this.position.y + (this.height * this.zoomLevel * fy)) },
+            renderSize: this.getAbsoluteDimension(),
+            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY)) },
             image: this.image.image.get(),
             offset: this.getOffset(),
             zoomLevel: this.zoomLevel
         };
     };
+    /** Gets the rotation of an object in dregrees. */
     IsoObject.prototype.getRotation = function () {
         return this.rotation;
     };
+    /** Checks the collision of two object with collision type "box". */
     IsoObject.prototype.isBoxCollision = function (coordsSource, coordsTarget) {
         if ((coordsSource.x < coordsTarget.x && coordsSource.x + coordsSource.width > coordsTarget.x || coordsSource.x < coordsTarget.x + coordsTarget.width && coordsSource.x + coordsSource.width > coordsTarget.x) &&
             (coordsSource.y < coordsTarget.y + coordsTarget.height && coordsSource.y + coordsSource.height > coordsTarget.y)) {
@@ -143,14 +173,15 @@ var IsoObject = (function () {
             return false;
         }
     };
-    // @todo implement pixel-box-collision
+    /** @todo implement pixel-box-collision */
     IsoObject.prototype.isPixelBoxCollision = function (sourceObject, targetCoords) {
         return false;
     };
-    // @todo implement pixel-collision
+    /** @todo implement pixel-collision */
     IsoObject.prototype.isPixelCollision = function (sourceObject, targetObject) {
         return false;
     };
+    /** Move an object relative to the current position. */
     IsoObject.prototype.move = function (deltaX, deltaY) {
         this.velocity.x += deltaX;
         this.velocity.y += deltaY;
@@ -170,115 +201,148 @@ var IsoObject = (function () {
         }
         return this;
     };
+    /** Rotates an object relative to the current rotation. */
     IsoObject.prototype.rotate = function (degrees) {
         this.rotation = this.rotation + degrees;
         return this;
     };
+    /** Set the scrolling position relative to the current scroll position. */
     IsoObject.prototype.scroll = function (deltaX, deltaY) {
         this.scrollPosition.x = this.scrollPosition.x + (deltaX * this.speed);
         this.scrollPosition.y = this.scrollPosition.y + (deltaY * this.speed);
         return this;
     };
+    /** Sets the alpha of an object. */
     IsoObject.prototype.setAlpha = function (alpha) {
         this.alpha = alpha;
         return this;
     };
+    /** Sets the anchor of an object. */
     IsoObject.prototype.setAnchor = function (x, y) {
         this.anchor = { x: x, y: y };
         return this;
     };
+    /** Sets the blending mode. See IsoBlending. */
     IsoObject.prototype.setBlendingMode = function (blendingMode) {
         this.blendingMode = blendingMode;
         return this;
     };
+    /** Sets the width. */
     IsoObject.prototype.setHeight = function (height) {
         this.height = height;
         return this;
     };
+    /** sets the image-ressource */
     IsoObject.prototype.setImage = function (image) {
         this.image = image;
         return this;
     };
+    /** Sets the friction of an object. */
     IsoObject.prototype.setFriction = function (friction) {
         this.friction = friction;
         return this;
     };
+    /** Sets the name of an object. */
     IsoObject.prototype.setName = function (name) {
         this.name = name;
         return this;
     };
+    /** Sets the offset of an object. */
     IsoObject.prototype.setOffset = function (offsetX, offsetY) {
         this.offset.x = offsetX;
         this.offset.y = offsetY;
         return this;
     };
+    /** Sets the position of an object. */
     IsoObject.prototype.setPosition = function (position) {
         this.position.x = position.x;
         this.position.y = position.y;
         return this;
     };
+    /** Sets an additional property. */
     IsoObject.prototype.setProperty = function (name, value) {
         this.properties[name] = value;
         return this;
     };
+    /** Sets all properties. */
     IsoObject.prototype.setProperties = function (properties) {
         this.properties = properties;
         return this;
     };
+    /** Sets the rotation of an object in degrees. */
     IsoObject.prototype.setRotation = function (degrees) {
         this.rotation = degrees;
         return this;
     };
+    /** Sets the scale of an object. */
+    IsoObject.prototype.setScale = function (factorX, factorY) {
+        this.scale.factorX = factorX;
+        this.scale.factorY = factorY;
+        return this;
+    };
+    /** Sets the scroll-position. */
     IsoObject.prototype.setScroll = function (x, y) {
         this.scrollPosition.x = x;
         this.scrollPosition.y = y;
         return this;
     };
+    /** Sets the width and height of an object. */
     IsoObject.prototype.setSize = function (width, height) {
         this.width = width;
-        // this.height = height;
+        this.height = height;
         return this;
     };
+    /** Sets the speed for moving of an object. */
     IsoObject.prototype.setSpeed = function (speed) {
         this.speed = speed;
         return this;
     };
+    /** Sets the width of an object. */
     IsoObject.prototype.setWidth = function (width) {
         this.width = width;
         return this;
     };
+    /** Sets the zooming-point of an object on the screen where zoomed to. */
     IsoObject.prototype.setZoomPoint = function (position) {
         this.zoomPoint = position;
         return this;
     };
+    /** Sets the absolute zooming-level. */
     IsoObject.prototype.setZoomLevel = function (zoomLevel) {
         this.zoomLevel = zoomLevel;
         return this;
     };
+    /** Sets the strength of zooming, when using the method IsoObject.zoom */
     IsoObject.prototype.setZoomStrength = function (zoomStrength) {
         this.zoomStrength = this.zoomStrength / 1000;
         return this;
     };
+    /** Calculate the zoom level */
     IsoObject.prototype.zoom = function (zoom) {
         this.setZoomLevel(this.zoomLevel + (zoom * this.zoomStrength));
         return this;
     };
+    /** Plays an animation. */
     IsoObject.prototype.play = function (name) {
         this.Engine.animation.play(name, this);
         return this;
     };
+    /** Stops an animation. */
     IsoObject.prototype.stop = function (name) {
         this.Engine.animation.stop(name, this);
         return this;
     };
+    /** Resumes an animation. */
     IsoObject.prototype.resume = function (name) {
         this.Engine.animation.resume(name, this);
         return this;
     };
+    /** Pause an animation. */
     IsoObject.prototype.pause = function (name) {
         this.Engine.animation.pause(name, this);
         return this;
     };
+    /** Calculat the new position. */
     IsoObject.prototype.updatePosition = function () {
         this.velocity.x *= this.friction;
         if (this.mass === 0) {
@@ -288,6 +352,7 @@ var IsoObject = (function () {
         this.position.y += this.velocity.y;
         this.rigidBody = this.getCoords();
     };
+    /** Gets all tiles of a given tilemap where the object collides with. */
     IsoObject.prototype.getCollidingTiles = function (tilemap) {
         var collisionBody = this.rigidBody;
         if (collisionBody === undefined) {
@@ -336,7 +401,7 @@ var IsoTileObject = (function (_super) {
     IsoTileObject.prototype.getTileOffset = function () {
         return this.tileOffset;
     };
-    IsoTileObject.prototype.getRelativePosition = function () {
+    IsoTileObject.prototype.getAbsolutePosition = function () {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
@@ -358,7 +423,7 @@ var IsoTileObject = (function (_super) {
     IsoTileObject.prototype.getRenderDetails = function () {
         var fx = this.anchor.x / this.tileSize.width, fy = this.anchor.y / this.tileSize.height;
         return {
-            position: this.getRelativePosition(),
+            position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
             renderSize: {
                 width: this.tileSize.width * this.zoomLevel,
@@ -466,7 +531,7 @@ var IsoTile = (function (_super) {
     IsoTile.prototype.getMapPosition = function () {
         return this.mapPosition;
     };
-    IsoTile.prototype.getRelativePosition = function () {
+    IsoTile.prototype.getAbsolutePosition = function () {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
@@ -482,14 +547,14 @@ var IsoTile = (function (_super) {
     IsoTile.prototype.getRenderDetails = function () {
         var fx = this.anchor.x / this.tileSize.width, fy = this.anchor.y / this.tileSize.height;
         return {
-            position: this.getRelativePosition(),
+            position: this.getAbsolutePosition(),
             mapPosition: this.mapPosition,
             tileSize: this.tileSize,
             renderSize: {
                 width: this.tileSize.width * this.zoomLevel,
                 height: this.tileSize.height * this.zoomLevel
             },
-            anchor: { x: (this.getRelativePosition().x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.getRelativePosition().y + (this.tileSize.height * this.zoomLevel * fy)) },
+            anchor: { x: (this.getAbsolutePosition().x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.getAbsolutePosition().y + (this.tileSize.height * this.zoomLevel * fy)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
             zoomLevel: this.zoomLevel
@@ -1060,15 +1125,19 @@ var IsoSprite = (function (_super) {
         this.setTile(tile.tile);
         return this;
     };
+    /** Gets the dimension of the object on the screen. */
+    IsoSprite.prototype.getAbsoluteDimension = function () {
+        return {
+            width: this.tileSize.width * this.zoomLevel * this.scale.factorX,
+            height: this.tileSize.height * this.zoomLevel * this.scale.factorY
+        };
+    };
     IsoSprite.prototype.getRenderDetails = function () {
         var fx = this.anchor.x / this.tileSize.width, fy = this.anchor.y / this.tileSize.height;
         return {
-            position: this.getRelativePosition(),
+            position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
-            renderSize: {
-                width: this.tileSize.width * this.zoomLevel,
-                height: this.tileSize.height * this.zoomLevel
-            },
+            renderSize: this.getAbsoluteDimension(),
             anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy)) },
             image: this.image.image.get(),
             offset: this.getTileOffset(),
@@ -1503,6 +1572,24 @@ var IsoAnimationManager = (function () {
     };
     return IsoAnimationManager;
 })();
+"use strict";
+var IsoBillboard = (function (_super) {
+    __extends(IsoBillboard, _super);
+    function IsoBillboard() {
+        _super.apply(this, arguments);
+        this.repeat = IsoBillboard.NOREPEAT;
+    }
+    /** Sets if the billboard will repeated. */
+    IsoBillboard.prototype.setRepeat = function (repeat) {
+        this.repeat = repeat;
+        return this;
+    };
+    IsoBillboard.REPEATX = "repeatx";
+    IsoBillboard.REPEATY = "repeaty";
+    IsoBillboard.REPEAT = "repeat";
+    IsoBillboard.NOREPEAT = "norepeat";
+    return IsoBillboard;
+})(IsoObject);
 var IsoBlendingModes = {
     NORMAL: "noraml",
     MULTIPLY: "multiply",
@@ -1544,9 +1631,13 @@ var IsoCanvas = (function () {
         }
         this.canvasElement.width = this.options.width;
         this.canvasElement.height = this.options.height;
+        this.canvasElement.style.width = this.options.width + "px";
+        this.canvasElement.style.height = this.options.height + "px";
         if (this.options.fullscreen === true) {
             this.canvasElement.width = window.innerWidth;
-            this.canvasElement.height = window.innerWidth;
+            this.canvasElement.height = window.innerHeight;
+            this.canvasElement.style.width = window.innerWidth + "px";
+            this.canvasElement.style.height = window.innerHeight + "px";
             window.onresize = window.onload = function () { return _this.updateScreen(); };
             this.canvasElement.style.overflow = "hidden";
         }
@@ -1572,7 +1663,9 @@ var IsoCanvas = (function () {
     };
     IsoCanvas.prototype.updateScreen = function () {
         this.canvasElement.width = window.innerWidth;
-        this.canvasElement.height = window.innerWidth;
+        this.canvasElement.height = window.innerHeight;
+        this.canvasElement.style.width = this.canvasElement.width + "px";
+        this.canvasElement.style.height = this.canvasElement.height + "px";
         new IsoEvent("IsoCanvasUpdate").trigger();
         return this;
     };
@@ -1641,6 +1734,7 @@ var IsoDrawer = (function () {
         this.canvas = Engine.canvas;
         this.context = Engine.canvas.context;
     }
+    /** Redraw all elements on the screen */
     IsoDrawer.prototype.update = function () {
         this.canvas.clearScreen();
         this.Engine.layers.sort();
@@ -1651,10 +1745,19 @@ var IsoDrawer = (function () {
         new IsoEvent("drawComplete").trigger();
         this.Engine.endLoop();
     };
+    /** Draws a single layer. */
     IsoDrawer.prototype.drawLayer = function (layer) {
-        this.drawTileMap(layer.getTileMap());
-        this.drawSprites(layer.sprites);
+        if (layer.billboards.length > 0) {
+            this.drawBillboards(layer.billboards);
+        }
+        if (layer.getTileMap() !== undefined) {
+            this.drawTileMap(layer.getTileMap());
+        }
+        if (layer.objects.length > 0) {
+            this.drawObjects(layer.objects);
+        }
     };
+    /** Draws a tilemap of a layer. */
     IsoDrawer.prototype.drawTileMap = function (tileMap) {
         tileMap.update();
         var tiles = tileMap.getTilesInView();
@@ -1664,7 +1767,7 @@ var IsoDrawer = (function () {
                 var detail = tiles.tiles[y][x].getRenderDetails();
                 if (tiles.tiles[y][x].rotation !== 0) {
                     this.translate(tiles.tiles[y][x], detail);
-                    this.rotateTile(tiles.tiles[y][x], detail);
+                    this.rotate(tiles.tiles[y][x], detail);
                     this.resetTranslation(tiles.tiles[y][x], detail);
                 }
                 this.context.globalCompositeOperation = tiles.tiles[y][x].blendingMode;
@@ -1676,19 +1779,79 @@ var IsoDrawer = (function () {
             }
         }
     };
-    IsoDrawer.prototype.drawSprites = function (sprites) {
-        for (var i = 0; i < sprites.length; i++) {
-            var s = sprites[i];
-            if (s.hidden === false) {
-                s.updatePosition();
-                var renderDetails = s.getRenderDetails();
-                if (s.rotation !== 0) {
-                    this.translate(s, renderDetails);
-                    this.rotate(s, renderDetails);
-                    this.resetTranslation(s, renderDetails);
+    /** Draws all given objects. */
+    IsoDrawer.prototype.drawBillboards = function (objects) {
+        for (var i = 0; i < objects.length; i++) {
+            var o = objects[i];
+            if (o.hidden === false) {
+                o.updatePosition();
+                var renderDetails = o.getRenderDetails();
+                if (o.rotation !== 0) {
+                    this.translate(o, renderDetails);
+                    this.rotate(o, renderDetails);
+                    this.resetTranslation(o, renderDetails);
                 }
-                this.context.globalCompositeOperation = s.blendingMode;
-                this.context.globalAlpha = s.alpha;
+                this.context.globalCompositeOperation = o.blendingMode;
+                this.context.globalAlpha = o.alpha;
+                if (o.repeat !== IsoBillboard.NOREPEAT) {
+                    if (o.repeat === IsoBillboard.REPEAT) {
+                        if (o.scrollPosition.x < -o.width || o.scrollPosition.x > o.width) {
+                            o.scrollPosition.x = 0;
+                        }
+                        if (o.scrollPosition.y < -o.height || o.scrollPosition.y > o.height) {
+                            o.scrollPosition.y = 0;
+                        }
+                    }
+                    if (o.repeat === IsoBillboard.REPEATX) {
+                        if (o.scrollPosition.x < -o.width || o.scrollPosition.x > o.width) {
+                            o.scrollPosition.x = 0;
+                        }
+                    }
+                    if (o.repeat === IsoBillboard.REPEATY) {
+                        if (o.scrollPosition.y < -o.height || o.scrollPosition.y > o.height) {
+                            o.scrollPosition.y = 0;
+                        }
+                    }
+                    for (var ii = 0; ii < Math.ceil(this.canvas.canvasElement.height / o.height) + 1; ii++) {
+                        for (var i = 0; i < Math.ceil(this.canvas.canvasElement.width / o.width) + 1; i++) {
+                            var rx = renderDetails.position.x, ry = renderDetails.position.y, fx = o.scrollPosition.x > 0 ? -1 : 1, fy = o.scrollPosition.y > 0 ? -1 : 1;
+                            if (o.repeat === IsoBillboard.REPEAT) {
+                                rx += i * (fx * renderDetails.renderSize.width);
+                                ry += ii * (fy * renderDetails.renderSize.height);
+                            }
+                            if (o.repeat === IsoBillboard.REPEATX) {
+                                rx += i * (fx * renderDetails.renderSize.width);
+                            }
+                            if (o.repeat === IsoBillboard.REPEATY) {
+                                ry += ii * (fy * renderDetails.renderSize.height);
+                            }
+                            this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, rx, ry, renderDetails.renderSize.width, renderDetails.renderSize.height);
+                        }
+                    }
+                }
+                else {
+                    this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
+                }
+                this.context.setTransform(1, 0, 0, 1, 0, 0);
+                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
+                this.context.globalAlpha = 1;
+            }
+        }
+    };
+    /** Draws all given objects. */
+    IsoDrawer.prototype.drawObjects = function (objects) {
+        for (var i = 0; i < objects.length; i++) {
+            var o = objects[i];
+            if (o.hidden === false) {
+                o.updatePosition();
+                var renderDetails = o.getRenderDetails();
+                if (o.rotation !== 0) {
+                    this.translate(o, renderDetails);
+                    this.rotate(o, renderDetails);
+                    this.resetTranslation(o, renderDetails);
+                }
+                this.context.globalCompositeOperation = o.blendingMode;
+                this.context.globalAlpha = o.alpha;
                 this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
                 this.context.setTransform(1, 0, 0, 1, 0, 0);
                 this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
@@ -1696,16 +1859,16 @@ var IsoDrawer = (function () {
             }
         }
     };
+    /** Sets the anchor of an object. */
     IsoDrawer.prototype.translate = function (object, renderDetails) {
         this.context.translate(renderDetails.anchor.x, renderDetails.anchor.y);
     };
+    /** Reset the anchor of an object. */
     IsoDrawer.prototype.resetTranslation = function (object, renderDetails) {
         this.context.translate(-renderDetails.anchor.x, -renderDetails.anchor.y);
     };
+    /** Rotates an object. */
     IsoDrawer.prototype.rotate = function (object, renderDetails) {
-        this.context.rotate(object.rotation * Math.PI / 180);
-    };
-    IsoDrawer.prototype.rotateTile = function (object, renderDetails) {
         this.context.rotate(object.rotation * Math.PI / 180);
     };
     return IsoDrawer;
@@ -1915,7 +2078,6 @@ var IsoInput = (function () {
 var IsoLayer = (function () {
     function IsoLayer(Engine, index, name) {
         this.objects = new Array();
-        this.sprites = new Array();
         this.billboards = new Array(); // isoBillboards
         this.Engine = Engine;
         this.index = index;
@@ -1931,12 +2093,17 @@ var IsoLayer = (function () {
     };
     IsoLayer.prototype.addSprite = function (name, image, tileObjectInfo) {
         var s = new IsoSprite(this.Engine, image, tileObjectInfo, name);
-        this.sprites.push(s);
+        this.objects.push(s);
         return s;
+    };
+    IsoLayer.prototype.addBillboard = function (name, image) {
+        var b = new IsoBillboard(this.Engine, image, name);
+        this.billboards.push(b);
+        return b;
     };
     IsoLayer.prototype.addAnimatedSprite = function (name, image, tileObjectInfo) {
         var s = new IsoAnimatedSprite(this.Engine, image, tileObjectInfo, name);
-        this.sprites.push(s);
+        this.objects.push(s);
         return s;
     };
     IsoLayer.prototype.addTileMap = function (name, image, tileWidth, tileHeight, map) {
@@ -1956,9 +2123,9 @@ var IsoLayer = (function () {
         return undefined;
     };
     IsoLayer.prototype.getSprite = function (name) {
-        for (var i = 0; i < this.sprites.length; i++) {
-            if (this.sprites[i].name === name) {
-                return this.sprites[i];
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].name === name) {
+                return this.objects[i];
             }
         }
         return undefined;
@@ -1971,13 +2138,11 @@ var IsoLayer = (function () {
             this.tileMap.zoom(zoom);
         }
         this.tileMap.update();
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].zoom(zoom);
-        }
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].zoom(zoom);
         }
         for (var i = 0; i < this.billboards.length; i++) {
+            this.billboards[i].zoom(zoom);
         }
     };
     IsoLayer.prototype.scroll = function (deltaX, deltaY) {
@@ -1986,39 +2151,33 @@ var IsoLayer = (function () {
         }
     };
     IsoLayer.prototype.rotate = function (degrees) {
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].rotate(degrees);
-        }
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].rotate(degrees);
         }
         for (var i = 0; i < this.billboards.length; i++) {
+            this.billboards[i].rotate(degrees);
         }
     };
     IsoLayer.prototype.setZoomPoint = function (point) {
         if (this.tileMap !== undefined) {
             this.tileMap.setZoomPoint(point);
         }
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].setZoomPoint(point);
-        }
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].setZoomPoint(point);
         }
         for (var i = 0; i < this.billboards.length; i++) {
+            this.billboards[i].setZoomPoint(point);
         }
     };
     IsoLayer.prototype.setSpeed = function (speed) {
         if (this.tileMap !== undefined) {
             this.tileMap.setSpeed(speed);
         }
-        for (var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].setSpeed(speed);
-        }
         for (var i = 0; i < this.objects.length; i++) {
             this.objects[i].setSpeed(speed);
         }
         for (var i = 0; i < this.billboards.length; i++) {
+            this.billboards[i].setSpeed(speed);
         }
     };
     return IsoLayer;

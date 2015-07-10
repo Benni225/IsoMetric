@@ -38,7 +38,7 @@ class IsoTileObject extends IsoObject {
         return this.tileOffset;
     }
 
-    getRelativePosition(): IsoPoint {
+    getAbsolutePosition(): IsoPoint {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
@@ -63,7 +63,7 @@ class IsoTileObject extends IsoObject {
         var fx = this.anchor.x / this.tileSize.width,
             fy = this.anchor.y / this.tileSize.height
         return {
-            position: this.getRelativePosition(),
+            position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
             renderSize: {
                 width: this.tileSize.width * this.zoomLevel,

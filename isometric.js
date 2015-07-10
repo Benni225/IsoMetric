@@ -1120,7 +1120,7 @@ var IsoSprite = (function (_super) {
         return this;
     };
     IsoSprite.prototype.set = function (tile) {
-        this.tileHeight = tile.height;
+        this.tileHeight = tile.height | 0;
         this.tileSize = tile.size;
         this.setTile(tile.tile);
         return this;

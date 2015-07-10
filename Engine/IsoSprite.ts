@@ -51,7 +51,7 @@ class IsoSprite extends IsoTileObject {
     }
 
     set(tile: IsoTileObjectInfo): IsoTileObject {
-        this.tileHeight = tile.height;
+        this.tileHeight = tile.height|0;
         this.tileSize = tile.size;
         this.setTile(tile.tile);
         return this;

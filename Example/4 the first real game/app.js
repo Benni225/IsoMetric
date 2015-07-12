@@ -125,7 +125,7 @@ window.onload = function () {
             }
             enemies = new Array();
             bird.setPosition({ x: 50, y: 50 });
-            bird.setProperty("hitted", false);
+            bird.setProperty("hit", false);
             bird.velocity.y = 0;
             score = 0;
             clearInterval(newEnemyInterval);

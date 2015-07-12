@@ -78,7 +78,7 @@ window.onload = function () {
                 // if the bird collides with an enemy
                 if (enemies[i].collide(bird)) {
                     // we set the bird as hit
-                    bird.setProperty("hitted", true);
+                    bird.setProperty("hit", true);
                     // ... and rotate it.
                     bird.play("r");
                 }
@@ -92,7 +92,7 @@ window.onload = function () {
         // Checks whether a key ws pressed
         if (App.input.keyEventType === IsoInput.EVENT_KEYPRESS) {
             // If the space button was pressen and the position of our bird is higher than 50...
-            if (App.input.keyCode === 32 && bird.getAbsolutePosition().y > 50 && bird.getProperty("hitted") !== true) {
+            if (App.input.keyCode === 32 && bird.getAbsolutePosition().y > 50 && bird.getProperty("hit") !== true) {
                 // ... we let our bird jump up
                 bird.move(0, -50);
                 bird.rotation = bird.velocity.y;

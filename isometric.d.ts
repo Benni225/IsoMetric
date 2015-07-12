@@ -766,12 +766,23 @@ declare class IsoDrawer {
     /** Rotates an object. */
     private rotate(object, renderDetails);
 }
+interface __IsoDocument extends Document {
+    createEventObject?: any;
+    fireEvent?: any;
+}
+interface __IsoElement extends Element {
+    fireEvent?: any;
+}
 declare class IsoEvent {
     type: string;
     data: any;
     constructor(type: string);
     addData(data: any): IsoEvent;
+    /**
+     * @todo Find a solid solution */
     trigger(target?: string | HTMLElement): void;
+    private __c(target?);
+    private __e(target?);
 }
 declare class IsoImage {
     /**

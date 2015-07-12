@@ -84,7 +84,7 @@ window.onload = function () {
             if (bird.getAbsolutePosition().y < 50 && bird.velocity.y < 0) {
                 bird.move(0, 1);
             }
-            if (bird.getProperty("hitted") !== true)
+            if (bird.getProperty("hit") !== true)
                 bird.rotation = bird.velocity.y;
         }
         // If the birds position is higher than the screenheight - game over

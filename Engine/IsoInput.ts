@@ -42,10 +42,13 @@ class IsoInput {
     mouseY: number;
     mouseWheelDelta: number;
 
-    lastTouchEventType: string;
     touches: TouchList;
     isTouchEvent: boolean = false;
     touchEvent: TouchEvent;
+    touchEventType: string;
+    touchStartTime: number;
+    touchEndTime: number;
+
     onTouch: Function;
 
     onInput: Function;
@@ -66,10 +69,6 @@ class IsoInput {
         el.onmousemove = (event: IsoMouseEvent) => this.checkMouse(event);
         el.onmouseup = (event: IsoMouseEvent) => this.checkMouse(event);
         el.onmousewheel = (event: IsoMouseEvent) => this.checkMouse(event);
-        el.ontouchcancel = (event: TouchEvent) => this.checkTouch(event);
-        el.ontouchend = (event: TouchEvent) => this.checkTouch(event);
-        el.ontouchmove = (event: TouchEvent) => this.checkTouch(event);
-        el.ontouchstart = (event: TouchEvent) => this.checkTouch(event);
     }
 
     checkKeyboard(event: KeyboardEvent) {
@@ -98,7 +97,7 @@ class IsoInput {
         this.oldEvent = event;
         this.isTouchEvent = true;
         this.touches = event.touches;
-        this.lastTouchEventType = event.type;
+        this.touchEventType = event.type;
         this.callCallback(event);
     }
 
@@ -116,7 +115,7 @@ class IsoInput {
         this.mouseWheelDelta = undefined;
         this.touches = undefined;
         this.touchEvent = undefined;
-        this.lastTouchEventType = "";
+        this.touchEventType = "";
     }
 
     callCallback(event: Event) {

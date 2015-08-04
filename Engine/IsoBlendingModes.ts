@@ -1,5 +1,5 @@
 ﻿var IsoBlendingModes = {
-    NORMAL: "noraml",
+    NORMAL: "normal",
     MULTIPLY: "multiply",
     SCREEN: "screen",
     OVERLAY: "overlay",

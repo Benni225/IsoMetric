@@ -20,24 +20,18 @@ class IsoTileMap {
     tilesInView: IsoTilesInView;
     tileSize: IsoTileSize;
     image: IsoRessource;
-    offset: IsoOffset;
-    scrollPosition: IsoScroll;
+    offset: IsoPoint = new IsoPoint(0, 0);
+    scrollPosition: IsoVector2D = new IsoVector2D(0, 0);
     speed: number = 1;
     zoomLevel: number = 1;
     zoomStrength: number = 1 / 1000;
     minZoomLevel: number;
     maxZoomLevel: number;
-    zoomPoint: IsoPoint = { x: 0, y: 0 };
+    zoomPoint: IsoPoint = new IsoPoint(0, 0);
     name: string;
     Engine: IsoMetric;
     /**
-     * @param {IsoMetric} Engine
-     * @param {string} [name]
-     * @param {number} [tileWidth]
-     * @param {number} [tileHeight]
-     * @param {IsoRessource} [image]
-     * @param {Array<Array<Array<number>>>} [map]
-     * @chainable
+     * Creates a new tiled map.
      */
     constructor(
         Engine: IsoMetric,
@@ -60,25 +54,19 @@ class IsoTileMap {
         if (map !== undefined) {
             this.setMap(map);
         }
-        this.setOffset({ x: 0, y: 0 });
-        this.setScroll(0, 0);
+        this.offset.set(0, 0);
+        this.scrollPosition.set(0, 0);
         return this;
     }
     /**
      * Sets the map of the tilemap
-     * @param {Array<Array<Array<number>>>} map The new map
-     * @chainable
      */
     setMap(map: Array<Array<Array<number>>>): IsoTileMap {
         this.map = new IsoMap(map);
         return this;
     }
     /**
-     * Create a new empty map
-     * @param {number} numTilesX The number of tiles on the X-axis
-     * @param {number} numTilesY The number of tiles on the Y-axis
-     * @param {Array<number>} [defaultValue] The default value of each new tile.
-     * @chainable
+     * Create a new empty map.
      */
     createMap(numTilesX: number, numTilesY: number, defaultValue?: Array<number>): IsoTileMap {
         if (defaultValue === undefined) {
@@ -98,7 +86,6 @@ class IsoTileMap {
     }
     /**
      * Creates all tile for the tilemap based on the map.
-     * @chainable
      */
     createTiles(): IsoTileMap {
         try {
@@ -121,10 +108,7 @@ class IsoTileMap {
                             tile: tile,
                             height: height,
                             size: this.tileSize,
-                            mapPosition: {
-                                column: x,
-                                row: y
-                            }
+                            mapPosition: new IsoMapVector2D(y, x)
                         });
                     }
                 }
@@ -138,8 +122,6 @@ class IsoTileMap {
     }
     /**
      * Get a tile given by its name.
-     * @param {string} name Name of the tile.
-     * @return {IsoTIle} The tile.
      */
     getTile(name: string) {
         for (var i = 0; i < this.tiles.length; i++) {
@@ -151,8 +133,7 @@ class IsoTileMap {
         }
     }
     /**
-     * Returns all tiles which are visible on the screen
-     * @return {IsoTilesInView} All tiles wich are visible on the screen.
+     * Returns all tiles which are visible on the screen.
      */
     getTilesInView(): IsoTilesInView {
         if (this.verify()) {
@@ -210,11 +191,6 @@ class IsoTileMap {
 
     /**
      * Gets all tiles in specified area.
-     * @param x The position on the X-axis of the area
-     * @param y The position on the Y-axis of the area
-     * @param width The width of the area
-     * @param height The height of the area
-     * @return An object with information of all tiles
      */
     getTilesInRadius(x: number, y: number, width: number, height: number): Array<IsoTile> {
         x = x - (((this.offset.x + this.scrollPosition.x) * this.zoomLevel)
@@ -253,9 +229,7 @@ class IsoTileMap {
     }
 
     /**
-     * Return the tile placed on the given position.
-     * @param {IsoPoint} position The position to check.
-     * @return {IsoTile} The tile on the given position.   
+     * Return the tile placed on the given position.  
      */
     getTileOnPosition(position: IsoPoint): IsoTile {
         if (this.map.get() !== undefined) {
@@ -290,8 +264,6 @@ class IsoTileMap {
     }
     /**
      * Sets the image ressource for the tilemap.
-     * @param {IsoRessource} image
-     * @chainable
      */
     setImage(image: IsoRessource): IsoTileMap {
         this.image = image;
@@ -299,8 +271,6 @@ class IsoTileMap {
     }
     /**
      * Sets the maximum value for zooming.
-     * @param {number} zoomLevel
-     * @chainable
      */
     setMaxZoomLevel(zoomLevel: number): IsoTileMap {
         this.maxZoomLevel = zoomLevel;
@@ -308,8 +278,6 @@ class IsoTileMap {
     }
     /**
      * Sets the minimum value for zooming.
-     * @param {number} zoomLevel
-     * @chainable
      */
     setMinZoomLevel(zoomLevel: number): IsoTileMap {
         this.minZoomLevel = zoomLevel;
@@ -317,36 +285,27 @@ class IsoTileMap {
     }
     /**
      * Sets the name of the tilemap
-     * @param {string} name
-     * @chainable
      */
     setName(name: string): IsoTileMap {
         this.name = name;
         return this;
     }
     /**
-     * Sets the offset of the tilemap
-     * @param {IsoOffset} offset
-     * @chainable
+     * Sets the offset of the tilemap. Alias for offset.set.
      */
-    setOffset(o: IsoOffset): IsoTileMap {
-        this.offset = o;
+    setOffset(x, y): IsoTileMap {
+        this.offset.set(x, y);
         return this;
     }
     /**
-     * Sets the scroll-position of the tilemap.
-     * @param {number} x The x-position.
-     * @param {number} y The y-position.
-     * @chainable
+     * Sets the scroll-position of the tilemap. Alias for scrollPosition.set.
      */
     setScroll(x: number, y: number): IsoTileMap {
-        this.scrollPosition = { x: x, y: y };
+        this.scrollPosition.set(x, y);
         return this;
     }
     /**
      * Sets the speed  for scrolling and moving for the tilemap.
-     * @param {number} speed
-     * @chainable
      */
     setSpeed(speed: number): IsoTileMap {
         this.speed = speed;
@@ -354,23 +313,15 @@ class IsoTileMap {
     }
     /**
      * Scrolls the tilemap relative to the actual position.
-     * @param {number} x The relative position on the x-axis.
-     * @param {number} y The relative position on the y-axis.
-     * @chainable
      */
     scroll(x: number, y: number): IsoTileMap {
         x = x + this.scrollPosition.x;
         y = y + this.scrollPosition.y;
-        this.scrollPosition = {
-            x: x,
-            y: y
-        };
+        this.scrollPosition.set(x, y);
         return this;
     }
     /**
      * Sets the tilesize of the tilemap.
-     * @param {IsoTileSize} size The new size.
-     * @chainable
      */
     setTileSize(size: IsoTileSize): IsoTileMap {
         this.tileSize = size;
@@ -378,8 +329,6 @@ class IsoTileMap {
     }
     /**
      * Sets the zoomLevel of the tilemap.
-     * @param {number} zoomLevel 
-     * @chainable
      */
     setZoomLevel(zoomLevel: number): IsoTileMap {
         this.zoomLevel = zoomLevel;
@@ -387,8 +336,6 @@ class IsoTileMap {
     }
     /**
      * Sets the zooming point of the tilemap.
-     * @param {IsoPoint} point
-     * @chainable
      */
     setZoomPoint(point: IsoPoint): IsoTileMap {
         this.zoomPoint = point;
@@ -396,8 +343,6 @@ class IsoTileMap {
     }
     /**
      * Sets the strength of zooming.
-     * @param {number} zoomStrength
-     * @chainable
      */
     setZoomStrength(zoomStrength: number): IsoTileMap {
         this.zoomStrength = zoomStrength / 1000;
@@ -426,13 +371,13 @@ class IsoTileMap {
                 tile.offset = this.offset;
                 tile.scrollPosition = this.scrollPosition;
                 tile.setZoomLevel(this.zoomLevel);
-                tile.setZoomPoint(this.zoomPoint);
+                tile.zoomPoint.set(this.zoomPoint.x, this.zoomPoint.y);
             } else if (tile.updateType === IsoTile.POSITION) {
                 tile.offset = this.offset;
                 tile.scrollPosition = this.scrollPosition;
             } else if (tile.updateType === IsoTile.ZOOM) {
                 tile.setZoomLevel(this.zoomLevel);
-                tile.setZoomPoint(this.zoomPoint);
+                tile.zoomPoint.set(this.zoomPoint.x, this.zoomPoint.y);
             }
             if (tile.tileHeight === undefined || typeof tile.tileHeight === "NaN") {
                 tile.tileHeight = 0;
@@ -444,7 +389,7 @@ class IsoTileMap {
      * @private
      */
     private verify() {
-        if (this.image === undefined || this.image.image.isLoaded === false) {
+        if (this.image === undefined || this.image.loaded === false) {
             return false;
         }
 
@@ -459,8 +404,6 @@ class IsoTileMap {
     }
     /**
      * Set te zoom of the tilemap relative to the current zoom.
-     * @param {number} zoom
-     * @chainable
      */
     zoom(zoom: number): IsoTileMap {
         var zoomLevel = this.zoomLevel + (this.zoomStrength * zoom);

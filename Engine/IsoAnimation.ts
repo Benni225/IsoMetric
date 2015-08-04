@@ -1,16 +1,29 @@
 ﻿///<reference path="IsoEasing.ts" />
+///<reference path="IsoOn.ts" />
 /**
  * Controls an animations.
  * There are two types of animations:
  * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be a number.
  * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be an IsoAnimatedSprite or IsoTile.W
  */
-class IsoAnimation {
+class IsoAnimation extends IsoOn {
+    static ADDITION_ABSOLUTE = "absolute";
+    static ADDTION_RELATIVE = "relative";
+
     static ONCE: string = "once";
     static PINGPONG: string = "pingpong";
     static ENDLESS: string = "endless";
+    static IMPULSE: string = "impulse";
     static ANIMATION_TYPE_FRAME: string = "frame";
     static ANIMATION_TYPE_ATTRIBUTE: string = "attribute";
+
+    // Events
+    static PLAYED: string = "played";
+    static EVERYPLAYED: string = "everyPlayed";
+    static STOPPED: string = "stopped";
+    static RESUME: string = "resume";
+    static PAUSE: string = "pause";
+
     name: string;
     duration: number;
     frames: Array<number>;
@@ -29,8 +42,11 @@ class IsoAnimation {
     framesPerSecond: number = 60;
     __debug: number = 0;
     animationType: string = "attribute";
+    additionType: string = IsoAnimation.ADDTION_RELATIVE;
+    private impulsePlaying: number = 0;
 
     constructor() {
+        super();
         return this;
     }
     
@@ -92,14 +108,28 @@ class IsoAnimation {
             }
             this.currentIteration++;
             this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
-            this.setObjectValue(this.actualValue);
+
+            if (this.additionType !== IsoAnimation.ADDITION_ABSOLUTE)
+                this.setObjectValue(this.actualValue);
+            else
+                this.setObjectValueAbsolute(this.actualValue);
 
             if (this.actualValue === this.endValue) {
                 switch (this.type) {
                     case IsoAnimation.ONCE:
+                        this.fire(IsoAnimation.PLAYED, this);
+                        if (this.checkOn(IsoAnimation.PLAYED)) {
+                            this.callOn(IsoAnimation.PLAYED);
+                        }
+                        this.isPlaying = false;
                         this.stop();
+                        return;
                         break;
                     case IsoAnimation.PINGPONG:
+                        this.fire(IsoAnimation.EVERYPLAYED, this);
+                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
+                            this.callOn(IsoAnimation.EVERYPLAYED);
+                        }
                         var endValue = this.endValue;
                         this.endValue = this.startValue;
                         this.startValue = endValue;
@@ -107,7 +137,30 @@ class IsoAnimation {
                         this.isPlaying = false;
                         this.play();
                         break;
+                    case IsoAnimation.IMPULSE:
+                        this.fire(IsoAnimation.EVERYPLAYED, this);
+                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
+                            this.callOn(IsoAnimation.EVERYPLAYED);
+                        }
+                        var endValue = this.endValue;
+                        this.impulsePlaying++;
+
+                        this.endValue = this.startValue;
+                        this.startValue = endValue;
+                        this.actualValue = this.startValue;
+
+                        if (this.impulsePlaying == 2) {
+                            this.stop();
+                        }
+
+                        this.isPlaying = false;
+                        this.play();
+                        break;
                     case IsoAnimation.ENDLESS:
+                        this.fire(IsoAnimation.EVERYPLAYED, this);
+                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
+                            this.callOn(IsoAnimation.EVERYPLAYED);
+                        }
                         this.actualValue = this.startValue;
                         this.isPlaying = false;
                         this.play();
@@ -117,6 +170,8 @@ class IsoAnimation {
                 if (this.isPlaying === true)
                     requestAnimationFrame(() => this.__playAttribute());
             }
+        } else {
+            return;
         }
     }
     /**
@@ -139,9 +194,17 @@ class IsoAnimation {
             if (__t === this.endValue) {
                 switch (this.type) {
                     case IsoAnimation.ONCE:
+                        this.fire(IsoAnimation.PLAYED, this);
+                        if (this.checkOn(IsoAnimation.PLAYED)) {
+                            this.callOn(IsoAnimation.PLAYED);
+                        }
                         this.stop();
                         break;
                     case IsoAnimation.PINGPONG:
+                        this.fire(IsoAnimation.EVERYPLAYED, this);
+                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
+                            this.callOn(IsoAnimation.EVERYPLAYED);
+                        }
                         var endValue = this.endValue;
                         this.endValue = this.startValue;
                         this.startValue = endValue;
@@ -149,7 +212,30 @@ class IsoAnimation {
                         this.isPlaying = false;
                         this.play();
                         break;
+                    case IsoAnimation.IMPULSE:
+                        this.fire(IsoAnimation.EVERYPLAYED, this);
+                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
+                            this.callOn(IsoAnimation.EVERYPLAYED);
+                        }
+                        var endValue = this.endValue;
+                        this.impulsePlaying++;
+
+                        this.endValue = this.startValue;
+                        this.startValue = endValue;
+                        this.actualValue = this.startValue;
+
+                        if (this.impulsePlaying == 2) {
+                            this.stop();
+                        }
+
+                        this.isPlaying = false;
+                        this.play();
+                        break;
                     case IsoAnimation.ENDLESS:
+                        this.fire(IsoAnimation.EVERYPLAYED, this);
+                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
+                            this.callOn(IsoAnimation.EVERYPLAYED);
+                        }
                         this.actualValue = this.startValue;
                         this.isPlaying = false;
                         this.play();
@@ -166,13 +252,20 @@ class IsoAnimation {
      */
     stop(): IsoAnimation {
         this.isPlaying = false;
-        this.actualValue = this.startValue;
+        // this.impulsePlaying = 0;
+        // this.actualValue = this.startValue;
+
+        // this.fire(IsoAnimation.STOPPED, this);
         return this;
     }
     /**
      * Pause the animation
      */
     pause(): IsoAnimation {
+        this.fire(IsoAnimation.PAUSE, this);
+        if (this.checkOn(IsoAnimation.PAUSE)) {
+            this.callOn(IsoAnimation.PAUSE);
+        }
         this.isPlaying = false;
         return this;
     }
@@ -180,6 +273,10 @@ class IsoAnimation {
      * Resume the animation.
      */
     resume(): IsoAnimation {
+        this.fire(IsoAnimation.RESUME, this);
+        if (this.checkOn(IsoAnimation.RESUME)) {
+            this.callOn(IsoAnimation.RESUME);
+        }
         this.isPlaying = true;
         if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
             this.__playAttribute();
@@ -201,7 +298,7 @@ class IsoAnimation {
         return f(this.object);
     }
     /**
-     * Parse the object and set the given attribute.
+     * Parse the object and set the given attribute in a relative way.
      */
     setObjectValue(value: number) {
         var a = this.attribute.split(".");
@@ -209,8 +306,24 @@ class IsoAnimation {
         for (var i = 0; i < a.length; i++) {
             s += "['" + a[i] + "']";
         }
-        var f = new Function("o", "v", "o" + s + "+=  v;");
+        var f = new Function("o", "v", "o" + s + "+= v;");
         f(this.object, value - this.getObjectValue());
     }
 
+    /**
+     * Parse the object and set the given attribute in a absolute way.
+     */
+    setObjectValueAbsolute(value: number) {
+        var a = this.attribute.split(".");
+        var s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
+        }
+        var f = new Function("o", "v", "o" + s + "= v;");
+        f(this.object, value);
+    }
+
+    setAdditionType(type: string) {
+        this.additionType = type;
+    }
 }

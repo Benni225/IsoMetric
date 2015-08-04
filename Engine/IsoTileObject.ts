@@ -12,7 +12,7 @@ interface IsoTileObjectInfo {
 }
 
 class IsoTileObject extends IsoObject {
-    tileOffset: IsoOffset = {x: 0, y: 0};
+    tileOffset: IsoPoint = new IsoPoint(0, 0);
     tileSize: IsoTileSize;
     tileHeight: number = 0;
     tile: number;
@@ -29,16 +29,16 @@ class IsoTileObject extends IsoObject {
         }
     }
 
-    setTileOffset(offset: IsoOffset): IsoTileObject {
-        this.tileOffset = offset;
+    setTileOffset(x: number, y: number): IsoTileObject {
+        this.tileOffset.set(x, y);
         return this;
     }
 
-    getTileOffset(): IsoOffset {
+    getTileOffset(): IsoPoint {
         return this.tileOffset;
     }
 
-    getAbsolutePosition(): IsoPoint {
+    getAbsolutePosition(): IsoVector2D {
         var x = 0, y = 0;
         x =
             ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
@@ -46,10 +46,7 @@ class IsoTileObject extends IsoObject {
         y =
             ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
             - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y);
-        return {
-            x: x,
-            y: y
-        };
+        return new IsoVector2D(x, y);
     }
 
     getRelativeDimension(): IsoDimension {
@@ -59,7 +56,7 @@ class IsoTileObject extends IsoObject {
         };
     }
 
-    getRenderDetails() {
+    getRenderDetails(): IIsoRenderDetails {
         var fx = this.anchor.x / this.tileSize.width * this.scale.factorX,
             fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
         return {
@@ -69,10 +66,11 @@ class IsoTileObject extends IsoObject {
                 width: this.tileSize.width * this.zoomLevel,
                 height: this.tileSize.height * this.zoomLevel
             },
-            anchor: { x: (this.position.x + (this.tileSize.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.tileSize.height * this.zoomLevel * fy * this.scale.factorY)) },
-            image: this.image.image.get(),
+            anchor: new IsoPoint((this.position.x + (this.tileSize.width * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.tileSize.height * this.zoomLevel * fy * this.scale.factorY))),
+            image: this.ressource.get(),
             offset: this.getTileOffset(),
-            zoomLevel: this.zoomLevel
+            zoomLevel: this.zoomLevel,
+            type: "IsoTileObject"
         };
     }
 
@@ -87,18 +85,18 @@ class IsoTileObject extends IsoObject {
             y: y,
             width: width,
             height: height,
-            image: this.image.image.get()
+            image: this.ressource.get()
         };
     }
 
     setTile(tile: number): IsoTileObject {
         try {
-            this.tileOffset = {x: 0, y: 0};
+            this.tileOffset.set(0, 0);
             this.tile = tile + this.startTile;
             this.tileOffset.x =
-            (this.tile % (this.width / this.tileSize.width)) * (this.tileSize.width + this.image.image.offset.x);
+            (this.tile % (this.width / this.tileSize.width)) * (this.tileSize.width + this.ressource.ressource.offset.x);
             this.tileOffset.y =
-            (Math.floor(this.tile / (this.width / this.tileSize.width))) * (this.tileSize.height + this.image.image.offset.y);
+            (Math.floor(this.tile / (this.width / this.tileSize.width))) * (this.tileSize.height + this.ressource.ressource.offset.y);
             return this;
         } catch (e) {
             throw (e);

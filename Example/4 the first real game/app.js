@@ -38,9 +38,9 @@ window.onload = function () {
         // Set the moving speed of the bird
         bird.setSpeed(8);
         // Set the position of the bird
-        bird.setPosition({ x: 50, y: 50 });
+        bird.position.set(50, 50);
         // We set the anchor of our bird in the center of the image.
-        bird.setAnchor(Math.floor(bird.width / 2), Math.floor(bird.height / 2));
+        bird.anchor.set(Math.floor(bird.width / 2), Math.floor(bird.height / 2));
         // Now, we start playing our animation.
         bird.play("fly");
         // Give the bird a mass, so we can use physics
@@ -124,7 +124,7 @@ window.onload = function () {
                 enemies[i].hidden = true;
             }
             enemies = new Array();
-            bird.setPosition({ x: 50, y: 50 });
+            bird.position.set(50, 50);
             bird.setProperty("hit", false);
             bird.velocity.y = 0;
             score = 0;
@@ -161,7 +161,7 @@ window.onload = function () {
         enemy.addFrameAnimation("fly", [1, 2, 3, 4], 400, IsoEasing.QuadIn, IsoAnimation.PINGPONG).play("fly");
         enemy.setSpeed(getRValue(5, 15));
         enemy.setScale(0.1, 0.1);
-        enemy.setPosition({ x: window.innerWidth + 50, y: newY });
+        enemy.position.set(window.innerWidth + 50, newY);
         enemy.addAnimation("updown", "position.y", newYEnd, getRValue(500, 2000), IsoEasing.SineIn, IsoAnimation.PINGPONG).play("updown");
         enemies.push(enemy);
     }

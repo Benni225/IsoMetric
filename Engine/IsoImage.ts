@@ -1,13 +1,10 @@
-﻿"use strict";
-class IsoImage {
+﻿///<reference path="IsoOn.ts" />
+"use strict";
+class IsoImage extends IsoOn implements IIsoResource {
    /**
     * Path to the image
     */
     src: string;
-   /**
-    * Name of the object
-    */
-    name: string;
    /**
     * HTMLImageObject
     */
@@ -27,62 +24,43 @@ class IsoImage {
      */
     height: number;
 
-    offset: IsoOffset = {
-        x: 0,
-        y: 0
-    };
+    offset: IsoPoint = new IsoPoint(0, 0);
 
-    constructor(name?: string, src?: string) {
+    type: string = IsoRessource.IMAGE;
+
+    constructor(src?: string, local = false) {
+        super();
         if (name !== undefined && src !== undefined) {
-            this.create(name, src);
+            this.create(src);
         }
     }
 
     /**
      * Creates a new image.
-     * @param src Source to the imagefile.
-     * @return Instance of IsoImage
      */
-    create(name: string, src: string): IsoImage {
-        this.name = name;
+    create(src: string): IsoImage {
         this.src = src;
         return this;
     }
     /**
      * Loads the image for further work.
-     * @return Instance of IsoImage
      */
     load() {
         this.image = new Image();
+        this.image.addEventListener("load", (e: Event) => this._onLoad(e), false);
         this.image.src = this.src;
-
-        this.image.addEventListener("load", (e: Event) => this._onLoad(e));
     }
     /**
      * Called when the image file was loaded.
-     * @param event The triggerd event
      */
     _onLoad(event: Event) {
         this.width = this.image.width;
         this.height = this.image.height;
         this.isLoaded = true;
-
-        
-
-        if (typeof this.__onLoad === "function") {
-            this.__onLoad.call(this, event);
-        }
-
-        var e = new IsoEvent(IsoRessource.ISO_EVENT_RESSOURCE_LOADED);
-        e.trigger();
-    }
-
-    onLoad(callback: Function) {
-        this.__onLoad = callback;
+        this.callOn("load");
     }
     /**
      * Returns the image.
-     * @return The image.
      */
     get() : HTMLImageElement {
         return this.image;
@@ -95,7 +73,19 @@ class IsoImage {
         delete (this);
     }
 
-    setOffset(offset: IsoOffset) {
-        this.offset = offset;
+    getWidth() {
+        return this.width;
+    }
+
+    getHeight() {
+        return this.height;
+    }
+
+    getOffset(): IsoPoint {
+        return this.offset;
+    }
+
+    setOffset(x: number, y: number) {
+        this.offset.set(x, y);
     }
 } 

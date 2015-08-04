@@ -1,18 +1,21 @@
 ﻿"use strict";
 
 class IsoPhysicsManager {
+    /** Includes all registered rigid bodies */
     rigidBodies: Array<IsoObject> = new Array();
+    /** Includes all registred mass bodies */
     massBodies: Array<IsoObject> = new Array();
-
+    /** The global gravity */
     gravity: number = 0.2;
-
+    /** Registers a new mass body */
     addMassBody(object: IsoObject) {
         this.massBodies.push(object);
     }
+    /** Registers a new rigid body */
     addRigidBody(object: IsoObject) {
         this.rigidBodies.push(object);
     }
-
+    /** Removes a rigid body */
     removeRigidBody(object: IsoObject) {
         var __i;
         for (var i = 0; i < this.rigidBodies.length; i++) {
@@ -26,6 +29,7 @@ class IsoPhysicsManager {
             }
         }
     }
+    /** Removes a mass body */
     removeMassBody(object: IsoObject) {
         var __i;
         for (var i = 0; i < this.massBodies.length; i++) {
@@ -39,11 +43,15 @@ class IsoPhysicsManager {
             }
         }
     }
-
+    /** Sets the global gravity */ 
     setGravity(g: number) {
         this.gravity = g;
     }
-
+    /** 
+    * Updates the physics.
+    * @todo find a much better solution
+    * @todo implement more physics 
+    */
     update() {
         for (var i = 0; i < this.massBodies.length; i++) {
             if (this.massBodies[i] !== undefined) {

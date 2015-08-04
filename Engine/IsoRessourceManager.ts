@@ -2,7 +2,7 @@
 ///<reference path="IsoOn.ts" />
 "use strict";
 
-class IsoRessourceManager {
+class IsoRessourceManager extends IsoOn {
     ressources: Array<IsoRessource> = new Array();
     Engine: IsoMetric;
     private numberAutoload: number = 0;
@@ -13,15 +13,14 @@ class IsoRessourceManager {
     __beforeLoad: Function;
 
     constructor(Engine: IsoMetric) {
+        super();
         this.Engine = Engine;
+        this.onEvent(IsoRessource.ISO_EVENT_RESSOURCE_LOADED, (event: CustomEvent) => this._onProgress(event));
     }
 
-    add(name: string, src: string, type: string, autoload: boolean = true) {
-        this.ressources.push(new IsoRessource(name, src, type, autoload));
-        this.ressources[this.ressources.length - 1].onLoad((e: Event) => this._onProgress(e));
-        if (autoload === true) {
-            this.numberAutoload++;
-        }
+    add(name: string, ressource: IsoImage) {
+        this.ressources.push(new IsoRessource(name, ressource));
+        this.numberAutoload++;
     }
 
     onBeforeLoad(callback: Function) {

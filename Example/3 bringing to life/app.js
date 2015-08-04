@@ -34,9 +34,9 @@ window.onload = function () {
         bird.setScale(0.1, 0.1);
         bird.setSpeed(8);
         // Set the position of the bird
-        bird.setPosition({ x: 50, y: 50 });
+        bird.position.set(50, 50);
         // We set the anchor of our bird in the center of the image.
-        bird.setAnchor(Math.floor(bird.width / 2), Math.floor(bird.height / 2));
+        bird.anchor.set(Math.floor(bird.width / 2), Math.floor(bird.height / 2));
         // Now, we start playing our animation.
         bird.play("fly");
         App.physics.addMassBody(bird);

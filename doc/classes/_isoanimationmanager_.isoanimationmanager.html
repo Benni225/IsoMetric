@@ -86,6 +86,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#animations" class="tsd-kind-icon">animations</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#playlists" class="tsd-kind-icon">play<wbr>Lists</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-not-exported">
@@ -93,10 +94,20 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#addanimation" class="tsd-kind-icon">add<wbr>Animation</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#addframeanimation" class="tsd-kind-icon">add<wbr>Frame<wbr>Animation</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#addplaylist" class="tsd-kind-icon">add<wbr>Playlist</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#get" class="tsd-kind-icon">get</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#getplaylist" class="tsd-kind-icon">get<wbr>Playlist</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#isplaying" class="tsd-kind-icon">is<wbr>Playing</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#isplayingplaylist" class="tsd-kind-icon">is<wbr>Playing<wbr>Playlist</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#pause" class="tsd-kind-icon">pause</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#pauseplaylist" class="tsd-kind-icon">pause<wbr>Playlist</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#play" class="tsd-kind-icon">play</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#playplaylist" class="tsd-kind-icon">play<wbr>Playlist</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#resume" class="tsd-kind-icon">resume</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#resumeplaylist" class="tsd-kind-icon">resume<wbr>Playlist</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#setadditiontype" class="tsd-kind-icon">set<wbr>Addition<wbr>Type</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#stop" class="tsd-kind-icon">stop</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isoanimationmanager_.isoanimationmanager.html#stopplaylist" class="tsd-kind-icon">stop<wbr>Playlist</a></li>
 							</ul>
 						</section>
 					</div>
@@ -110,9 +121,29 @@
 					<div class="tsd-signature tsd-kind-icon">animations<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_isoanimation_.isoanimation.html" class="tsd-signature-type">IsoAnimation</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in IsoAnimationManager.ts:5</li>
+							<li>Defined in IsoAnimationManager.ts:6</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Includes all object animations.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
+					<a name="playlists" class="tsd-anchor"></a>
+					<h3>play<wbr>Lists</h3>
+					<div class="tsd-signature tsd-kind-icon">play<wbr>Lists<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_isoanimationplaylist_.isoanimationplaylist.html" class="tsd-signature-type">IsoAnimationPlaylist</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in IsoAnimationManager.ts:8</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Includes all playlists.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
@@ -127,9 +158,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoAnimationManager.ts:12</li>
+									<li>Defined in IsoAnimationManager.ts:15</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds a new attribute-based animation.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -171,9 +207,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoAnimationManager.ts:7</li>
+									<li>Defined in IsoAnimationManager.ts:10</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds a new frame-based animation.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -203,6 +244,164 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="addplaylist" class="tsd-anchor"></a>
+					<h3>add<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a>, animations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_isoanimation_.isoanimation.html" class="tsd-signature-type">IsoAnimation</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isoanimationmanager_.isoanimationmanager.html" class="tsd-signature-type">IsoAnimationManager</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:20</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds a new playlist.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a></h5>
+								</li>
+								<li>
+									<h5>animations: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_isoanimation_.isoanimation.html" class="tsd-signature-type">IsoAnimation</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_isoanimationmanager_.isoanimationmanager.html" class="tsd-signature-type">IsoAnimationManager</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="get" class="tsd-anchor"></a>
+					<h3>get</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isoanimation_.isoanimation.html" class="tsd-signature-type">IsoAnimation</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:69</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a specified animation given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_isoanimation_.isoanimation.html" class="tsd-signature-type">IsoAnimation</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="getplaylist" class="tsd-anchor"></a>
+					<h3>get<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isoanimationplaylist_.isoanimationplaylist.html" class="tsd-signature-type">IsoAnimationPlaylist</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:77</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a specified playlist given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_isoanimationplaylist_.isoanimationplaylist.html" class="tsd-signature-type">IsoAnimationPlaylist</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="isplaying" class="tsd-anchor"></a>
+					<h3>is<wbr>Playing</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Playing<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:41</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks if an animation is playing given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="isplayingplaylist" class="tsd-anchor"></a>
+					<h3>is<wbr>Playing<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Playing<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:65</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks if a playlist is playing given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 					<a name="pause" class="tsd-anchor"></a>
 					<h3>pause</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
@@ -212,9 +411,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoAnimationManager.ts:41</li>
+									<li>Defined in IsoAnimationManager.ts:37</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Pauses an animation given by its name and the animated object.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -222,6 +426,37 @@
 								</li>
 								<li>
 									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="pauseplaylist" class="tsd-anchor"></a>
+					<h3>pause<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">pause<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:57</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Pauses a playlist given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -238,9 +473,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoAnimationManager.ts:17</li>
+									<li>Defined in IsoAnimationManager.ts:25</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Plays an animation given by its name and the animated object.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -248,6 +488,37 @@
 								</li>
 								<li>
 									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="playplaylist" class="tsd-anchor"></a>
+					<h3>play<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">play<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:49</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Plays a playlist given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -267,6 +538,11 @@
 									<li>Defined in IsoAnimationManager.ts:33</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resumes an animation given by its name and the animated object.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -274,6 +550,71 @@
 								</li>
 								<li>
 									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="resumeplaylist" class="tsd-anchor"></a>
+					<h3>resume<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">resume<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:61</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resumes a playlist given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="setadditiontype" class="tsd-anchor"></a>
+					<h3>set<wbr>Addition<wbr>Type</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Addition<wbr>Type<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span>, type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:45</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets the addiion type of the animation.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+								<li>
+									<h5>type: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -290,9 +631,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoAnimationManager.ts:25</li>
+									<li>Defined in IsoAnimationManager.ts:29</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Stops an animation given by its name and the animated object.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -300,6 +646,37 @@
 								</li>
 								<li>
 									<h5>object: <span class="tsd-signature-type">Object</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+					<a name="stopplaylist" class="tsd-anchor"></a>
+					<h3>stop<wbr>Playlist</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">stop<wbr>Playlist<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, object<span class="tsd-signature-symbol">: </span><a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in IsoAnimationManager.ts:53</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Stops a playlist given by its name and the animated object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>object: <a href="_isominimalobject_.isominimalobject.html" class="tsd-signature-type">IsoMinimalObject</a><span class="tsd-signature-symbol"> | </span><a href="_isosprite_.isosprite.html" class="tsd-signature-type">IsoSprite</a><span class="tsd-signature-symbol"> | </span><a href="_isotext_.isotext.html" class="tsd-signature-type">IsoText</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -314,80 +691,8 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimatedsprite_.html">"<wbr>Iso<wbr>Animated<wbr>Sprite"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimation_.html">"<wbr>Iso<wbr>Animation"</a>
-					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_isoanimationmanager_.html">"<wbr>Iso<wbr>Animation<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isobillboard_.html">"<wbr>Iso<wbr>Billboard"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoblendingmodes_.html">"<wbr>Iso<wbr>Blending<wbr>Modes"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isocanvas_.html">"<wbr>Iso<wbr>Canvas"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoconfig_.html">"<wbr>Iso<wbr>Config"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isodrawer_.html">"<wbr>Iso<wbr>Drawer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoeasing_.html">"<wbr>Iso<wbr>Easing"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoevent_.html">"<wbr>Iso<wbr>Event"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoimage_.html">"<wbr>Iso<wbr>Image"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoinput_.html">"<wbr>Iso<wbr>Input"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isolayer_.html">"<wbr>Iso<wbr>Layer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isolayers_.html">"<wbr>Iso<wbr>Layers"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isomap_.html">"<wbr>Iso<wbr>Map"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoobject_.html">"<wbr>Iso<wbr>Object"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoon_.html">"<wbr>Iso<wbr>On"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isophysicsmanager_.html">"<wbr>Iso<wbr>Physics<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoressource_.html">"<wbr>Iso<wbr>Ressource"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoressourcemanager_.html">"<wbr>Iso<wbr>Ressource<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isosprite_.html">"<wbr>Iso<wbr>Sprite"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotile_.html">"<wbr>Iso<wbr>Tile"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotilemap_.html">"<wbr>Iso<wbr>Tile<wbr>Map"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotileobject_.html">"<wbr>Iso<wbr>Tile<wbr>Object"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isometric_.html">"<wbr>Isometric"</a>
 					</li>
 				</ul>
 			</nav>
@@ -401,6 +706,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isoanimationmanager_.isoanimationmanager.html#animations" class="tsd-kind-icon">animations</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#playlists" class="tsd-kind-icon">play<wbr>Lists</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isoanimationmanager_.isoanimationmanager.html#addanimation" class="tsd-kind-icon">add<wbr>Animation</a>
 							</li>
@@ -408,16 +716,46 @@
 								<a href="_isoanimationmanager_.isoanimationmanager.html#addframeanimation" class="tsd-kind-icon">add<wbr>Frame<wbr>Animation</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#addplaylist" class="tsd-kind-icon">add<wbr>Playlist</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#get" class="tsd-kind-icon">get</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#getplaylist" class="tsd-kind-icon">get<wbr>Playlist</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#isplaying" class="tsd-kind-icon">is<wbr>Playing</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#isplayingplaylist" class="tsd-kind-icon">is<wbr>Playing<wbr>Playlist</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isoanimationmanager_.isoanimationmanager.html#pause" class="tsd-kind-icon">pause</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#pauseplaylist" class="tsd-kind-icon">pause<wbr>Playlist</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isoanimationmanager_.isoanimationmanager.html#play" class="tsd-kind-icon">play</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#playplaylist" class="tsd-kind-icon">play<wbr>Playlist</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isoanimationmanager_.isoanimationmanager.html#resume" class="tsd-kind-icon">resume</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#resumeplaylist" class="tsd-kind-icon">resume<wbr>Playlist</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#setadditiontype" class="tsd-kind-icon">set<wbr>Addition<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isoanimationmanager_.isoanimationmanager.html#stop" class="tsd-kind-icon">stop</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isoanimationmanager_.isoanimationmanager.html#stopplaylist" class="tsd-kind-icon">stop<wbr>Playlist</a>
 							</li>
 						</ul>
 					</li>

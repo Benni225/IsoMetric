@@ -13,7 +13,7 @@ interface IsoTileInfo {
     tile: number;
     height: number;
     size: IsoTileSize;
-    mapPosition: IsoMapPosition;
+    mapPosition: IsoMapVector2D;
 }
 
 interface IsoMapPosition {
@@ -26,10 +26,10 @@ class IsoTile extends IsoTileObject {
     static MANUAL: string = "manual";
     static POSITION: string = "position";
     static ZOOM: string = "zoom";
-    tileOffset: IsoOffset;
+    tileOffset: IsoPoint = new IsoPoint(0, 0);
     tileSize: IsoTileSize;
     tileHeight: number = 0;
-    mapPosition: IsoMapPosition;
+    mapPosition: IsoMapVector2D = new IsoMapVector2D(0, 0);
     tile: number;
     updateType: string = "automatic";
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileInfo) {
@@ -84,11 +84,11 @@ class IsoTile extends IsoTileObject {
         };
     }
 
-    getMapPosition(): IsoMapPosition {
+    getMapPosition(): IsoMapVector2D {
         return this.mapPosition;
     }
 
-    getAbsolutePosition(): IsoPoint {
+    getAbsolutePosition(): IsoVector2D {
         var x = 0, y = 0;
         x =
         ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
@@ -96,13 +96,10 @@ class IsoTile extends IsoTileObject {
         y =
         ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
         - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y) + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight;
-        return {
-            x: x,
-            y: y
-        };
+        return new IsoVector2D(x, y);
     }
 
-    getRenderDetails() {
+    getRenderDetails(): IIsoRenderDetails {
         var fx = this.anchor.x / this.tileSize.width,
             fy = this.anchor.y / this.tileSize.height;
         return {
@@ -113,10 +110,11 @@ class IsoTile extends IsoTileObject {
                 width: this.tileSize.width * this.zoomLevel,
                 height: this.tileSize.height * this.zoomLevel
             },
-            anchor: { x: (this.getAbsolutePosition().x + (this.tileSize.width * this.zoomLevel * fx)), y: (this.getAbsolutePosition().y + (this.tileSize.height * this.zoomLevel * fy)) },
-            image: this.image.image.get(),
+            anchor: new IsoPoint((this.getAbsolutePosition().x + (this.tileSize.width * this.zoomLevel * fx)), (this.getAbsolutePosition().y + (this.tileSize.height * this.zoomLevel * fy))),
+            image: this.ressource.get(),
             offset: this.getTileOffset(),
-            zoomLevel: this.zoomLevel
+            zoomLevel: this.zoomLevel,
+            type: "IsoTile"
         };
     }
 

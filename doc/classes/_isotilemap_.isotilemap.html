@@ -111,6 +111,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#tiles" class="tsd-kind-icon">tiles</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#tilesinview" class="tsd-kind-icon">tiles<wbr>InView</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#zoomlevel" class="tsd-kind-icon">zoom<wbr>Level</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#zoompoint" class="tsd-kind-icon">zoom<wbr>Point</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#zoomstrength" class="tsd-kind-icon">zoom<wbr>Strength</a></li>
 							</ul>
 						</section>
@@ -142,12 +143,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#zoom" class="tsd-kind-icon">zoom</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-not-exported">
-							<h3>Object literals</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-object-literal tsd-parent-kind-class tsd-is-not-exported"><a href="_isotilemap_.isotilemap.html#zoompoint" class="tsd-kind-icon">zoom<wbr>Point</a></li>
-							</ul>
-						</section>
 					</div>
 				</section>
 			</section>
@@ -167,10 +162,9 @@
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
+								<div class="lead">
+									<p>Creates a new tiled map.</p>
+								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -263,7 +257,7 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 					<a name="offset" class="tsd-anchor"></a>
 					<h3>offset</h3>
-					<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_isoobject_.isooffset.html" class="tsd-signature-type">IsoOffset</a></div>
+					<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <a href="_isopoint_.isopoint.html" class="tsd-signature-type">IsoPoint</a></div>
 					<aside class="tsd-sources">
 						<ul>
 							<li>Defined in IsoTileMap.ts:23</li>
@@ -273,7 +267,7 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 					<a name="scrollposition" class="tsd-anchor"></a>
 					<h3>scroll<wbr>Position</h3>
-					<div class="tsd-signature tsd-kind-icon">scroll<wbr>Position<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_isoobject_.isoscroll.html" class="tsd-signature-type">IsoScroll</a></div>
+					<div class="tsd-signature tsd-kind-icon">scroll<wbr>Position<span class="tsd-signature-symbol">:</span> <a href="_isovector2d_.isovector2d.html" class="tsd-signature-type">IsoVector2D</a></div>
 					<aside class="tsd-sources">
 						<ul>
 							<li>Defined in IsoTileMap.ts:24</li>
@@ -331,6 +325,16 @@
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
+					<a name="zoompoint" class="tsd-anchor"></a>
+					<h3>zoom<wbr>Point</h3>
+					<div class="tsd-signature tsd-kind-icon">zoom<wbr>Point<span class="tsd-signature-symbol">:</span> <a href="_isopoint_.isopoint.html" class="tsd-signature-type">IsoPoint</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in IsoTileMap.ts:30</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 					<a name="zoomstrength" class="tsd-anchor"></a>
 					<h3>zoom<wbr>Strength</h3>
 					<div class="tsd-signature tsd-kind-icon">zoom<wbr>Strength<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
@@ -353,31 +357,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:83</li>
+									<li>Defined in IsoTileMap.ts:71</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Create a new empty map</p>
+									<p>Create a new empty map.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>numTilesX: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The number of tiles on the X-axis</p>
-									</div>
 								</li>
 								<li>
 									<h5>numTilesY: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The number of tiles on the Y-axis</p>
-									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> defaultValue: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h5>
@@ -397,17 +391,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:103</li>
+									<li>Defined in IsoTileMap.ts:90</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Creates all tile for the tilemap based on the map.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
 						</li>
@@ -423,7 +413,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:144</li>
+									<li>Defined in IsoTileMap.ts:126</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -435,13 +425,9 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>name: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Name of the tile.</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotile_.isotile.html" class="tsd-signature-type">IsoTile</a></h4>
-							<p>The tile.</p>
 						</li>
 					</ul>
 				</section>
@@ -449,13 +435,13 @@
 					<a name="gettileonposition" class="tsd-anchor"></a>
 					<h3>get<wbr>Tile<wbr>OnPosition</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Tile<wbr>OnPosition<span class="tsd-signature-symbol">(</span>position<span class="tsd-signature-symbol">: </span><a href="../interfaces/_isoobject_.isopoint.html" class="tsd-signature-type">IsoPoint</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isotile_.isotile.html" class="tsd-signature-type">IsoTile</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Tile<wbr>OnPosition<span class="tsd-signature-symbol">(</span>position<span class="tsd-signature-symbol">: </span><a href="_isopoint_.isopoint.html" class="tsd-signature-type">IsoPoint</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isotile_.isotile.html" class="tsd-signature-type">IsoTile</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:260</li>
+									<li>Defined in IsoTileMap.ts:234</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -466,14 +452,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>position: <a href="../interfaces/_isoobject_.isopoint.html" class="tsd-signature-type">IsoPoint</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The position to check.</p>
-									</div>
+									<h5>position: <a href="_isopoint_.isopoint.html" class="tsd-signature-type">IsoPoint</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotile_.isotile.html" class="tsd-signature-type">IsoTile</a></h4>
-							<p>The tile on the given position.</p>
 						</li>
 					</ul>
 				</section>
@@ -487,7 +469,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:219</li>
+									<li>Defined in IsoTileMap.ts:195</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -499,31 +481,18 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>x: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The position on the X-axis of the area</p>
-									</div>
 								</li>
 								<li>
 									<h5>y: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The position on the Y-axis of the area</p>
-									</div>
 								</li>
 								<li>
 									<h5>width: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The width of the area</p>
-									</div>
 								</li>
 								<li>
 									<h5>height: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The height of the area</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_isotile_.isotile.html" class="tsd-signature-type">IsoTile</a><span class="tsd-signature-symbol">&gt;</span></h4>
-							<p>An object with information of all tiles</p>
 						</li>
 					</ul>
 				</section>
@@ -537,16 +506,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:157</li>
+									<li>Defined in IsoTileMap.ts:138</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns all tiles which are visible on the screen</p>
+									<p>Returns all tiles which are visible on the screen.</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_isotilemap_.isotilesinview.html" class="tsd-signature-type">IsoTilesInView</a></h4>
-							<p>All tiles wich are visible on the screen.</p>
 						</li>
 					</ul>
 				</section>
@@ -560,31 +528,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:361</li>
+									<li>Defined in IsoTileMap.ts:317</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Scrolls the tilemap relative to the actual position.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>x: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The relative position on the x-axis.</p>
-									</div>
 								</li>
 								<li>
 									<h5>y: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The relative position on the y-axis.</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
@@ -601,17 +559,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:296</li>
+									<li>Defined in IsoTileMap.ts:268</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the image ressource for the tilemap.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -633,25 +587,18 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:72</li>
+									<li>Defined in IsoTileMap.ts:64</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the map of the tilemap</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>map: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The new map</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
@@ -668,17 +615,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:305</li>
+									<li>Defined in IsoTileMap.ts:275</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the maximum value for zooming.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -700,17 +643,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:314</li>
+									<li>Defined in IsoTileMap.ts:282</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the minimum value for zooming.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -732,17 +671,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:323</li>
+									<li>Defined in IsoTileMap.ts:289</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the name of the tilemap</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -758,28 +693,27 @@
 					<a name="setoffset" class="tsd-anchor"></a>
 					<h3>set<wbr>Offset</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Offset<span class="tsd-signature-symbol">(</span>o<span class="tsd-signature-symbol">: </span><a href="../interfaces/_isoobject_.isooffset.html" class="tsd-signature-type">IsoOffset</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Offset<span class="tsd-signature-symbol">(</span>x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:332</li>
+									<li>Defined in IsoTileMap.ts:296</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Sets the offset of the tilemap</p>
+									<p>Sets the offset of the tilemap. Alias for offset.set.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>o: <a href="../interfaces/_isoobject_.isooffset.html" class="tsd-signature-type">IsoOffset</a></h5>
+									<h5>x: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5>y: <span class="tsd-signature-type">any</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
@@ -796,31 +730,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:342</li>
+									<li>Defined in IsoTileMap.ts:303</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Sets the scroll-position of the tilemap.</p>
+									<p>Sets the scroll-position of the tilemap. Alias for scrollPosition.set.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>x: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The x-position.</p>
-									</div>
 								</li>
 								<li>
 									<h5>y: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The y-position.</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
@@ -837,17 +761,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:351</li>
+									<li>Defined in IsoTileMap.ts:310</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the speed  for scrolling and moving for the tilemap.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -869,25 +789,18 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:375</li>
+									<li>Defined in IsoTileMap.ts:326</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the tilesize of the tilemap.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>size: <a href="../interfaces/_isotileobject_.isotilesize.html" class="tsd-signature-type">IsoTileSize</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The new size.</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
@@ -904,17 +817,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:384</li>
+									<li>Defined in IsoTileMap.ts:333</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the zoomLevel of the tilemap.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -930,28 +839,24 @@
 					<a name="setzoompoint" class="tsd-anchor"></a>
 					<h3>set<wbr>Zoom<wbr>Point</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Zoom<wbr>Point<span class="tsd-signature-symbol">(</span>point<span class="tsd-signature-symbol">: </span><a href="../interfaces/_isoobject_.isopoint.html" class="tsd-signature-type">IsoPoint</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Zoom<wbr>Point<span class="tsd-signature-symbol">(</span>point<span class="tsd-signature-symbol">: </span><a href="_isopoint_.isopoint.html" class="tsd-signature-type">IsoPoint</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:393</li>
+									<li>Defined in IsoTileMap.ts:340</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the zooming point of the tilemap.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>point: <a href="../interfaces/_isoobject_.isopoint.html" class="tsd-signature-type">IsoPoint</a></h5>
+									<h5>point: <a href="_isopoint_.isopoint.html" class="tsd-signature-type">IsoPoint</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_isotilemap_.isotilemap.html" class="tsd-signature-type">IsoTileMap</a></h4>
@@ -968,17 +873,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:402</li>
+									<li>Defined in IsoTileMap.ts:347</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the strength of zooming.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -1000,7 +901,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:409</li>
+									<li>Defined in IsoTileMap.ts:354</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1022,7 +923,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:423</li>
+									<li>Defined in IsoTileMap.ts:368</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1050,7 +951,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:446</li>
+									<li>Defined in IsoTileMap.ts:391</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1072,17 +973,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in IsoTileMap.ts:465</li>
+									<li>Defined in IsoTileMap.ts:408</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Set te zoom of the tilemap relative to the current zoom.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>chainable</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -1095,39 +992,6 @@
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
-				<h2>Object literals</h2>
-				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-parent-kind-class tsd-is-not-exported">
-					<a name="zoompoint" class="tsd-anchor"></a>
-					<h3>zoom<wbr>Point</h3>
-					<div class="tsd-signature tsd-kind-icon">zoom<wbr>Point<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in IsoTileMap.ts:30</li>
-						</ul>
-					</aside>
-					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
-						<a name="zoompoint.x" class="tsd-anchor"></a>
-						<h3>x</h3>
-						<div class="tsd-signature tsd-kind-icon">x<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in IsoTileMap.ts:30</li>
-							</ul>
-						</aside>
-					</section>
-					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
-						<a name="zoompoint.y" class="tsd-anchor"></a>
-						<h3>y</h3>
-						<div class="tsd-signature tsd-kind-icon">y<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in IsoTileMap.ts:30</li>
-							</ul>
-						</aside>
-					</section>
-				</section>
-			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
@@ -1135,80 +999,8 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimatedsprite_.html">"<wbr>Iso<wbr>Animated<wbr>Sprite"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimation_.html">"<wbr>Iso<wbr>Animation"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimationmanager_.html">"<wbr>Iso<wbr>Animation<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isobillboard_.html">"<wbr>Iso<wbr>Billboard"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoblendingmodes_.html">"<wbr>Iso<wbr>Blending<wbr>Modes"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isocanvas_.html">"<wbr>Iso<wbr>Canvas"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoconfig_.html">"<wbr>Iso<wbr>Config"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isodrawer_.html">"<wbr>Iso<wbr>Drawer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoeasing_.html">"<wbr>Iso<wbr>Easing"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoevent_.html">"<wbr>Iso<wbr>Event"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoimage_.html">"<wbr>Iso<wbr>Image"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoinput_.html">"<wbr>Iso<wbr>Input"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isolayer_.html">"<wbr>Iso<wbr>Layer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isolayers_.html">"<wbr>Iso<wbr>Layers"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isomap_.html">"<wbr>Iso<wbr>Map"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoobject_.html">"<wbr>Iso<wbr>Object"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoon_.html">"<wbr>Iso<wbr>On"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isophysicsmanager_.html">"<wbr>Iso<wbr>Physics<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoressource_.html">"<wbr>Iso<wbr>Ressource"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoressourcemanager_.html">"<wbr>Iso<wbr>Ressource<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isosprite_.html">"<wbr>Iso<wbr>Sprite"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotile_.html">"<wbr>Iso<wbr>Tile"</a>
-					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_isotilemap_.html">"<wbr>Iso<wbr>Tile<wbr>Map"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotileobject_.html">"<wbr>Iso<wbr>Tile<wbr>Object"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isometric_.html">"<wbr>Isometric"</a>
 					</li>
 				</ul>
 			</nav>
@@ -1260,6 +1052,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isotilemap_.isotilemap.html#zoomlevel" class="tsd-kind-icon">zoom<wbr>Level</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_isotilemap_.isotilemap.html#zoompoint" class="tsd-kind-icon">zoom<wbr>Point</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isotilemap_.isotilemap.html#zoomstrength" class="tsd-kind-icon">zoom<wbr>Strength</a>
@@ -1332,9 +1127,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isotilemap_.isotilemap.html#zoom" class="tsd-kind-icon">zoom</a>
-							</li>
-							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-not-exported">
-								<a href="_isotilemap_.isotilemap.html#zoompoint" class="tsd-kind-icon">zoom<wbr>Point</a>
 							</li>
 						</ul>
 					</li>

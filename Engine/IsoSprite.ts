@@ -13,16 +13,13 @@ interface IsoCollisionBody {
 }
 
 interface IsoFrame {
-    offset: IsoOffset;
+    offset: IsoPoint;
     dimension: IsoDimension;
 }
 
 class IsoSprite extends IsoTileObject {
-    Engine: IsoMetric;
-
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string) {
         super(Engine, image, tileInfo);
-        this.Engine = Engine;
         if (name !== undefined) {
             this.setName(name);
         }
@@ -40,17 +37,17 @@ class IsoSprite extends IsoTileObject {
             y: y,
             width: width,
             height: height,
-            image: this.image.image.get()
+            image: this.ressource.get()
         };
     }
 
     setFrame(frame: IsoFrame): IsoSprite {
         this.tileSize = frame.dimension;
-        this.tileOffset = frame.offset;
+        this.tileOffset.set(frame.offset.x, frame.offset.y);
         return this;
     }
 
-    set(tile: IsoTileObjectInfo): IsoTileObject {
+    set(tile: IsoTileObjectInfo): IsoSprite {
         this.tileHeight = tile.height|0;
         this.tileSize = tile.size;
         this.setTile(tile.tile);
@@ -72,10 +69,11 @@ class IsoSprite extends IsoTileObject {
             position: this.getAbsolutePosition(),
             tileSize: this.tileSize,
             renderSize: this.getAbsoluteDimension(),
-            anchor: { x: (this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), y: (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY)) },
-            image: this.image.image.get(),
+            anchor: new IsoPoint((this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY))),
+            image: this.ressource.get(),
             offset: this.getTileOffset(),
-            zoomLevel: this.zoomLevel
+            zoomLevel: this.zoomLevel,
+            type: "IsoSprite"
         };
     }
 }

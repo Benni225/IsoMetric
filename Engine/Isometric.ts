@@ -18,124 +18,54 @@ interface IsoCallback {
  * @constructor 
  * 
  */
-class IsoMetric {
+class IsoMetric extends IsoOn{
     /**
-     * @property config
      * The configuration.
-     * @type {IsoConfig}
      */
     config: IsoConfig;
     /**
-     * @property canvas
-     * @type {IsoCanvas} 
      * The canvas object
      */
     canvas: IsoCanvas;
-    /**
-    * @property layers
-     * @description All layers of the actual game
-     * @type {IsoLayers}
-     */
-     layers: IsoLayers;
-    /**
-     * @property drawer
-     * @type {IsoDrawer}  
-     * The drawing lib.
-     */
-     drawer: IsoDrawer;
-    /**
-     * @property physics
-     * @type {IsoPhysicsManager}
-     */
-     physics: IsoPhysicsManager;
-    /**
-     * @property animation
-     * @type {IsoAnimationManager}
-     */
-     animation: IsoAnimationManager;
-    /**
-     * @property input
-     * @type {IsoInput} 
-     */
-     input: IsoInput;
-    /** 
-     * Handles all ressources of a project.
-     * @property ressource 
-     * @type {IsoRessourceManager} 
-     * @see IsoRessourceManager
-     */
-     ressources: IsoRessourceManager;
-    /**
-     * The time one frames needs to draw.
-     * @property frameTime
-     * @type {number}  
-     */
+    /** Includes all layers */
+    layers: IsoLayers;
+    /** The drawing lib. */
+    drawer: IsoDrawer;
+    /** The physics library */
+    physics: IsoPhysicsManager;
+    /** The animation library */
+    animation: IsoAnimationManager;
+    /** The input library */
+    input: IsoInput;
+    /** Handles all ressources of a project. */
+    ressources: IsoRessourceManager;
+    /** The time one frames needs to drawn. */
     frameTime: number;
-    /**
-     * A counter for frames.
-     * @property frameCount
-     * @type {number}
-     * @default 0   
-     */
+    /** A counter for frames */
     frameCount: number = 0;
-    /**
-     * An inteval for reseting the FPS
-     * @property frameCountInterval
-     * @type {any}   
-     */
+    /** An inteval for reseting the FPS */
     frameCountInteral: any;
-    /**
-     * The time in milliseconds at the begin of a loop.
-     * @property startLoopTime
-     * @type {Date}  
-     */
+    /** The time in milliseconds at the begin of a loop. */
     startLoopTime: Date;
-    /**
-     * The frames per second
-     * @property FPS
-     * @type {number}
-     * @default 0   
-     */
+    /** The frames per second */
     FPS: number = 0;
-    /**
-     * @property on
-     * @type {IsoOn}
-     */
-    on: IsoOn;
-    /**
-     * The default canvas configuration.
-     * @property defaultWIndowOptions
-     * @type {IIsoConfigWindowOptions}
-     * @default {fullscreen: true, width: window.innerWidth, height: window.innerHeight}
-     */
+    /** The default canvas configuration. */
     defaultWindowOptions: IIsoConfigWindowOptions = {
         fullscreen: true,
         width: window.innerWidth,
         height: window.innerHeight
     };
-    /**
-     * An inteval for the drawing and game loop
-     * @property interval
-     * @type {Object} 
-     */
+    /**  An inteval for the drawing and game loop */
     interval: Object;
-    /**
-     * @property animationFrame
-     * @type {Object} 
-     */
     animationFrame: Object;
-    /**
-     * Creates a new instance of IsoMetric
-     * @method constructor
-     * @param {object} [windowOptions] The canvas configuration.
-     */
+    /** Creates a new instance of IsoMetric */
     constructor(windowOptions?: Object) {
+        super();
         this.config = new IsoConfig(this);
         this.canvas = new IsoCanvas(this);
         this.layers = new IsoLayers(this);
         this.input = new IsoInput(this);
         this.animation = new IsoAnimationManager();
-        this.on = new IsoOn();
         this.ressources = new IsoRessourceManager(this);
         this.physics = new IsoPhysicsManager();
 
@@ -147,34 +77,22 @@ class IsoMetric {
         this.drawer = new IsoDrawer(this);
         this.frameCountInteral = setInterval(() => this.setFPS(), 1000);
     }
-    /**
-     * Reset and set the FPS
-     * @method setFPS 
-     */
+    /** Reset and set the FPS */
     setFPS() {
         this.FPS = this.frameCount;
         this.frameCount = 0;
     }
-    /**
-     * Starts the game- and drawing-loop.
-     * @method startLoop 
-     */
+    /** Starts the game- and drawing-loop. */
     startLoop() {
         this.update();
     }
-    /**
-     * Sets the FPS after the drawing-loop completed.
-     * @method endLoop
-     */
+    /** Sets the FPS after the drawing-loop completed. */
     endLoop() {
         var endLoop = new Date();
         this.frameTime = (endLoop.getMilliseconds() - this.startLoopTime.getMilliseconds());
         this.frameCount = this.frameCount + 1;
     }
-    /**
-     * The game- and drawing-loop.
-     * @method update() 
-     */
+    /** The game- and drawing-loop. */
     update() {
         this.startLoopTime = new Date();
         this.drawer.update();

@@ -88,7 +88,12 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IsoMetric</span>
+						<a href="_isoon_.isoon.html" class="tsd-signature-type">IsoOn</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">IsoMetric</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -117,7 +122,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#input" class="tsd-kind-icon">input</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#interval" class="tsd-kind-icon">interval</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#layers" class="tsd-kind-icon">layers</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#on" class="tsd-kind-icon">on</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#oncallbacks" class="tsd-kind-icon">on<wbr>Callbacks</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#physics" class="tsd-kind-icon">physics</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#ressources" class="tsd-kind-icon">ressources</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#startlooptime" class="tsd-kind-icon">start<wbr>Loop<wbr>Time</a></li>
@@ -126,9 +131,15 @@
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#callon" class="tsd-kind-icon">call<wbr>On</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#checkon" class="tsd-kind-icon">check<wbr>On</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#endloop" class="tsd-kind-icon">end<wbr>Loop</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#fire" class="tsd-kind-icon">fire</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#on" class="tsd-kind-icon">on</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#onevent" class="tsd-kind-icon">on<wbr>Event</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#setfps" class="tsd-kind-icon">setFPS</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#startloop" class="tsd-kind-icon">start<wbr>Loop</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isometric_.isometric.html#unbindevent" class="tsd-kind-icon">unbind<wbr>Event</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-not-exported"><a href="_isometric_.isometric.html#update" class="tsd-kind-icon">update</a></li>
 							</ul>
 						</section>
@@ -153,18 +164,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in Isometric.ts:126</li>
+									<li>Defined in Isometric.ts:60</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Creates a new instance of IsoMetric</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>method</dt>
-									<dd><p>constructor</p>
-									</dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -185,24 +191,13 @@
 					<div class="tsd-signature tsd-kind-icon">FPS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:99</li>
+							<li>Defined in Isometric.ts:51</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The frames per second</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>FPS</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{number}</p>
-							</dd>
-							<dt>default</dt>
-							<dd><p>0</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -211,18 +206,13 @@
 					<div class="tsd-signature tsd-kind-icon">animation<span class="tsd-signature-symbol">:</span> <a href="_isoanimationmanager_.isoanimationmanager.html" class="tsd-signature-type">IsoAnimationManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:55</li>
+							<li>Defined in Isometric.ts:37</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>animation</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoAnimationManager}</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>The animation library</p>
+						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -231,19 +221,9 @@
 					<div class="tsd-signature tsd-kind-icon">animation<wbr>Frame<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:126</li>
+							<li>Defined in Isometric.ts:60</li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>animationFrame</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{Object}</p>
-							</dd>
-						</dl>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 					<a name="canvas" class="tsd-anchor"></a>
@@ -251,19 +231,13 @@
 					<div class="tsd-signature tsd-kind-icon">canvas<span class="tsd-signature-symbol">:</span> <a href="_isocanvas_.isocanvas.html" class="tsd-signature-type">IsoCanvas</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:33</li>
+							<li>Defined in Isometric.ts:29</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>canvas</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoCanvas}
-								The canvas object</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>The canvas object</p>
+						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -272,19 +246,13 @@
 					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <a href="_isoconfig_.isoconfig.html" class="tsd-signature-type">IsoConfig</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:27</li>
+							<li>Defined in Isometric.ts:25</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>config
-								The configuration.</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoConfig}</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>The configuration.</p>
+						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -293,19 +261,13 @@
 					<div class="tsd-signature tsd-kind-icon">drawer<span class="tsd-signature-symbol">:</span> <a href="_isodrawer_.isodrawer.html" class="tsd-signature-type">IsoDrawer</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:45</li>
+							<li>Defined in Isometric.ts:33</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>drawer</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoDrawer}
-								The drawing lib.</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>The drawing lib.</p>
+						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -314,24 +276,13 @@
 					<div class="tsd-signature tsd-kind-icon">frame<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:80</li>
+							<li>Defined in Isometric.ts:45</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>A counter for frames.</p>
+							<p>A counter for frames</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>frameCount</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{number}</p>
-							</dd>
-							<dt>default</dt>
-							<dd><p>0</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -340,21 +291,13 @@
 					<div class="tsd-signature tsd-kind-icon">frame<wbr>Count<wbr>Interal<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:86</li>
+							<li>Defined in Isometric.ts:47</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>An inteval for reseting the FPS</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>frameCountInterval</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{any}</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -363,21 +306,13 @@
 					<div class="tsd-signature tsd-kind-icon">frame<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:73</li>
+							<li>Defined in Isometric.ts:43</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The time one frames needs to draw.</p>
+							<p>The time one frames needs to drawn.</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>frameTime</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{number}</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -386,18 +321,13 @@
 					<div class="tsd-signature tsd-kind-icon">input<span class="tsd-signature-symbol">:</span> <a href="_isoinput_.isoinput.html" class="tsd-signature-type">IsoInput</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:60</li>
+							<li>Defined in Isometric.ts:39</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>input</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoInput}</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>The input library</p>
+						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -406,21 +336,13 @@
 					<div class="tsd-signature tsd-kind-icon">interval<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:121</li>
+							<li>Defined in Isometric.ts:59</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>An inteval for the drawing and game loop</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>interval</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{Object}</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -429,42 +351,25 @@
 					<div class="tsd-signature tsd-kind-icon">layers<span class="tsd-signature-symbol">:</span> <a href="_isolayers_.isolayers.html" class="tsd-signature-type">IsoLayers</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:39</li>
+							<li>Defined in Isometric.ts:31</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>layers</p>
-							</dd>
-							<dt>description</dt>
-							<dd><p>All layers of the actual game</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoLayers}</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>Includes all layers</p>
+						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
-					<a name="on" class="tsd-anchor"></a>
-					<h3>on</h3>
-					<div class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">:</span> <a href="_isoon_.isoon.html" class="tsd-signature-type">IsoOn</a></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="oncallbacks" class="tsd-anchor"></a>
+					<h3>on<wbr>Callbacks</h3>
+					<div class="tsd-signature tsd-kind-icon">on<wbr>Callbacks<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#oncallbacks">onCallbacks</a></p>
 						<ul>
-							<li>Defined in Isometric.ts:104</li>
+							<li>Defined in IsoOn.ts:2</li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>on</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoOn}</p>
-							</dd>
-						</dl>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 					<a name="physics" class="tsd-anchor"></a>
@@ -472,18 +377,13 @@
 					<div class="tsd-signature tsd-kind-icon">physics<span class="tsd-signature-symbol">:</span> <a href="_isophysicsmanager_.isophysicsmanager.html" class="tsd-signature-type">IsoPhysicsManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:50</li>
+							<li>Defined in Isometric.ts:35</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>physics</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoPhysicsManager}</p>
-							</dd>
-						</dl>
+						<div class="lead">
+							<p>The physics library</p>
+						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -492,24 +392,13 @@
 					<div class="tsd-signature tsd-kind-icon">ressources<span class="tsd-signature-symbol">:</span> <a href="_isoressourcemanager_.isoressourcemanager.html" class="tsd-signature-type">IsoRessourceManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:67</li>
+							<li>Defined in Isometric.ts:41</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>Handles all ressources of a project.</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>ressource</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IsoRessourceManager}</p>
-							</dd>
-							<dt>see</dt>
-							<dd><p>IsoRessourceManager</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -518,26 +407,66 @@
 					<div class="tsd-signature tsd-kind-icon">start<wbr>Loop<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Date</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:92</li>
+							<li>Defined in Isometric.ts:49</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The time in milliseconds at the begin of a loop.</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>startLoopTime</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{Date}</p>
-							</dd>
-						</dl>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="callon" class="tsd-anchor"></a>
+					<h3>call<wbr>On</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">call<wbr>On<span class="tsd-signature-symbol">(</span>eventType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#callon">callOn</a></p>
+								<ul>
+									<li>Defined in IsoOn.ts:27</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventType: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="checkon" class="tsd-anchor"></a>
+					<h3>check<wbr>On</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">check<wbr>On<span class="tsd-signature-symbol">(</span>eventType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#checkon">checkOn</a></p>
+								<ul>
+									<li>Defined in IsoOn.ts:32</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventType: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 					<a name="endloop" class="tsd-anchor"></a>
 					<h3>end<wbr>Loop</h3>
@@ -548,19 +477,98 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in Isometric.ts:169</li>
+									<li>Defined in Isometric.ts:90</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets the FPS after the drawing-loop completed.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>method</dt>
-									<dd><p>endLoop</p>
-									</dd>
-								</dl>
 							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="fire" class="tsd-anchor"></a>
+					<h3>fire</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">fire<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, data<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, element<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">HTMLElement</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#fire">fire</a></p>
+								<ul>
+									<li>Defined in IsoOn.ts:3</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>type: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> element: <span class="tsd-signature-type">HTMLElement</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="on" class="tsd-anchor"></a>
+					<h3>on</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>eventType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_isoon_.isoon.html" class="tsd-signature-type">IsoOn</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#on">on</a></p>
+								<ul>
+									<li>Defined in IsoOn.ts:22</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventType: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>callback: <span class="tsd-signature-type">Function</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_isoon_.isoon.html" class="tsd-signature-type">IsoOn</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="onevent" class="tsd-anchor"></a>
+					<h3>on<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Event<span class="tsd-signature-symbol">(</span>eventType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventListener</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#onevent">onEvent</a></p>
+								<ul>
+									<li>Defined in IsoOn.ts:14</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventType: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>callback: <span class="tsd-signature-type">EventListener</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -575,18 +583,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in Isometric.ts:154</li>
+									<li>Defined in Isometric.ts:81</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Reset and set the FPS</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>method</dt>
-									<dd><p>setFPS</p>
-									</dd>
-								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
@@ -602,19 +605,41 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in Isometric.ts:162</li>
+									<li>Defined in Isometric.ts:86</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Starts the game- and drawing-loop.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>method</dt>
-									<dd><p>startLoop</p>
-									</dd>
-								</dl>
 							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="unbindevent" class="tsd-anchor"></a>
+					<h3>unbind<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">unbind<wbr>Event<span class="tsd-signature-symbol">(</span>eventType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isoon_.isoon.html">IsoOn</a>.<a href="_isoon_.isoon.html#unbindevent">unbindEvent</a></p>
+								<ul>
+									<li>Defined in IsoOn.ts:18</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventType: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>callback: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -629,18 +654,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in Isometric.ts:178</li>
+									<li>Defined in Isometric.ts:96</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>The game- and drawing-loop.</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>method</dt>
-									<dd><p>update()</p>
-									</dd>
-								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
@@ -655,24 +675,13 @@
 					<div class="tsd-signature tsd-kind-icon">default<wbr>Window<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Isometric.ts:111</li>
+							<li>Defined in Isometric.ts:53</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The default canvas configuration.</p>
 						</div>
-						<dl class="tsd-comment-tags">
-							<dt>property</dt>
-							<dd><p>defaultWIndowOptions</p>
-							</dd>
-							<dt>type</dt>
-							<dd><p>{IIsoConfigWindowOptions}</p>
-							</dd>
-							<dt>default</dt>
-							<dd><p>{fullscreen: true, width: window.innerWidth, height: window.innerHeight}</p>
-							</dd>
-						</dl>
 					</div>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
 						<a name="defaultwindowoptions.fullscreen" class="tsd-anchor"></a>
@@ -680,7 +689,7 @@
 						<div class="tsd-signature tsd-kind-icon">fullscreen<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in Isometric.ts:112</li>
+								<li>Defined in Isometric.ts:54</li>
 							</ul>
 						</aside>
 					</section>
@@ -690,7 +699,7 @@
 						<div class="tsd-signature tsd-kind-icon">height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in Isometric.ts:114</li>
+								<li>Defined in Isometric.ts:56</li>
 							</ul>
 						</aside>
 					</section>
@@ -700,7 +709,7 @@
 						<div class="tsd-signature tsd-kind-icon">width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in Isometric.ts:113</li>
+								<li>Defined in Isometric.ts:55</li>
 							</ul>
 						</aside>
 					</section>
@@ -712,78 +721,6 @@
 				<ul>
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimatedsprite_.html">"<wbr>Iso<wbr>Animated<wbr>Sprite"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimation_.html">"<wbr>Iso<wbr>Animation"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoanimationmanager_.html">"<wbr>Iso<wbr>Animation<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isobillboard_.html">"<wbr>Iso<wbr>Billboard"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoblendingmodes_.html">"<wbr>Iso<wbr>Blending<wbr>Modes"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isocanvas_.html">"<wbr>Iso<wbr>Canvas"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoconfig_.html">"<wbr>Iso<wbr>Config"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isodrawer_.html">"<wbr>Iso<wbr>Drawer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoeasing_.html">"<wbr>Iso<wbr>Easing"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoevent_.html">"<wbr>Iso<wbr>Event"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoimage_.html">"<wbr>Iso<wbr>Image"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoinput_.html">"<wbr>Iso<wbr>Input"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isolayer_.html">"<wbr>Iso<wbr>Layer"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isolayers_.html">"<wbr>Iso<wbr>Layers"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isomap_.html">"<wbr>Iso<wbr>Map"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoobject_.html">"<wbr>Iso<wbr>Object"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoon_.html">"<wbr>Iso<wbr>On"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isophysicsmanager_.html">"<wbr>Iso<wbr>Physics<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoressource_.html">"<wbr>Iso<wbr>Ressource"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isoressourcemanager_.html">"<wbr>Iso<wbr>Ressource<wbr>Manager"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isosprite_.html">"<wbr>Iso<wbr>Sprite"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotile_.html">"<wbr>Iso<wbr>Tile"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotilemap_.html">"<wbr>Iso<wbr>Tile<wbr>Map"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_isotileobject_.html">"<wbr>Iso<wbr>Tile<wbr>Object"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="../modules/_isometric_.html">"<wbr>Isometric"</a>
@@ -836,8 +773,8 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#layers" class="tsd-kind-icon">layers</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
-								<a href="_isometric_.isometric.html#on" class="tsd-kind-icon">on</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#oncallbacks" class="tsd-kind-icon">on<wbr>Callbacks</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#physics" class="tsd-kind-icon">physics</a>
@@ -848,14 +785,32 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#startlooptime" class="tsd-kind-icon">start<wbr>Loop<wbr>Time</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#callon" class="tsd-kind-icon">call<wbr>On</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#checkon" class="tsd-kind-icon">check<wbr>On</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#endloop" class="tsd-kind-icon">end<wbr>Loop</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#fire" class="tsd-kind-icon">fire</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#on" class="tsd-kind-icon">on</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#onevent" class="tsd-kind-icon">on<wbr>Event</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#setfps" class="tsd-kind-icon">setFPS</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#startloop" class="tsd-kind-icon">start<wbr>Loop</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isometric_.isometric.html#unbindevent" class="tsd-kind-icon">unbind<wbr>Event</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isometric_.isometric.html#update" class="tsd-kind-icon">update</a>

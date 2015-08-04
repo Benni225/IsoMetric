@@ -1,0 +1,71 @@
+v.0.2.d
+=======
+- Changed IsoRessource
+	- changed the creating of a ressource
+	- Example:
+		app.ressources.add("nameOfTheRessource", new IsoImage(pathToFile));
+		app.ressources.add("nameOfTheRessource", new IsoAudio(pathToFile));
+- Added IsoLayer.freeObject
+	- deletes an object or a sprite from the layer
+- Added IsoLayer.freeText
+	- deletes a text from the layer
+- Added IsoLayer.freeBillboard
+	- deletes a billboard from the layer
+- Added IsoMinimalObject
+	- Is the minimal configuration for every object
+- Added IsoAudio [experimental]
+	- Load audio files just like image files.
+- Added IsoOn
+	- IsoObject.on("EventType");
+	- IsoObject.fire(eventType: string, detail?: any, element?: HTMLElement);
+	- Example:
+		var o = new IsoObject(...);
+		// Receive an event
+		o.on("myCustomEvent", (event: CustomEvent) => doSomething(event));
+		// Fire a simple custom event
+		o.fire("customEvent");
+		// Fire a custom event with additional data
+		o.fire("customEvent2", AnyDataYouWant);
+		// Fire a custom event with additional data triggered by a given HTMLElement
+		o.fire("customEvent2", AnyDataYouWant, myHTMLElement);
+	- IsoMetric, IsoTile, IsoSprite, IsoAnimatedSprite, IsoText and IsoTileObject extends IsoOn or IsoObject
+- Added new interface IsoColor
+	IsoColor{
+		red: number; // between 0 and 255
+		green: number; // between 0 and 255
+		blue: number; // between 0 and 255
+	}
+- Added IsoText
+	- Is an text element, that simliar to IsoObject can be animated
+	- You also can animate the new property IsoText.colorRGB and IsoText.backgroundColorRGB which implements IsoColor
+- Added IsoPoint
+	- Includes a point on the screen
+- Added IsoVector2D
+	- extending IsoPoint and including a position on the screen
+	- you can calculate the distance between two point:
+	- Example:
+		var distance = object.position.getDistance(object2.position);
+- Added IsoMapPoint
+	- Includes a point on a map
+- Added IsoMapVector2D
+	- Includes a position on a map
+	- you can calculate the distance between 2 points
+	- Example:
+		var distance = map1.mapPosition.getDistance(map2.MapPosition);
+- Added IsoMinimalObject
+	- just for extending all the other object types
+- Added the animation type IsoAnimation.IMPULSE
+	- plays the animation forward and backward once
+- Added playlists for animations [experimental]
+- Added IsoRandom
+	- includes a class for creating random number
+- Removed IsoObject.setPosition and IsoObject.getPosition
+	- use IsoObject.position.get or IsoObject.position.set(x, y) instead
+- Removed IsoObject.getOffset and IsoObject.setOffset
+	- use IsoObject.offset.get or IsoObject.offset.set(x, y) instead
+- Removed IsoObject.setScroll and IsoObject.getScroll
+	- use IsoObject.scrollPosition.get and IsoObject.scrollPosition.set(x, y) instead
+- Removed IsoObject.setAnchor and IsoObject.getAnchor
+	- use IsoObject.anchor.get and IsoObject.anchor.set(x, y) instead
+- Fixed bug by drawing billboards
+- Updated the documentation

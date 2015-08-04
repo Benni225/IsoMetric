@@ -37,10 +37,10 @@ window.onload = function () {
         bird.setScale(0.3, 0.3);
 
         // Set the position of the bird
-        bird.setPosition({x: 50, y: 50});
+        bird.position.set(50, 50);
 
         // We set the anchor of our bird in the center of the image.
-        bird.setAnchor(bird.width / 2, bird.height / 2);
+        bird.anchor.set(bird.width / 2, bird.height / 2);
 
         // Now, we start playing our animation.
         bird.play("rotate");

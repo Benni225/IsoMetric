@@ -18,6 +18,8 @@ interface IsoFrame {
 }
 
 class IsoSprite extends IsoTileObject {
+    /** Type of the object. */
+    type: string = "IsoSprite";
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string) {
         super(Engine, image, tileInfo);
         if (name !== undefined) {

@@ -41,6 +41,8 @@ class IsoObject extends IsoMinimalObject {
     mass: number = 0;
     /** The rigidbody of the object */
     rigidBody: IsoCoords;
+    /** Type of the object. */
+    type: string = "IsoObbject";
     /** Creates a new object */
     constructor(Engine, image: IsoRessource, name?: string) {
         super(Engine);

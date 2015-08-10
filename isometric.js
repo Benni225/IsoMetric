@@ -79,6 +79,10 @@ var IsoMinimalObject = (function (_super) {
         this.friction = 1;
         /** The velocity when moving an object. */
         this.velocity = new IsoVector2D(0, 0);
+        /** Sets if a object could clear from the memory. */
+        this.free = false;
+        /** Type of the object. */
+        this.type = "IsoMinimalObject";
         this.Engine = Engine;
     }
     /** Adds an animation. The animation will animate a given attribute of the object. */
@@ -236,6 +240,15 @@ var IsoMinimalObject = (function (_super) {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
     };
+    /** Updates the object. */
+    IsoMinimalObject.prototype.update = function () {
+        this.updatePosition();
+        var a = this.Engine.animation.getActive(this);
+        for (var i = 0; i < this.addAnimation.length; i++) {
+            if (a[i] !== undefined)
+                a[i].update();
+        }
+    };
     return IsoMinimalObject;
 })(IsoOn);
 var IsoBlendingModes = {
@@ -269,6 +282,8 @@ var IsoObject = (function (_super) {
         this.collisionResolution = 0;
         /** Mass of the object for physics */
         this.mass = 0;
+        /** Type of the object. */
+        this.type = "IsoObbject";
         try {
             this.setImage(image);
             this.setWidth(image.ressource.width);
@@ -1128,6 +1143,8 @@ var IsoSprite = (function (_super) {
     __extends(IsoSprite, _super);
     function IsoSprite(Engine, image, tileInfo, name) {
         _super.call(this, Engine, image, tileInfo);
+        /** Type of the object. */
+        this.type = "IsoSprite";
         if (name !== undefined) {
             this.setName(name);
         }
@@ -1191,6 +1208,8 @@ var IsoAnimatedSprite = (function (_super) {
      */
     function IsoAnimatedSprite(Engine, image, tileInfo, name) {
         _super.call(this, Engine, image, tileInfo);
+        /** Type of the object. */
+        this.type = "IsoAnimatedSprite";
         if (name !== undefined) {
             this.setName(name);
         }
@@ -1380,11 +1399,21 @@ var IsoAnimation = (function (_super) {
         }
         return this;
     };
+    /** Update the animation. */
+    IsoAnimation.prototype.update = function () {
+        if (this.isPlaying === true) {
+            if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
+                this.__playAttribute();
+            }
+            else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
+                this.__playFrame();
+            }
+        }
+    };
     /**
      * Starts an animation of the type "attribute".
      */
     IsoAnimation.prototype.__playAttribute = function () {
-        var _this = this;
         if (this.isPlaying === true) {
             if (this.currentIteration === 0) {
                 this.actualValue = this.startValue;
@@ -1445,10 +1474,6 @@ var IsoAnimation = (function (_super) {
                         break;
                 }
             }
-            else {
-                if (this.isPlaying === true)
-                    requestAnimationFrame(function () { return _this.__playAttribute(); });
-            }
         }
         else {
             return;
@@ -1458,7 +1483,6 @@ var IsoAnimation = (function (_super) {
      * Starts an animation of the type "frame".
      */
     IsoAnimation.prototype.__playFrame = function () {
-        var _this = this;
         if (this.isPlaying === true) {
             if (this.currentIteration === 0) {
                 this.actualValue = this.startValue;
@@ -1516,10 +1540,6 @@ var IsoAnimation = (function (_super) {
                         this.play();
                         break;
                 }
-            }
-            else {
-                if (this.isPlaying === true)
-                    requestAnimationFrame(function () { return _this.__playFrame(); });
             }
         }
     };
@@ -1695,6 +1715,16 @@ var IsoAnimationManager = (function () {
             }
         }
     };
+    /** Returns all active animations of an object as an array. */
+    IsoAnimationManager.prototype.getActive = function (object) {
+        var animations = new Array();
+        for (var i = 0; i < this.animations.length; i++) {
+            if ((this.animations[i].object === object || this.animations[i].sprite === object) && this.animations[i].isPlaying === true) {
+                animations.push(this.animations[i]);
+            }
+        }
+        return animations;
+    };
     /** Returns a specified playlist given by its name and the animated object.*/
     IsoAnimationManager.prototype.getPlaylist = function (name, object) {
         for (var i = 0; i < this.playLists.length; i++) {
@@ -1815,6 +1845,8 @@ var IsoBillboard = (function (_super) {
     __extends(IsoBillboard, _super);
     function IsoBillboard() {
         _super.apply(this, arguments);
+        /** Type of the object. */
+        this.type = "IsoBillboard";
         this.repeat = IsoBillboard.NOREPEAT;
     }
     /** Sets if the billboard will repeated. */
@@ -2075,7 +2107,7 @@ var IsoDrawer = (function () {
         for (var i = 0; i < objects.length; i++) {
             var o = objects[i];
             if (o.hidden === false) {
-                o.updatePosition();
+                o.update();
                 var renderDetails = o.getRenderDetails();
                 if (o.rotation !== 0) {
                     this.translate(o, renderDetails);
@@ -2100,6 +2132,26 @@ var IsoDrawer = (function () {
     };
     /** Draws the particles of an emitter. */
     IsoDrawer.prototype.drawParticles = function (renderDetails, emitter) {
+        if (emitter.oldTime === 0) {
+            emitter.oldTime = new Date().getTime();
+        }
+        var currentTime = new Date().getTime();
+        var particles = emitter.particles;
+        for (var i = 0; i < particles.length; i++) {
+            particles[i].update(currentTime - emitter.oldTime);
+            if (particles[i].rotation !== 0) {
+                this.translate(particles[i], particles[i].getRenderDetails());
+                this.rotate(particles[i], particles[i].getRenderDetails());
+                this.resetTranslation(particles[i], particles[i].getRenderDetails());
+            }
+            this.context.globalCompositeOperation = particles[i].blendingMode;
+            this.context.globalAlpha = particles[i].alpha;
+            this.drawImage(particles[i].getRenderDetails());
+            this.context.setTransform(1, 0, 0, 1, 0, 0);
+            this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
+            this.context.globalAlpha = 1;
+        }
+        emitter.oldTime = currentTime;
     };
     /** Draws all given texts. */
     IsoDrawer.prototype.drawTexts = function (objects) {
@@ -2123,9 +2175,6 @@ var IsoDrawer = (function () {
         }
     };
     IsoDrawer.prototype.drawImage = function (renderDetails) {
-        if (renderDetails["alpha"] !== undefined) {
-            this.context.globalAlpha = renderDetails["alpha"];
-        }
         this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
     };
     IsoDrawer.prototype.drawText = function (renderDetails) {
@@ -2189,7 +2238,7 @@ var IsoDrawer = (function () {
 var IsoEmitter = (function (_super) {
     __extends(IsoEmitter, _super);
     /** Creates a new particle emiter.*/
-    function IsoEmitter(Engine, ressource) {
+    function IsoEmitter(Engine, ressource, config) {
         _super.call(this, Engine);
         /** The maximum particle count. */
         this.particleCount = 100;
@@ -2197,23 +2246,59 @@ var IsoEmitter = (function (_super) {
         this.lifetime = 1000;
         /** Sets how many particles will spreaded.*/
         this.spreadCount = 4;
+        this.oldTime = 0;
         /** A simple seed number.*/
         this.variance = 100;
+        /** Includes all the particles.*/
+        this.particles = new Array();
         /** The speed of the particles.*/
         this.particleSpeed = 1;
         /** Height of the emitter.*/
         this.height = 1;
         /** Width of the emitter.*/
         this.width = 1;
+        /** Sets if the emitter is emitting */
+        this.isEmitting = undefined;
+        /** The random library. */
+        this.rand = new MersenneTwister();
         /** Sets the typ of this object.*/
         this.type = "IsoEmitter";
         this.ressource = ressource;
     }
+    IsoEmitter.prototype.addParticle = function (particle) {
+        for (var i = 0; i < this.particles.length; i++) {
+            if (this.particles[i].life < 0) {
+                this.particles[i] = null;
+                this.particles[i] = particle;
+                return;
+            }
+        }
+        this.particles.push(particle);
+    };
     IsoEmitter.prototype.update = function () {
+        if (this.isEmitting) {
+            this.emit();
+        }
+        this.updatePosition();
+        var a = this.Engine.animation.getActive(this);
+        for (var i = 0; i < this.addAnimation.length; i++) {
+            if (a[i] !== undefined)
+                a[i].update();
+        }
     };
     IsoEmitter.prototype.emit = function () {
-        var vector2d = new IsoVector2D();
-        vector2d.createFromAngle(this.rotation, this.height);
+        if (this.isEmitting === undefined) {
+            this.isEmitting = true;
+        }
+        if (this.particles.length - 1 < this.particleCount) {
+            var count = this.spreadCount;
+            if (this.particles.length - 1 + this.spreadCount > this.particleCount) {
+                count = this.particleCount - this.particles.length - 1;
+            }
+            for (var i = 0; i < count; i++) {
+                this.addParticle(new IsoParticle(this.Engine, this.ressource, new IsoPoint(this.position.x, this.position.y), this.lifetime, this.random((this.rotation - this.variance), (this.rotation + this.variance)), this.scale, this.particleSpeed));
+            }
+        }
     };
     IsoEmitter.prototype.getLifetime = function () {
         return this.lifetime;
@@ -2259,6 +2344,26 @@ var IsoEmitter = (function (_super) {
         }
         this.particles.pop();
         return f;
+    };
+    IsoEmitter.prototype.getRenderDetails = function () {
+        var fx = this.anchor.x / this.ressource.ressource.width * this.scale.factorX, fy = this.anchor.y / this.ressource.ressource.height * this.scale.factorY;
+        return {
+            position: this.getAbsolutePosition(),
+            tileSize: {
+                width: this.ressource.ressource.width,
+                height: this.ressource.ressource.height
+            },
+            renderSize: { width: 0, height: 0 },
+            anchor: new IsoPoint((this.position.x + (this.ressource.ressource.image.width * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.ressource.ressource.image.height * this.zoomLevel * fy * this.scale.factorY))),
+            image: this.ressource.get(),
+            offset: new IsoPoint(0, 0),
+            zoomLevel: this.zoomLevel,
+            type: this.type
+        };
+    };
+    IsoEmitter.prototype.random = function (min, max) {
+        this.rand = new MersenneTwister();
+        return this.rand.genrand_real1() * (max - min) + min;
     };
     return IsoEmitter;
 })(IsoMinimalObject);
@@ -2550,33 +2655,67 @@ var IsoLayer = (function () {
     /** Adds a new object to the layer */
     IsoLayer.prototype.addObject = function (name, image) {
         var o = new IsoObject(this.Engine, image, name);
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].free === true) {
+                this.objects[i] = null;
+                this.objects[i] = o;
+                return o;
+            }
+        }
         this.objects.push(o);
         return o;
     };
     /** Adds a new sprite to the layer. */
     IsoLayer.prototype.addSprite = function (name, image, tileObjectInfo) {
         var s = new IsoSprite(this.Engine, image, tileObjectInfo, name);
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].free === true) {
+                this.objects[i] = null;
+                this.objects[i] = s;
+                return s;
+            }
+        }
         this.objects.push(s);
         return s;
     };
     /** Adds a new text to the layer. */
     IsoLayer.prototype.addText = function (name, text) {
         var t = new IsoText(this.Engine, name, text);
+        for (var i = 0; i < this.texts.length; i++) {
+            if (this.texts[i].free === true) {
+                this.texts[i] = null;
+                this.texts[i] = t;
+                return t;
+            }
+        }
         this.texts.push(t);
         return t;
     };
     /** Adds a new billboard to the layer. */
     IsoLayer.prototype.addBillboard = function (name, image) {
         var b = new IsoBillboard(this.Engine, image, name);
+        for (var i = 0; i < this.billboards.length; i++) {
+            if (this.billboards[i].free === true) {
+                this.billboards[i] = null;
+                this.billboards[i] = b;
+                return b;
+            }
+        }
         this.billboards.push(b);
         return b;
     };
     /** Adds a new particle emitter. */
     IsoLayer.prototype.addEmitter = function (name, ressource) {
-        var b = new IsoEmitter(this.Engine, ressource);
-        b.name = name;
-        this.objects.push(b);
-        return b;
+        var e = new IsoEmitter(this.Engine, ressource);
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].free === true) {
+                this.objects[i] = null;
+                this.objects[i] = e;
+                return e;
+            }
+        }
+        this.objects.push(e);
+        return e;
     };
     /** Adds a new animated sprite to the layer. */
     IsoLayer.prototype.addAnimatedSprite = function (name, image, tileObjectInfo) {
@@ -2701,54 +2840,23 @@ var IsoLayer = (function () {
     };
     /** Removes an object or sprite from the layer. */
     IsoLayer.prototype.freeObject = function (object) {
-        var f = false;
-        for (var i = 0; i < this.objects.length; i++) {
-            if (this.objects[i] === object) {
-                f = true;
-            }
-            if (f === true) {
-                this.objects[i - 1] = this.objects[i];
-            }
-        }
-        this.objects.pop();
-        return f;
+        object.hidden = true;
+        object.free = true;
     };
     /** Removes an object from the layer. */
     IsoLayer.prototype.freeText = function (text) {
-        var f = false;
-        for (var i = 0; i < this.texts.length; i++) {
-            if (this.texts[i] === text) {
-                f = true;
-            }
-            if (f === true) {
-                this.texts[i - 1] = this.texts[i];
-            }
-        }
-        this.texts.pop();
-        return f;
+        text.free = true;
+        text.hidden = true;
     };
     /** Removes a billboard from the layer. */
     IsoLayer.prototype.freeBillboard = function (billboard) {
-        var f = false;
-        for (var i = 0; i < this.billboards.length; i++) {
-            if (this.billboards[i] === billboard) {
-                f = true;
-            }
-            if (f === true) {
-                this.billboards[i - 1] = this.billboards[i];
-            }
-        }
-        this.billboards.pop();
-        return f;
+        billboard.free = true;
+        billboard.hidden = true;
     };
     /** Removes the tilemap form the layer.*/
     IsoLayer.prototype.freeTileMap = function () {
         if (this.tileMap !== undefined && this.tileMap !== null) {
             this.tileMap = null;
-            return true;
-        }
-        else {
-            return false;
         }
     };
     return IsoLayer;
@@ -3010,34 +3118,54 @@ var IsoMetric = (function (_super) {
     };
     return IsoMetric;
 })(IsoOn);
-var IsoParticle = (function (_super) {
-    __extends(IsoParticle, _super);
-    /** Create a new particle. */
-    function IsoParticle(Engine, ressource, position, velocity) {
-        _super.call(this, Engine);
-        /** number in milliseconds */
-        this.lifetimeStart = 0;
-        this.lifetimeEnd = 0;
-        /** The velocity as an vector. */
-        this.velocity = new IsoVector2D(0, 0);
-        /** The position of the particle. */
-        this.position = new IsoVector2D(0, 0);
-        this.anchor = new IsoPoint(0, 0);
+"use strict";
+var IsoParticle = (function () {
+    function IsoParticle(Engine, ressource, position, life, angle, scale, speed) {
+        this.position = new IsoVector2D();
+        this.life = 0;
+        this.originalLife = 0;
+        this.velocity = new IsoVector2D();
+        this.color = { red: 0, green: 0, blue: 0 };
+        this.alpha = 1;
+        this.renderSize = { width: 0, height: 0 };
+        this.blendingMode = IsoBlendingModes.NORMAL;
+        this.Engine = Engine;
+        this.position.set(position.x, position.y);
+        this.originalLife = this.life = life;
+        var angleRadians = angle * Math.PI / 180;
+        this.velocity.set(speed * Math.cos(angleRadians), -speed * Math.sin(angleRadians));
+        this.originalScale = this.scale = scale;
+        this.alpha = 1;
         this.ressource = ressource;
-        this.velocity = velocity;
-        this.position = position;
     }
-    /** Moves the particle. */
-    IsoParticle.prototype.move = function () {
-        this.position.add(this.velocity);
-        return this;
+    IsoParticle.prototype.update = function (dt) {
+        this.life -= dt;
+        if (this.life > 0) {
+            var ageRatio = this.life / this.originalLife;
+            this.renderSize.width = (this.ressource.ressource.width - (this.ressource.ressource.width * ageRatio)) * this.scale.factorY;
+            this.renderSize.height = (this.ressource.ressource.height - (this.ressource.ressource.height * ageRatio)) * this.scale.factorY;
+            this.alpha = ageRatio;
+            this.position.x += this.velocity.x * dt;
+            this.position.y += this.velocity.y * dt;
+        }
     };
     IsoParticle.prototype.getRenderDetails = function () {
-    };
-    IsoParticle.prototype.updatePosition = function () {
+        return {
+            position: new IsoVector2D(this.position.x, this.position.y),
+            image: this.ressource.get(),
+            tileSize: {
+                width: this.ressource.ressource.getWidth(), height: this.ressource.ressource.getHeight()
+            },
+            alpha: this.alpha,
+            renderSize: this.renderSize,
+            offset: new IsoPoint(0, 0),
+            type: "IsoParticle",
+            zoomLevel: 0,
+            anchor: new IsoPoint(0.5, 0.5)
+        };
     };
     return IsoParticle;
-})(IsoMinimalObject);
+})();
 "use strict";
 var IsoPoint = (function () {
     function IsoPoint(x, y) {
@@ -3264,6 +3392,8 @@ var IsoText = (function (_super) {
         this.baseline = IsoText.ALPHABETIC;
         /** The allignment of the text. Possible values are IsoText.START, IsoText.END, IsoText.LEFT, IsoText.RIGHT or IsoText.CENTER. Default is IsoText.START. */
         this.align = IsoText.START;
+        /** Type of the object. */
+        this.type = "IsoText";
         this.name = name;
         this.text = text;
         return this;

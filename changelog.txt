@@ -1,3 +1,28 @@
+v.0.2.e
+=======
+- Improved the memory usage
+- Improved heavy the performance
+- Added a very simple particle engine
+	- Example:
+	// Load a ressource
+	isometric.ressources.add("particle", "path/to/image.jpg");
+	// add a new layer
+        layer = layers.add("layer");
+	// Add the emitter
+        emitter = layer.addEmitter("emitter", ressources.get("particle"));
+	// Set up the emitter
+        emitter.position.set(800, 100);
+        emitter.setVariance(10);
+        emitter.rotation = 0;
+        emitter.setScale(0.25, 0.25);
+        emitter.velocity.set(-1, 0);
+        emitter.blendingMode = IsoBlendingModes.SOFT_LIGHT;
+        emitter.lifetime = 1000;
+        emitter.particleCount = 1000;
+        emitter.spreadCount = 10;
+	// start emitting
+        emitter.emit();
+- Added a new particle example
 v.0.2.d
 =======
 - Changed IsoRessource

@@ -174,7 +174,7 @@ class IsoDrawer {
         for (var i = 0; i < objects.length; i++) {
             var o: any = objects[i];
             if (o.hidden === false) {
-                o.updatePosition();
+                o.update();
                 var renderDetails: IIsoRenderDetails = o.getRenderDetails();
                 if (o.rotation !== 0) {
                     this.translate(o, renderDetails);
@@ -199,6 +199,28 @@ class IsoDrawer {
     }
     /** Draws the particles of an emitter. */
     drawParticles(renderDetails: IIsoRenderDetails, emitter: IsoEmitter) {
+        if (emitter.oldTime === 0) {
+            emitter.oldTime = new Date().getTime();
+        }
+        var currentTime = new Date().getTime();
+        var particles = emitter.particles;
+        
+        for (var i = 0; i < particles.length; i++) {
+            particles[i].update(currentTime - emitter.oldTime);
+            if (particles[i].rotation !== 0) {
+                this.translate(particles[i], particles[i].getRenderDetails());
+                this.rotate(particles[i], particles[i].getRenderDetails());
+                this.resetTranslation(particles[i], particles[i].getRenderDetails());
+            }
+            this.context.globalCompositeOperation = particles[i].blendingMode;
+            this.context.globalAlpha = particles[i].alpha;
+            this.drawImage(particles[i].getRenderDetails());
+
+            this.context.setTransform(1, 0, 0, 1, 0, 0);
+            this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
+            this.context.globalAlpha = 1;
+        }
+        emitter.oldTime = currentTime;
     }
     /** Draws all given texts. */
     drawTexts(objects: Array<IsoText>) {
@@ -225,9 +247,6 @@ class IsoDrawer {
     }
 
     private drawImage(renderDetails) {
-        if (renderDetails["alpha"] !== undefined) {
-            this.context.globalAlpha = renderDetails["alpha"];
-        }
         this.context.drawImage(
             renderDetails.image,
             renderDetails.offset.x,
@@ -294,15 +313,15 @@ class IsoDrawer {
     }
 
     /** Sets the anchor of an object. */
-    private translate(object: IsoObject|IsoText|IsoTile|IsoEmitter, renderDetails: any) {
+    private translate(object: IsoObject|IsoText|IsoTile|IsoEmitter|IsoParticle, renderDetails: any) {
         this.context.translate(renderDetails.anchor.x, renderDetails.anchor.y);
     }
     /** Reset the anchor of an object. */
-    private resetTranslation(object: IsoObject|IsoText|IsoTile|IsoEmitter, renderDetails: any) {
+    private resetTranslation(object: IsoObject|IsoText|IsoTile|IsoEmitter|IsoParticle, renderDetails: any) {
         this.context.translate(-renderDetails.anchor.x, -renderDetails.anchor.y);
     }
     /** Rotates an object. */
-    private rotate(object: IsoObject|IsoText|IsoTile|IsoEmitter, renderDetails: any) {
+    private rotate(object: IsoObject|IsoText|IsoTile|IsoEmitter|IsoParticle, renderDetails: any) {
         this.context.rotate(object.rotation * Math.PI / 180);
     }
 } 

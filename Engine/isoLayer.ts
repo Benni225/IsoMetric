@@ -31,33 +31,67 @@ class IsoLayer {
     /** Adds a new object to the layer */
     addObject(name: string, image: IsoRessource): IsoObject {
         var o = new IsoObject(this.Engine, image, name);
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].free === true) {
+                this.objects[i] = null;
+                this.objects[i] = o;
+                return o;
+            }
+        }
         this.objects.push(o);
         return o;
     }
     /** Adds a new sprite to the layer. */
     addSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoSprite {
         var s = new IsoSprite(this.Engine, image, tileObjectInfo, name);
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].free === true) {
+                this.objects[i] = null;
+                this.objects[i] = s;
+                return s;
+            }
+        }
         this.objects.push(s);
         return s;
     }
     /** Adds a new text to the layer. */
     addText(name: string, text: string): IsoText {
         var t = new IsoText(this.Engine, name, text);
+        for (var i = 0; i < this.texts.length; i++) {
+            if (this.texts[i].free === true) {
+                this.texts[i] = null;
+                this.texts[i] = t;
+                return t;
+            }
+        }
         this.texts.push(t);
         return t;
     }
     /** Adds a new billboard to the layer. */
     addBillboard(name: string, image: IsoRessource): IsoBillboard {
         var b = new IsoBillboard(this.Engine, image, name);
+        for (var i = 0; i < this.billboards.length; i++) {
+            if (this.billboards[i].free === true) {
+                this.billboards[i] = null;
+                this.billboards[i] = b;
+                return b;
+            }
+        }
         this.billboards.push(b);
         return b;
     }
     /** Adds a new particle emitter. */
     addEmitter(name: string, ressource: IsoRessource) {
-        var b = new IsoEmitter(this.Engine, ressource);
-        b.name = name;
-        this.objects.push(b);
-        return b;
+        var e = new IsoEmitter(this.Engine, ressource);
+        for (var i = 0; i < this.objects.length; i++) {
+            if (this.objects[i].free === true) {
+                this.objects[i] = null;
+                this.objects[i] = e;
+                return e;
+            }
+        }
+        this.objects.push(e);
+        return e;
     }
     /** Adds a new animated sprite to the layer. */
     addAnimatedSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoAnimatedSprite {
@@ -189,54 +223,24 @@ class IsoLayer {
         return this.hidden;
     }
     /** Removes an object or sprite from the layer. */
-    freeObject(object: IsoMinimalObject): boolean {
-        var f = false;
-        for (var i = 0; i < this.objects.length; i++) {
-            if (this.objects[i] === object) {
-                f = true;
-            }
-            if (f === true) {
-                this.objects[i - 1] = this.objects[i];
-            }
-        }
-        this.objects.pop();
-        return f;
+    freeObject(object: IsoMinimalObject) {
+        object.hidden = true;
+        object.free = true;
     }
     /** Removes an object from the layer. */
-    freeText(text: IsoText): boolean {
-        var f = false;
-        for (var i = 0; i < this.texts.length; i++) {
-            if (this.texts[i] === text) {
-                f = true;
-            }
-            if (f === true) {
-                this.texts[i - 1] = this.texts[i];
-            }
-        }
-        this.texts.pop();
-        return f;
+    freeText(text: IsoText) {
+        text.free = true;
+        text.hidden = true;
     }
     /** Removes a billboard from the layer. */
-    freeBillboard(billboard: IsoBillboard): boolean {
-        var f = false;
-        for (var i = 0; i < this.billboards.length; i++) {
-            if (this.billboards[i] === billboard) {
-                f = true;
-            }
-            if (f === true) {
-                this.billboards[i - 1] = this.billboards[i];
-            }
-        }
-        this.billboards.pop();
-        return f;
+    freeBillboard(billboard: IsoBillboard) {
+        billboard.free = true;
+        billboard.hidden = true;
     }
     /** Removes the tilemap form the layer.*/
-    freeTileMap(): boolean {
+    freeTileMap() {
         if (this.tileMap !== undefined && this.tileMap !== null) {
             this.tileMap = null;
-            return true;
-        } else {
-            return false;
         }
     }
 } 

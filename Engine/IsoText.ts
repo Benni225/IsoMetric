@@ -48,6 +48,8 @@ class IsoText extends IsoMinimalObject {
     baseline: string = IsoText.ALPHABETIC;
     /** The allignment of the text. Possible values are IsoText.START, IsoText.END, IsoText.LEFT, IsoText.RIGHT or IsoText.CENTER. Default is IsoText.START. */
     align: string = IsoText.START;
+    /** Type of the object. */
+    type: string = "IsoText";
     /** Creates a new text object. */
     constructor(Engine: IsoMetric, name: string, text?: string) {
         super(Engine);

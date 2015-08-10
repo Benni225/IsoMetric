@@ -4,6 +4,8 @@
  * This sprite type is an animated sprite, which uses frames of a tileset for animations.
  */
 class IsoAnimatedSprite extends IsoSprite {
+    /** Type of the object. */
+    type: string = "IsoAnimatedSprite";
     /**
      * Creats a new frame-animated sprite 
      */

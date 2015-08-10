@@ -111,6 +111,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#collisionresolution" class="tsd-kind-icon">collision<wbr>Resolution</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#collisiontype" class="tsd-kind-icon">collision<wbr>Type</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#collsionmask" class="tsd-kind-icon">collsion<wbr>Mask</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#free" class="tsd-kind-icon">free</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#friction" class="tsd-kind-icon">friction</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#height" class="tsd-kind-icon">height</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#hidden" class="tsd-kind-icon">hidden</a></li>
@@ -130,6 +131,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#tileheight" class="tsd-kind-icon">tile<wbr>Height</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#tileoffset" class="tsd-kind-icon">tile<wbr>Offset</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#tilesize" class="tsd-kind-icon">tile<wbr>Size</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#type" class="tsd-kind-icon">type</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#velocity" class="tsd-kind-icon">velocity</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#width" class="tsd-kind-icon">width</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#zoomlevel" class="tsd-kind-icon">zoom<wbr>Level</a></li>
@@ -193,6 +195,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#setzoomstrength" class="tsd-kind-icon">set<wbr>Zoom<wbr>Strength</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#stop" class="tsd-kind-icon">stop</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#unbindevent" class="tsd-kind-icon">unbind<wbr>Event</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#update" class="tsd-kind-icon">update</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#updateposition" class="tsd-kind-icon">update<wbr>Position</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported"><a href="_isotileobject_.isotileobject.html#zoom" class="tsd-kind-icon">zoom</a></li>
 							</ul>
@@ -345,6 +348,22 @@
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The image data of the object in a lower resolution for collision detection.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="free" class="tsd-anchor"></a>
+					<h3>free</h3>
+					<div class="tsd-signature tsd-kind-icon">free<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#free">free</a></p>
+						<ul>
+							<li>Defined in IsoMinimalObject.ts:39</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Sets if a object could clear from the memory.</p>
 						</div>
 					</div>
 				</section>
@@ -617,6 +636,23 @@
 						</ul>
 					</aside>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#type">type</a></p>
+						<p>Overwrites <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#type">type</a></p>
+						<ul>
+							<li>Defined in IsoObject.ts:45</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Type of the object.</p>
+						</div>
+					</div>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
 					<a name="velocity" class="tsd-anchor"></a>
 					<h3>velocity</h3>
@@ -733,7 +769,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#addanimation">addAnimation</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:45</li>
+									<li>Defined in IsoMinimalObject.ts:48</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -780,7 +816,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#addplaylist">addPlaylist</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:54</li>
+									<li>Defined in IsoMinimalObject.ts:57</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -860,7 +896,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#collide">collide</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:87</li>
+									<li>Defined in IsoObject.ts:89</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -889,7 +925,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#createcollidingmask">createCollidingMask</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:66</li>
+									<li>Defined in IsoObject.ts:68</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -937,7 +973,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#getabsolutedimension">getAbsoluteDimension</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:135</li>
+									<li>Defined in IsoObject.ts:137</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -978,7 +1014,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#getanimation">getAnimation</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:50</li>
+									<li>Defined in IsoMinimalObject.ts:53</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1007,7 +1043,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#getcollidingtiles">getCollidingTiles</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:230</li>
+									<li>Defined in IsoObject.ts:232</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1036,7 +1072,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#getcoords">getCoords</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:103</li>
+									<li>Defined in IsoObject.ts:105</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1059,7 +1095,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#getoriginaldimension">getOriginalDimension</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:113</li>
+									<li>Defined in IsoObject.ts:115</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1082,7 +1118,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#getoriginalheight">getOriginalHeight</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:120</li>
+									<li>Defined in IsoObject.ts:122</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1105,7 +1141,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#getoriginalwidth">getOriginalWidth</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:124</li>
+									<li>Defined in IsoObject.ts:126</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1128,7 +1164,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#getproperties">getProperties</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:63</li>
+									<li>Defined in IsoMinimalObject.ts:66</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1151,7 +1187,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#getproperty">getProperty</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:59</li>
+									<li>Defined in IsoMinimalObject.ts:62</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1215,7 +1251,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#getrotation">getRotation</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:74</li>
+									<li>Defined in IsoMinimalObject.ts:77</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1272,7 +1308,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#isboxcollision">isBoxCollision</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:157</li>
+									<li>Defined in IsoObject.ts:159</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1304,7 +1340,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#ispixelboxcollision">isPixelBoxCollision</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:169</li>
+									<li>Defined in IsoObject.ts:171</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1338,7 +1374,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#ispixelcollision">isPixelCollision</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:174</li>
+									<li>Defined in IsoObject.ts:176</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1372,7 +1408,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#isplaying">isPlaying</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:185</li>
+									<li>Defined in IsoMinimalObject.ts:188</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1402,7 +1438,7 @@
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#move">move</a></p>
 								<p>Overwrites <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#move">move</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:178</li>
+									<li>Defined in IsoObject.ts:180</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1488,7 +1524,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#pause">pause</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:180</li>
+									<li>Defined in IsoMinimalObject.ts:183</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1517,7 +1553,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#play">play</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:165</li>
+									<li>Defined in IsoMinimalObject.ts:168</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1546,7 +1582,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#resume">resume</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:175</li>
+									<li>Defined in IsoMinimalObject.ts:178</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1575,7 +1611,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#rotate">rotate</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:97</li>
+									<li>Defined in IsoMinimalObject.ts:100</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1604,7 +1640,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#scroll">scroll</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:102</li>
+									<li>Defined in IsoMinimalObject.ts:105</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1659,7 +1695,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setadditiontype">setAdditionType</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:189</li>
+									<li>Defined in IsoMinimalObject.ts:192</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1691,7 +1727,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setalpha">setAlpha</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:109</li>
+									<li>Defined in IsoMinimalObject.ts:112</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1720,7 +1756,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setblendingmode">setBlendingMode</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:114</li>
+									<li>Defined in IsoMinimalObject.ts:117</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1749,7 +1785,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#setimage">setImage</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:203</li>
+									<li>Defined in IsoObject.ts:205</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1778,7 +1814,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setname">setName</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:119</li>
+									<li>Defined in IsoMinimalObject.ts:122</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1807,7 +1843,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setproperties">setProperties</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:129</li>
+									<li>Defined in IsoMinimalObject.ts:132</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1836,7 +1872,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setproperty">setProperty</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:124</li>
+									<li>Defined in IsoMinimalObject.ts:127</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1868,7 +1904,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setrotation">setRotation</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:134</li>
+									<li>Defined in IsoMinimalObject.ts:137</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1897,7 +1933,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setscale">setScale</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:139</li>
+									<li>Defined in IsoMinimalObject.ts:142</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1929,7 +1965,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setspeed">setSpeed</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:145</li>
+									<li>Defined in IsoMinimalObject.ts:148</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2007,7 +2043,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setzoomlevel">setZoomLevel</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:150</li>
+									<li>Defined in IsoMinimalObject.ts:153</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2036,7 +2072,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#setzoomstrength">setZoomStrength</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:155</li>
+									<li>Defined in IsoMinimalObject.ts:158</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2065,7 +2101,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#stop">stop</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:170</li>
+									<li>Defined in IsoMinimalObject.ts:173</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2110,6 +2146,29 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+					<a name="update" class="tsd-anchor"></a>
+					<h3>update</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">update<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#update">update</a></p>
+								<ul>
+									<li>Defined in IsoMinimalObject.ts:202</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Updates the object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
 					<a name="updateposition" class="tsd-anchor"></a>
 					<h3>update<wbr>Position</h3>
@@ -2122,7 +2181,7 @@
 								<p>Inherited from <a href="_isoobject_.isoobject.html">IsoObject</a>.<a href="_isoobject_.isoobject.html#updateposition">updatePosition</a></p>
 								<p>Overwrites <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#updateposition">updatePosition</a></p>
 								<ul>
-									<li>Defined in IsoObject.ts:219</li>
+									<li>Defined in IsoObject.ts:221</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2145,7 +2204,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_isominimalobject_.isominimalobject.html">IsoMinimalObject</a>.<a href="_isominimalobject_.isominimalobject.html#zoom">zoom</a></p>
 								<ul>
-									<li>Defined in IsoMinimalObject.ts:160</li>
+									<li>Defined in IsoMinimalObject.ts:163</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2247,6 +2306,9 @@
 								<a href="_isotileobject_.isotileobject.html#collsionmask" class="tsd-kind-icon">collsion<wbr>Mask</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isotileobject_.isotileobject.html#free" class="tsd-kind-icon">free</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
 								<a href="_isotileobject_.isotileobject.html#friction" class="tsd-kind-icon">friction</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
@@ -2302,6 +2364,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_isotileobject_.isotileobject.html#tilesize" class="tsd-kind-icon">tile<wbr>Size</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
+								<a href="_isotileobject_.isotileobject.html#type" class="tsd-kind-icon">type</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
 								<a href="_isotileobject_.isotileobject.html#velocity" class="tsd-kind-icon">velocity</a>
@@ -2476,6 +2541,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
 								<a href="_isotileobject_.isotileobject.html#unbindevent" class="tsd-kind-icon">unbind<wbr>Event</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-not-exported">
+								<a href="_isotileobject_.isotileobject.html#update" class="tsd-kind-icon">update</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited tsd-is-not-exported">
 								<a href="_isotileobject_.isotileobject.html#updateposition" class="tsd-kind-icon">update<wbr>Position</a>

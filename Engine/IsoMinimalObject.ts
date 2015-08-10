@@ -35,7 +35,10 @@ class IsoMinimalObject extends IsoOn {
     friction: number = 1;
     /** The velocity when moving an object. */
     velocity: IsoVector2D = new IsoVector2D(0, 0);
-
+    /** Sets if a object could clear from the memory. */
+    free: boolean = false;
+    /** Type of the object. */
+    type: string = "IsoMinimalObject";
     constructor(Engine: IsoMetric) {
         super();
         this.Engine = Engine;
@@ -194,5 +197,14 @@ class IsoMinimalObject extends IsoOn {
         this.velocity.x *= this.friction;
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
+    }
+    /** Updates the object. */
+    update() {
+        this.updatePosition();
+        var a = this.Engine.animation.getActive(this);
+        for (var i = 0; i < this.addAnimation.length; i++) {
+            if (a[i] !== undefined)
+                a[i].update();
+        }
     }
 }

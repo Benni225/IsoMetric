@@ -5,7 +5,8 @@ class IsoBillboard extends IsoObject {
     static REPEATY: string = "repeaty";
     static REPEAT: string = "repeat";
     static NOREPEAT: string = "norepeat";
-
+    /** Type of the object. */
+    type: string = "IsoBillboard";
     repeat: string = IsoBillboard.NOREPEAT;
     /** Sets if the billboard will repeated. */
     setRepeat(repeat: string): IsoBillboard {

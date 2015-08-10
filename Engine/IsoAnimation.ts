@@ -98,6 +98,16 @@ class IsoAnimation extends IsoOn {
         }
         return this;
     }
+    /** Update the animation. */
+    update() {
+        if (this.isPlaying === true) {
+            if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
+                this.__playAttribute();
+            } else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
+                this.__playFrame();
+            }
+        }
+    }
     /**
      * Starts an animation of the type "attribute". 
      */
@@ -166,9 +176,6 @@ class IsoAnimation extends IsoOn {
                         this.play();
                         break;
                 }
-            } else {
-                if (this.isPlaying === true)
-                    requestAnimationFrame(() => this.__playAttribute());
             }
         } else {
             return;
@@ -241,9 +248,6 @@ class IsoAnimation extends IsoOn {
                         this.play();
                         break;
                 }
-            } else {
-                if (this.isPlaying === true)
-                    requestAnimationFrame(() => this.__playFrame());
             }
         }
     }

@@ -43,6 +43,10 @@ declare class IsoMinimalObject extends IsoOn {
     friction: number;
     /** The velocity when moving an object. */
     velocity: IsoVector2D;
+    /** Sets if a object could clear from the memory. */
+    free: boolean;
+    /** Type of the object. */
+    type: string;
     constructor(Engine: IsoMetric);
     /** Adds an animation. The animation will animate a given attribute of the object. */
     addAnimation(name: string, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoMinimalObject;
@@ -100,6 +104,8 @@ declare class IsoMinimalObject extends IsoOn {
     setAdditionType(name: string, type: string): void;
     /** Calculat the new position. */
     updatePosition(): void;
+    /** Updates the object. */
+    update(): void;
 }
 declare var IsoBlendingModes: {
     NORMAL: string;
@@ -154,6 +160,8 @@ declare class IsoObject extends IsoMinimalObject {
     mass: number;
     /** The rigidbody of the object */
     rigidBody: IsoCoords;
+    /** Type of the object. */
+    type: string;
     /** Creates a new object */
     constructor(Engine: any, image: IsoRessource, name?: string);
     createCollidingMask(): void;
@@ -186,9 +194,9 @@ declare class IsoObject extends IsoMinimalObject {
     /** sets the image-ressource */
     setImage(image: IsoRessource): IsoObject;
     /** Sets the width and height of an object. */
-    setSize(width: number, height: number): IsoObject;
+    private setSize(width, height);
     /** Sets the width of an object. */
-    setWidth(width: number): IsoObject;
+    private setWidth(width);
     /** Calculat the new position. */
     updatePosition(): void;
     /** Gets all tiles of a given tilemap where the object collides with. */
@@ -404,7 +412,7 @@ declare class IsoTileMap {
      * Verify the tilemap.
      * @private
      */
-    verify(): boolean;
+    private verify();
     /**
      * Set te zoom of the tilemap relative to the current zoom.
      */
@@ -425,6 +433,8 @@ interface IsoFrame {
     dimension: IsoDimension;
 }
 declare class IsoSprite extends IsoTileObject {
+    /** Type of the object. */
+    type: string;
     constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
     getTileImage(): IsoTileImage;
     setFrame(frame: IsoFrame): IsoSprite;
@@ -446,6 +456,8 @@ declare class IsoSprite extends IsoTileObject {
  * This sprite type is an animated sprite, which uses frames of a tileset for animations.
  */
 declare class IsoAnimatedSprite extends IsoSprite {
+    /** Type of the object. */
+    type: string;
     /**
      * Creats a new frame-animated sprite
      */
@@ -537,14 +549,16 @@ declare class IsoAnimation extends IsoOn {
      * Starts the animation.
      */
     play(): IsoAnimation;
+    /** Update the animation. */
+    update(): void;
     /**
      * Starts an animation of the type "attribute".
      */
-    __playAttribute(): void;
+    private __playAttribute();
     /**
      * Starts an animation of the type "frame".
      */
-    __playFrame(): void;
+    private __playFrame();
     /**
      * Stop playing the animation.
      */
@@ -560,7 +574,7 @@ declare class IsoAnimation extends IsoOn {
     /**
      * Parse the object and return the given attribute.
      */
-    getObjectValue(): any;
+    private getObjectValue();
     /**
      * Parse the object and set the given attribute in a relative way.
      */
@@ -606,6 +620,8 @@ declare class IsoAnimationManager {
     isPlayingPlaylist(name: string, object: IsoMinimalObject | IsoSprite | IsoText): boolean;
     /** Returns a specified animation given by its name and the animated object.*/
     get(name: string, object: Object): IsoAnimation;
+    /** Returns all active animations of an object as an array. */
+    getActive(object: Object): Array<IsoAnimation>;
     /** Returns a specified playlist given by its name and the animated object.*/
     getPlaylist(name: string, object: Object): IsoAnimationPlaylist;
 }
@@ -624,7 +640,7 @@ declare class IsoAnimationPlaylist extends IsoOn {
     pausedAnimation: string;
     /** Creates a new playlist.*/
     constructor(name: string, object: IsoMinimalObject | IsoText | IsoSprite, animations: Array<IsoAnimation>);
-    checkPlaylist(event: CustomEvent): void;
+    private checkPlaylist(event);
     /** Stops the playlist. */
     stop(): void;
     /** Pause the playlist and saves the current animation.*/
@@ -655,6 +671,8 @@ declare class IsoBillboard extends IsoObject {
     static REPEATY: string;
     static REPEAT: string;
     static NOREPEAT: string;
+    /** Type of the object. */
+    type: string;
     repeat: string;
     /** Sets if the billboard will repeated. */
     setRepeat(repeat: string): IsoBillboard;
@@ -734,14 +752,14 @@ declare class IsoDrawer {
     drawParticles(renderDetails: IIsoRenderDetails, emitter: IsoEmitter): void;
     /** Draws all given texts. */
     drawTexts(objects: Array<IsoText>): void;
-    drawImage(renderDetails: any): void;
-    drawText(renderDetails: IIsoRenderDetails): void;
+    private drawImage(renderDetails);
+    private drawText(renderDetails);
     /** Sets the anchor of an object. */
-    translate(object: IsoObject | IsoText | IsoTile | IsoEmitter, renderDetails: any): void;
+    private translate(object, renderDetails);
     /** Reset the anchor of an object. */
-    resetTranslation(object: IsoObject | IsoText | IsoTile | IsoEmitter, renderDetails: any): void;
+    private resetTranslation(object, renderDetails);
     /** Rotates an object. */
-    rotate(object: IsoObject | IsoText | IsoTile | IsoEmitter, renderDetails: any): void;
+    private rotate(object, renderDetails);
 }
 declare class IsoEmitter extends IsoMinimalObject {
     /** The maximum particle count. */
@@ -750,6 +768,7 @@ declare class IsoEmitter extends IsoMinimalObject {
     lifetime: number;
     /** Sets how many particles will spreaded.*/
     spreadCount: number;
+    oldTime: number;
     /** The ressource for the particles.*/
     ressource: IsoRessource;
     /** A simple seed number.*/
@@ -762,10 +781,15 @@ declare class IsoEmitter extends IsoMinimalObject {
     height: number;
     /** Width of the emitter.*/
     width: number;
+    /** Sets if the emitter is emitting */
+    isEmitting: boolean;
+    /** The random library. */
+    rand: MersenneTwister;
     /** Sets the typ of this object.*/
     type: string;
     /** Creates a new particle emiter.*/
-    constructor(Engine: IsoMetric, ressource: IsoRessource);
+    constructor(Engine: IsoMetric, ressource: IsoRessource, config?: any);
+    addParticle(particle: IsoParticle): void;
     update(): void;
     emit(): void;
     getLifetime(): number;
@@ -778,6 +802,23 @@ declare class IsoEmitter extends IsoMinimalObject {
     setVariance(variance: number): IsoEmitter;
     setSpreadCount(count: number): IsoEmitter;
     freeParticle(particle: IsoParticle): boolean;
+    getRenderDetails(): {
+        position: IsoVector2D;
+        tileSize: {
+            width: number;
+            height: number;
+        };
+        renderSize: {
+            width: number;
+            height: number;
+        };
+        anchor: IsoPoint;
+        image: HTMLImageElement;
+        offset: IsoPoint;
+        zoomLevel: number;
+        type: string;
+    };
+    random(min: number, max: number): number;
 }
 interface __IsoDocument extends Document {
     createEventObject?: any;
@@ -794,8 +835,8 @@ declare class IsoEvent {
     /**
      * @todo Find a solid solution */
     trigger(target?: string | HTMLElement): void;
-    __c(target?: string | HTMLElement): void;
-    __e(target?: string | HTMLElement): void;
+    private __c(target?);
+    private __e(target?);
 }
 declare class IsoGroup extends IsoMinimalObject {
     items: Array<IsoMinimalObject>;
@@ -993,13 +1034,13 @@ declare class IsoLayer {
     /** Return true if the layer is hidden. Else false. */
     isHidden(): boolean;
     /** Removes an object or sprite from the layer. */
-    freeObject(object: IsoMinimalObject): boolean;
+    freeObject(object: IsoMinimalObject): void;
     /** Removes an object from the layer. */
-    freeText(text: IsoText): boolean;
+    freeText(text: IsoText): void;
     /** Removes a billboard from the layer. */
-    freeBillboard(billboard: IsoBillboard): boolean;
+    freeBillboard(billboard: IsoBillboard): void;
     /** Removes the tilemap form the layer.*/
-    freeTileMap(): boolean;
+    freeTileMap(): void;
 }
 declare class IsoLayers {
     layers: Array<IsoLayer>;
@@ -1132,23 +1173,26 @@ declare class IsoMetric extends IsoOn {
     /** The game- and drawing-loop. */
     update(): void;
 }
-declare class IsoParticle extends IsoMinimalObject {
-    /** number in milliseconds */
-    lifetimeStart: number;
-    lifetimeEnd: number;
-    /** The acceleration. */
-    ressource: IsoRessource;
-    /** The velocity as an vector. */
-    velocity: IsoVector2D;
-    /** The position of the particle. */
+declare class IsoParticle {
     position: IsoVector2D;
-    anchor: IsoPoint;
-    /** Create a new particle. */
-    constructor(Engine: IsoMetric, ressource: IsoRessource, position: IsoVector2D, velocity: IsoVector2D);
-    /** Moves the particle. */
-    move(): IsoParticle;
-    getRenderDetails(): void;
-    updatePosition(): void;
+    life: number;
+    originalLife: number;
+    velocity: IsoVector2D;
+    color: IsoColor;
+    Engine: IsoMetric;
+    alpha: number;
+    scale: IsoScale;
+    originalScale: IsoScale;
+    rotation: number;
+    renderSize: {
+        width: number;
+        height: number;
+    };
+    blendingMode: string;
+    ressource: IsoRessource;
+    constructor(Engine: IsoMetric, ressource: IsoRessource, position: IsoPoint, life: number, angle: number, scale: IsoScale, speed: number);
+    update(dt: number): void;
+    getRenderDetails(): IIsoRenderDetails;
 }
 interface IIsoPoint {
     x: number;
@@ -1245,6 +1289,8 @@ declare class IsoText extends IsoMinimalObject {
     baseline: string;
     /** The allignment of the text. Possible values are IsoText.START, IsoText.END, IsoText.LEFT, IsoText.RIGHT or IsoText.CENTER. Default is IsoText.START. */
     align: string;
+    /** Type of the object. */
+    type: string;
     /** Creates a new text object. */
     constructor(Engine: IsoMetric, name: string, text?: string);
     /** Sets the text. */
@@ -1314,14 +1360,14 @@ declare class IsoText extends IsoMinimalObject {
      * Code by Time Down @ stackoverflow.com
      * @see http://www.stackoverflow.com/user/96100/tim-down
      */
-    hexToRGB(hex: string): IsoColor;
+    private hexToRGB(hex);
     /**
      * Converts a RGB-color to a hex value and return it.
      * Code by Time Down @ stackoverflow.com
      * @see http://www.stackoverflow.com/user/96100/tim-down
      */
-    rgbToHex(r: any, g: any, b: any): string;
-    ptToPx(size: string): string;
+    private rgbToHex(r, g, b);
+    private ptToPx(size);
     /** Gets the position on the screen. */
     getAbsolutePosition(): IsoVector2D;
     /** Gets the original dimension of a text in pixel. @todo convert %, pt, em to px */

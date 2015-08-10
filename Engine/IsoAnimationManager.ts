@@ -73,6 +73,16 @@ class IsoAnimationManager {
             }
         }
     }
+    /** Returns all active animations of an object as an array. */
+    getActive(object: Object): Array<IsoAnimation> {
+        var animations: Array<IsoAnimation> = new Array();
+        for (var i = 0; i < this.animations.length; i++) {
+            if ((this.animations[i].object === object || this.animations[i].sprite === object) && this.animations[i].isPlaying === true) {
+                animations.push(this.animations[i]);
+            }
+        }
+        return animations;
+    }
     /** Returns a specified playlist given by its name and the animated object.*/
     getPlaylist(name: string, object: Object): IsoAnimationPlaylist {
         for (var i = 0; i < this.playLists.length; i++) {

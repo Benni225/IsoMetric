@@ -1,3 +1,41 @@
+v.0.3.a
+=======
+- This is the last big API update
+- Nearly everthing is rewritten
+- The different types of objects reduced
+- Added a new texture system
+	- every sprite can include many textures
+	- every texture can mixed with another
+	- for better framerates the textures cached
+- Added video textures
+- Added an object watcher
+	- nearly every property of an object can be watched for changes
+	- Example:
+		var sprite = new IsoSprite(...);
+		sprite.position.watch("x", function(newValue){
+			// do something
+		});
+- Redesigned animation system
+	- Example:
+		var tex = sprite.getTexture("text");
+		tex.animations.add("alpha", {
+			duration: 1000,
+			property: "alpha",
+			startValue: 1,
+			endValue: 0
+		}).play();
+- New logging system
+	- you will get more information while running your game
+- Uses matterJs for physics, now
+	- not finished yet
+- Todo:
+	- add more examples
+	- finish physics
+- Need Help:
+	- I really need help with the particle system, it works but... ohm, bad ;)
+	- Integrate a WebGL 2D renderer
+
+
 v.0.2.e
 =======
 - Improved the memory usage

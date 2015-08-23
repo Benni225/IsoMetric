@@ -1,112 +1,4 @@
-declare class IsoOn {
-    onCallbacks: Array<Function>;
-    fire(type: string, data?: any, element?: HTMLElement): void;
-    onEvent(eventType: string, callback: EventListener): void;
-    unbindEvent(eventType: string, callback: any): void;
-    on(eventType: string, callback: Function): IsoOn;
-    callOn(eventType: string): void;
-    checkOn(eventType: string): boolean;
-}
-declare class IsoMinimalObject extends IsoOn {
-    Engine: IsoMetric;
-    /** The position of the object */
-    position: IsoVector2D;
-    /** The scroll-position of the object */
-    scrollPosition: IsoVector2D;
-    /** An offset relative to the position */
-    offset: IsoPoint;
-    /** The scale of an object given as a factor */
-    scale: IsoScale;
-    /** The zooming level of an object */
-    zoomLevel: number;
-    /** By using the method zoom, this factor controls the zooming level */
-    zoomStrength: number;
-    /** A point on the screen where zoomed to */
-    zoomPoint: IsoVector2D;
-    /** Rotation in degrees */
-    rotation: number;
-    /** When moving this factor controls the speed of moving */
-    speed: number;
-    /** Name of the object */
-    name: string;
-    /** The anchor of the object for rotation */
-    anchor: IsoPoint;
-    /** The blending mode. See IsoBlendingModes */
-    blendingMode: string;
-    /** The alpha of the object */
-    alpha: number;
-    /** If hidden is true, the object will not be drawn. */
-    hidden: boolean;
-    /** Optional additional properties */
-    properties: Object;
-    /** The friction of the object */
-    friction: number;
-    /** The velocity when moving an object. */
-    velocity: IsoVector2D;
-    /** Sets if a object could clear from the memory. */
-    free: boolean;
-    /** Type of the object. */
-    type: string;
-    constructor(Engine: IsoMetric);
-    /** Adds an animation. The animation will animate a given attribute of the object. */
-    addAnimation(name: string, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoMinimalObject;
-    /** Gets an animation */
-    getAnimation(name: string): IsoAnimation;
-    /** Adds a new playlist. The playlist includes animations which animates the attributes of an object.*/
-    addPlaylist(name: string, animations: Array<IsoAnimation>): IsoMinimalObject;
-    /** Gets one of the additional properties. */
-    getProperty(name: string): any;
-    /** Gets all the additional properties. */
-    getProperties(): Object;
-    /** Gets the position on the screen. */
-    getAbsolutePosition(): IsoVector2D;
-    /** Gets the rotation of an object in dregrees. */
-    getRotation(): number;
-    /** Move an object relative to the current position. */
-    move(deltaX: number, deltaY: number): IsoMinimalObject;
-    /** Rotates an object relative to the current rotation. */
-    rotate(degrees: number): IsoMinimalObject;
-    /** Set the scrolling position relative to the current scroll position. */
-    scroll(deltaX: number, deltaY: number): IsoMinimalObject;
-    /** Sets the alpha of an object. */
-    setAlpha(alpha: number): IsoMinimalObject;
-    /** Sets the blending mode. See IsoBlending. */
-    setBlendingMode(blendingMode: string): IsoMinimalObject;
-    /** Sets the name of an object. */
-    setName(name: string): IsoMinimalObject;
-    /** Sets an additional property. */
-    setProperty(name: string, value: any): IsoMinimalObject;
-    /** Sets all properties. */
-    setProperties(properties: Object): IsoMinimalObject;
-    /** Sets the rotation of an object in degrees. */
-    setRotation(degrees: number): IsoMinimalObject;
-    /** Sets the scale of an object. */
-    setScale(factorX: number, factorY: number): IsoMinimalObject;
-    /** Sets the speed for moving of an object. */
-    setSpeed(speed: number): IsoMinimalObject;
-    /** Sets the absolute zooming-level. */
-    setZoomLevel(zoomLevel: number): IsoMinimalObject;
-    /** Sets the strength of zooming, when using the method IsoObject.zoom */
-    setZoomStrength(zoomStrength: number): IsoMinimalObject;
-    /** Calculate the zoom level */
-    zoom(zoom: number): IsoMinimalObject;
-    /** Plays an animation. */
-    play(name: string): IsoMinimalObject;
-    /** Stops an animation. */
-    stop(name: any): IsoMinimalObject;
-    /** Resumes an animation. */
-    resume(name: string): IsoMinimalObject;
-    /** Pause an animation. */
-    pause(name: string): IsoMinimalObject;
-    /** Checks whether an animation is playing or not. */
-    isPlaying(name: string): boolean;
-    /** Sets the addition type of an animation: */
-    setAdditionType(name: string, type: string): void;
-    /** Calculat the new position. */
-    updatePosition(): void;
-    /** Updates the object. */
-    update(): void;
-}
+/// <reference path="C:/Users/camel/Documents/Visual Studio 2013/Projects/Isometroc/IsoMetric3/Engine/typings/matterJs.d.ts" />
 declare var IsoBlendingModes: {
     NORMAL: string;
     MULTIPLY: string;
@@ -124,350 +16,219 @@ declare var IsoBlendingModes: {
     SATURATION: string;
     COLOR: string;
     LUMINOSITY: string;
+    SOURCE_IN: string;
+    SOURCE_OVER: string;
+    SOURCE_OUT: string;
+    SOURCE_ATOP: string;
+    DESTINATION_OVER: string;
+    DESTINATION_IN: string;
+    DESTINATION_OUT: string;
+    DESTINATION_ATOP: string;
+    LIGHTER: string;
+    COPY: string;
+    XOR: string;
 };
-interface IsoDimension {
-    width: number;
-    height: number;
+declare class IsoLogger {
+    static ERROR: number;
+    static WARN: number;
+    static INFO: number;
+    static DEBUG: boolean;
+    lastError: string;
+    log(error: Error | string, warnLevel: number): void;
+    debug(o: any): void;
 }
-interface IsoCoords {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+declare class IsoEvent extends IsoLogger {
+    __onCallbacks: Array<EventListener>;
+    fire(type: string, data?: any, element?: HTMLElement): void;
+    bind(eventType: string, callback: EventListener): void;
+    unbind(eventType: string, callback: any): void;
+    on(eventType: string, callback: EventListener): IsoEvent;
+    call(eventType: any, args?: Array<any>): void;
+    __checkOn(eventType: string): boolean;
 }
-interface IsoScale {
-    factorX: number;
-    factorY: number;
+/** This class helps to observe special values of a class. */
+declare class IsoWatcher extends IsoEvent {
+    __watch: Array<any>;
+    watch(property: string, callback: EventListener): void;
+    __propertyChanged(property: string, value: any): void;
 }
-interface IsoPixel {
-}
-declare class IsoObject extends IsoMinimalObject {
-    static BOX_COLLISION: string;
-    static PIXEL_COLLISION: string;
-    /** The original width */
-    width: number;
-    /** The original height */
-    height: number;
-    /** The image ressource of the object */
-    ressource: IsoRessource;
-    /** The collsion type of the object */
-    collisionType: string;
-    /** If the object has the collisiontype "pixel" this property controls the accuracy of the collision. */
-    collisionResolution: number;
-    /** The image data of the object in a lower resolution for collision detection. */
-    collsionMask: Array<Array<Array<number>>>;
-    /** Mass of the object for physics */
-    mass: number;
-    /** The rigidbody of the object */
-    rigidBody: IsoCoords;
-    /** Type of the object. */
+declare class IsoObject extends IsoWatcher {
     type: string;
-    /** Creates a new object */
-    constructor(Engine: any, image: IsoRessource, name?: string);
-    createCollidingMask(): void;
-    /** Checks if the object collides with an another given object. */
-    collide(object: IsoObject): boolean;
-    /** Get the position of the object on the screen. */
-    getCoords(): IsoCoords;
-    /** Gets the original dimension of the object. */
-    getOriginalDimension(): IsoDimension;
-    /** Gets the originall height of the object */
-    getOriginalHeight(): number;
-    /** Gets the original width of the obect */
-    getOriginalWidth(): number;
-    /** Gets the position on the screen. */
-    getAbsolutePosition(): IsoVector2D;
-    /** Gets the dimension of the object on the screen. */
-    getAbsoluteDimension(): IsoDimension;
-    /** Gets all important information for rendering an object. */
-    getRenderDetails(): IIsoRenderDetails;
-    /** Checks the collision of two object with collision type "box". */
-    isBoxCollision(coordsSource: IsoCoords, coordsTarget: IsoCoords): boolean;
-    /** @todo implement pixel-box-collision */
-    isPixelBoxCollision(sourceObject: IsoObject, targetCoords: IsoCoords): boolean;
-    /** @todo implement pixel-collision */
-    isPixelCollision(sourceObject: IsoObject, targetObject: IsoObject): boolean;
-    /** Move an object relative to the current position. */
-    move(deltaX: number, deltaY: number): IsoObject;
-    /** Sets the width. */
-    private setHeight(height);
-    /** sets the image-ressource */
-    setImage(image: IsoRessource): IsoObject;
-    /** Sets the width and height of an object. */
-    private setSize(width, height);
-    /** Sets the width of an object. */
-    private setWidth(width);
-    /** Calculat the new position. */
-    updatePosition(): void;
-    /** Gets all tiles of a given tilemap where the object collides with. */
-    getCollidingTiles(tilemap: IsoTileMap): Array<IsoTile>;
+    apply(object: Object, to?: Object): void;
 }
-interface IsoTileSize {
-    width: number;
-    height: number;
-}
-interface IsoTileObjectInfo {
-    tile: number;
-    height?: number;
-    size: IsoTileSize;
-}
-declare class IsoTileObject extends IsoObject {
-    tileOffset: IsoPoint;
-    tileSize: IsoTileSize;
-    tileHeight: number;
-    tile: number;
-    startTile: number;
-    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo?: IsoTileObjectInfo);
-    setTileOffset(x: number, y: number): IsoTileObject;
-    getTileOffset(): IsoPoint;
-    getAbsolutePosition(): IsoVector2D;
-    getRelativeDimension(): IsoDimension;
-    getRenderDetails(): IIsoRenderDetails;
-    getTileImage(): IsoTileImage;
-    setTile(tile: number): IsoTileObject;
-    set(tile: IsoTileObjectInfo): IsoTileObject;
-}
-interface IsoTileImage {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    image: HTMLImageElement;
-}
-interface IsoTileInfo {
-    tile: number;
-    height: number;
-    size: IsoTileSize;
-    mapPosition: IsoMapVector2D;
-}
-interface IsoMapPosition {
-    row: number;
-    column: number;
-}
-declare class IsoTile extends IsoTileObject {
-    static AUTOMATIC: string;
-    static MANUAL: string;
-    static POSITION: string;
-    static ZOOM: string;
-    tileOffset: IsoPoint;
-    tileSize: IsoTileSize;
-    tileHeight: number;
-    mapPosition: IsoMapVector2D;
-    tile: number;
-    updateType: string;
-    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileInfo);
-    /**
-     * Create a new frame-animation.
-     *
-     * @param  {string}                name   Name of the new animation.
-     * @param  {Array<number>}         frames An array that includes the frame numbers.
-     * @param  {number}                duration The duration in milliseconds of the animation.
-     * @param  {Function}  easing    The animation-easing. For more information see IsoEasing. By default: IsoEasing.Linear.
-     * @param  {string} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG. By Default: IsoAnimation.ONCE.
-     * @param  {Array<IsoCallback>} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
-     * @return {IsoAnimatedSprite}            The sprite.
-     */
-    addFrameAnimation(name: string, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoTile;
-    setUpdateType(type: string): IsoTile;
-    set(tile: IsoTileInfo): IsoTile;
-    getCoords(): IsoCoords;
-    getMapPosition(): IsoMapVector2D;
-    getAbsolutePosition(): IsoVector2D;
-    getRenderDetails(): IIsoRenderDetails;
-    updatePosition(): void;
-}
-declare class IsoMap {
-    name: string;
-    map: Array<Array<Array<number>>>;
-    properties: Array<number>;
-    updated: boolean;
-    constructor(map?: Array<Array<Array<number>>>, name?: string);
-    set(map: Array<Array<Array<number>>>): IsoMap;
-    setName(name: string): IsoMap;
-    get(): Array<Array<Array<number>>>;
-    getValue(row: number, column: number): Array<number>;
-    getPropertiy(property: string, row: number, column: number): number;
-    nameProperty(name: string, valueIndex: number): void;
-    editProperty(name: string, valueIndex: number): void;
-    edit(x: number, y: number, value: Array<number>): IsoMap;
-}
-/**
- * @interface IsoTilesInView
- */
-interface IsoTilesInView {
-    rowStart: number;
-    rowEnd: number;
-    columnStart: number;
-    columnEnd: number;
-    tiles: Array<Array<IsoTile>>;
-}
-/**
- * IsoTileMap draws a tile-based map on the screen.
- */
-declare class IsoTileMap {
-    map: IsoMap;
-    tiles: Array<Array<IsoTile>>;
-    tilesInView: IsoTilesInView;
-    tileSize: IsoTileSize;
-    image: IsoRessource;
-    offset: IsoPoint;
-    scrollPosition: IsoVector2D;
-    speed: number;
-    zoomLevel: number;
-    zoomStrength: number;
-    minZoomLevel: number;
-    maxZoomLevel: number;
-    zoomPoint: IsoPoint;
-    name: string;
-    Engine: IsoMetric;
-    /**
-     * Creates a new tiled map.
-     */
-    constructor(Engine: IsoMetric, name?: string, tileWidth?: number, tileHeight?: number, image?: IsoRessource, map?: Array<Array<Array<number>>>);
-    /**
-     * Sets the map of the tilemap
-     */
-    setMap(map: Array<Array<Array<number>>>): IsoTileMap;
-    /**
-     * Create a new empty map.
-     */
-    createMap(numTilesX: number, numTilesY: number, defaultValue?: Array<number>): IsoTileMap;
-    /**
-     * Creates all tile for the tilemap based on the map.
-     */
-    createTiles(): IsoTileMap;
-    /**
-     * Get a tile given by its name.
-     */
-    getTile(name: string): IsoTile;
-    /**
-     * Returns all tiles which are visible on the screen.
-     */
-    getTilesInView(): IsoTilesInView;
-    /**
-     * Gets all tiles in specified area.
-     */
-    getTilesInRadius(x: number, y: number, width: number, height: number): Array<IsoTile>;
-    /**
-     * Return the tile placed on the given position.
-     */
-    getTileOnPosition(position: IsoPoint): IsoTile;
-    /**
-     * Sets the image ressource for the tilemap.
-     */
-    setImage(image: IsoRessource): IsoTileMap;
-    /**
-     * Sets the maximum value for zooming.
-     */
-    setMaxZoomLevel(zoomLevel: number): IsoTileMap;
-    /**
-     * Sets the minimum value for zooming.
-     */
-    setMinZoomLevel(zoomLevel: number): IsoTileMap;
-    /**
-     * Sets the name of the tilemap
-     */
-    setName(name: string): IsoTileMap;
-    /**
-     * Sets the offset of the tilemap. Alias for offset.set.
-     */
-    setOffset(x: any, y: any): IsoTileMap;
-    /**
-     * Sets the scroll-position of the tilemap. Alias for scrollPosition.set.
-     */
-    setScroll(x: number, y: number): IsoTileMap;
-    /**
-     * Sets the speed  for scrolling and moving for the tilemap.
-     */
-    setSpeed(speed: number): IsoTileMap;
-    /**
-     * Scrolls the tilemap relative to the actual position.
-     */
-    scroll(x: number, y: number): IsoTileMap;
-    /**
-     * Sets the tilesize of the tilemap.
-     */
-    setTileSize(size: IsoTileSize): IsoTileMap;
-    /**
-     * Sets the zoomLevel of the tilemap.
-     */
-    setZoomLevel(zoomLevel: number): IsoTileMap;
-    /**
-     * Sets the zooming point of the tilemap.
-     */
-    setZoomPoint(point: IsoPoint): IsoTileMap;
-    /**
-     * Sets the strength of zooming.
-     */
-    setZoomStrength(zoomStrength: number): IsoTileMap;
-    /**
-     * Update the tilemap and with this all the tiles of the tilemap.
-     */
-    update(): void;
-    /**
-     * Update all tiles of the tilemap.
-     */
-    updateTile(tile: IsoTile): void;
-    /**
-     * Verify the tilemap.
-     * @private
-     */
-    private verify();
-    /**
-     * Set te zoom of the tilemap relative to the current zoom.
-     */
-    zoom(zoom: number): IsoTileMap;
-}
-/**
- * @interface IsoCollisionBody
- * @static
- */
-interface IsoCollisionBody {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
-interface IsoFrame {
-    offset: IsoPoint;
-    dimension: IsoDimension;
-}
-declare class IsoSprite extends IsoTileObject {
-    /** Type of the object. */
+declare class IsoColor extends IsoObject {
+    /** red */
+    private _r;
+    r: number;
+    /** green */
+    private _g;
+    g: number;
+    /** blue */
+    private _b;
+    b: any;
+    /** The object type for identification. */
     type: string;
-    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
-    getTileImage(): IsoTileImage;
-    setFrame(frame: IsoFrame): IsoSprite;
-    set(tile: IsoTileObjectInfo): IsoSprite;
-    /** Gets the dimension of the object on the screen. */
-    getAbsoluteDimension(): IsoDimension;
-    getRenderDetails(): {
-        position: IsoVector2D;
-        tileSize: IsoTileSize;
-        renderSize: IsoDimension;
-        anchor: IsoPoint;
-        image: HTMLImageElement;
-        offset: IsoPoint;
-        zoomLevel: number;
-        type: string;
+    constructor(color: any);
+    /** Sets the color with an hex value or an color object like {r: 255,g: 255,b: 255}. */
+    set(color: any): void;
+    /** Returns the color as a hex-value. */
+    getHex(): string;
+    /** Turns a number to a hex-value. */
+    componentToHex(c: number): string;
+    /** Turns 3 numbers to a hex-value. */
+    rgbToHex(r: any, g: any, b: any): string;
+    /** Turns a hex-value to 3 numbers. */
+    hexToRgb(hex: string): {
+        r: number;
+        g: number;
+        b: number;
     };
 }
+declare class IsoPoint extends IsoWatcher {
+    private _x;
+    x: number;
+    private _y;
+    y: number;
+    constructor(x?: number, y?: number);
+    /** Sets or resets the point */
+    set(x: number, y: number): void;
+    /** Gets the point on the screen. */
+    get(): IsoPoint;
+}
+declare class IsoScale extends IsoWatcher {
+    /** The scale factor on the x axis */
+    private _fx;
+    fx: number;
+    /** The scale factor on the y axis */
+    private _fy;
+    fy: number;
+    constructor(fx?: number, fy?: number);
+    /** Sets or resets the scale */
+    set(fx: number, fy: number): void;
+    /** Gets the scale. */
+    get(): IsoScale;
+}
+declare class IsoSize extends IsoWatcher {
+    /** The width. */
+    private _width;
+    width: number;
+    /** The height. */
+    private _height;
+    height: number;
+    constructor(width: number, height: number);
+    /** Sets or resets the size */
+    set(width: number, height: number): void;
+    /** Gets the size. */
+    get(): IsoSize;
+}
 /**
- * This sprite type is an animated sprite, which uses frames of a tileset for animations.
+ * IsoVector2D represents a point on the screen.
  */
-declare class IsoAnimatedSprite extends IsoSprite {
-    /** Type of the object. */
-    type: string;
-    /**
-     * Creats a new frame-animated sprite
-     */
-    constructor(Engine: IsoMetric, image: IsoRessource, tileInfo: IsoTileObjectInfo, name?: string);
-    /**
-     * Create a new frame-based animation.
-     */
-    addFrameAnimation(name: string, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimatedSprite;
-    /** Adds a new playlist. The playlist includes animations which animates both: the attributes and/or the frames of an object.*/
-    addPlaylist(name: string, animations: Array<IsoAnimation>): IsoMinimalObject;
+declare class IsoVector2D extends IsoPoint {
+    /** Creates a new vector */
+    constructor(x: number, y: number);
+    /** Gets the distance between two points */
+    getDistance(vec: IsoVector2D): number;
+    /** Gets the length of a vector. */
+    getMagnitude(): number;
+    /** Gets the angle of a vector. */
+    getAngle(): number;
+    getAngleDegrees(): number;
+    /** Sets the vector from an angle and a length.*/
+    createFromAngle(angle: number, length: number): void;
+    /** Add a second vector to the vector. */
+    add(vector: IsoVector2D): void;
+}
+declare class IsoAnimation extends IsoObject {
+    /** The play types of an animation. */
+    static PLAY_ONCE: string;
+    static PLAY_LOOP: string;
+    /** The play direction of the animation. */
+    static TRACK_NORMAL: string;
+    static TRACK_PINGPONG: string;
+    /** Repetition type */
+    static REPEAT_ENDLESS: string;
+    /** The name of the animation. */
+    private _name;
+    name: string;
+    /** The animated object. */
+    private _object;
+    object: Object;
+    /** The value the animation starts with. */
+    private _startValue;
+    startValue: number;
+    /** The value the animation ends with.*/
+    private _endValue;
+    endValue: number;
+    /** The current value of the animation. */
+    private _currentValue;
+    currentValue: number;
+    /** The duraion of the animation in milliseconds. */
+    private _duration;
+    duration: number;
+    /** The time in milliseconds after the animations starts.*/
+    private _time;
+    time: number;
+    /** Indecates wether the animation played once or loops.*/
+    private _playType;
+    playType: string;
+    /** Indecates wether the animation played normal or as ping-pong.*/
+    private _trackDirection;
+    trackDirection: string;
+    /** Indecates how often the animation is played.*/
+    private _repetitions;
+    repetitions: string | number;
+    /** The property to animate.*/
+    private _property;
+    property: string;
+    /** The easing effect of the animation.*/
+    private _effect;
+    effect: Function;
+    /** A function for round a number.*/
+    private _round;
+    round: Function;
+    private isPlaying;
+    private pingPongFlag;
+    private initStartValue;
+    private currentIteration;
+    private Engine;
+    private FPS;
+    private played;
+    private startTime;
+    private pauseTime;
+    constructor(name: string, options: IAnimationOptions);
+    /** Sets the name of the animation. */
+    setName(name: string): IsoAnimation;
+    /** Returns the name of the animation. */
+    getName(): string;
+    /** Updates the animation. */
+    update(): void;
+    /** Plays the animation. */
+    play(): void;
+    /** Stops the animation. */
+    stop(): void;
+    /** Pause the animation. */
+    pause(): void;
+    /** Resumes the animation.*/
+    resume(): void;
+    /** Sets a value to the object. */
+    setValue(value: number): void;
+    /** Parse the object and return the given attribute. */
+    private getObjectValue();
+}
+declare class IsoAnimationManager extends IsoObject {
+    Engine: IsoMetric;
+    object: Object;
+    animations: Array<IsoAnimation>;
+    constructor(object: Object);
+    add(name: string, animation: IAnimationOptions): IsoAnimation;
+    remove(name: string): IsoAnimationManager;
+    play(name: string): IsoAnimation;
+    pause(name: string): IsoAnimation;
+    resume(name: string): IsoAnimation;
+    stop(name: string): IsoAnimation;
+    get(name: any): IsoAnimation;
+    update(): void;
 }
 /**
  * A library including all easing-functions.
@@ -496,431 +257,475 @@ declare var IsoEasing: {
     CircOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
     CircInOut: (currentIteration: number, startValue: number, endValue: number, iterationCount: number) => number;
 };
-/**
- * Controls an animations.
- * There are two types of animations:
- * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be a number.
- * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be an IsoAnimatedSprite or IsoTile.W
- */
-declare class IsoAnimation extends IsoOn {
-    static ADDITION_ABSOLUTE: string;
-    static ADDTION_RELATIVE: string;
-    static ONCE: string;
-    static PINGPONG: string;
-    static ENDLESS: string;
-    static IMPULSE: string;
-    static ANIMATION_TYPE_FRAME: string;
-    static ANIMATION_TYPE_ATTRIBUTE: string;
-    static PLAYED: string;
-    static EVERYPLAYED: string;
-    static STOPPED: string;
-    static RESUME: string;
-    static PAUSE: string;
+declare class IsoBaseEntity extends IsoObject {
+    /** The physics. */
+    physics: IsoPhysics;
+    /** Name of the entity. */
+    private _name;
     name: string;
-    duration: number;
-    frames: Array<number>;
-    startValue: number;
-    endValue: number;
-    actualValue: number;
-    attribute: string;
+    /** The friction of the entity. */
+    private _friction;
+    friction: number;
+    /** The mass of the entity. */
+    private _mass;
+    mass: number;
+    /** The acceleration of the entity. */
+    acceleration: IsoVector2D;
+    /** The velocity of the entity. */
+    velocity: IsoVector2D;
+    /** The position of the entity. */
+    position: IsoVector2D;
+    /** The rotation in degrees of the entity. */
+    private _rotation;
+    rotation: number;
+    /** The size of the entity. */
+    size: IsoSize;
+    /** The anchor of the entity. */
+    anchor: IsoPoint;
+    /** Includes all animations of the entity. */
+    animations: IsoAnimationManager;
+    /** Indicates if an entity could be deleted.*/
+    private _isFree;
+    isFree: boolean;
+    /** Hide or show an entity. */
+    private _hidden;
+    hidden: boolean;
+    /** The type of the object for identification. */
     type: string;
-    easing: Function;
-    isPlaying: boolean;
-    callbacks: Array<IsoCallback>;
-    object: Object;
-    sprite: IsoAnimatedSprite | IsoTile;
-    iterations: number;
-    currentIteration: number;
-    framesPerSecond: number;
-    __debug: number;
-    animationType: string;
-    additionType: string;
-    private impulsePlaying;
-    constructor();
-    /**
-     * Creates a new frame-based animation.
-     */
-    createFrameAnimation(name: string, object: IsoAnimatedSprite | IsoTile, frames: Array<number>, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
-    /**
-     * Creates a new frame-based animation.
-     */
-    createAnimation(name: string, object: Object, attribute: string, endValue: number, duration: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimation;
-    /**
-     * Starts the animation.
-     */
-    play(): IsoAnimation;
-    /** Update the animation. */
+    /** The drawing index of the entity. */
+    private _index;
+    index: number;
+    chache: IsoTextureCache;
+    /** Creates a new entity by its name. */
+    constructor(name: string);
+    /** Sets the name of the entity. */
+    setName(name: string): IsoBaseEntity;
+    /** Gets the name of the entity. */
+    getName(): string;
+    /** Sets the rotation of the entity. */
+    setRotation(rotation: number): void;
+    /** Gets the rotation of the entity. */
+    getRotation(): number;
+    /** Sets the friction of the entity. */
+    setFriction(friction: number): IsoBaseEntity;
+    /** Gets the friction of the entity. */
+    getFriction(): number;
+    /** Updates the position of the entity. */
+    updatePosition(): IsoBaseEntity;
+    /** Updates the entity. */
     update(): void;
-    /**
-     * Starts an animation of the type "attribute".
-     */
-    private __playAttribute();
-    /**
-     * Starts an animation of the type "frame".
-     */
-    private __playFrame();
-    /**
-     * Stop playing the animation.
-     */
-    stop(): IsoAnimation;
-    /**
-     * Pause the animation
-     */
-    pause(): IsoAnimation;
-    /**
-     * Resume the animation.
-     */
-    resume(): IsoAnimation;
-    /**
-     * Parse the object and return the given attribute.
-     */
-    private getObjectValue();
-    /**
-     * Parse the object and set the given attribute in a relative way.
-     */
-    setObjectValue(value: number): void;
-    /**
-     * Parse the object and set the given attribute in a absolute way.
-     */
-    setObjectValueAbsolute(value: number): void;
-    setAdditionType(type: string): void;
+    /** Free the memory. */
+    free(): void;
+    /** Hides the entity. */
+    hide(): IsoBaseEntity;
+    /** Shows the entity. */
+    show(): IsoBaseEntity;
+    /** Checks if the entity is hidden. */
+    isHidden(): boolean;
+    /** Sets the index of the entity. */
+    setIndex(index: number): IsoBaseEntity;
+    /** returns the index of the entity. */
+    getIndex(): number;
+    /** Returns the render data. */
+    getRenderData(): IRenderData;
+    /** Checks if this entity intersects with another entity. */
+    isBoxIntersection(entityB: IsoBaseEntity): boolean;
 }
-declare class IsoAnimationManager {
-    /** Includes all object animations. */
-    animations: Array<IsoAnimation>;
-    /** Includes all playlists. */
-    playLists: Array<IsoAnimationPlaylist>;
-    /** Adds a new frame-based animation. */
-    addFrameAnimation(name: string, object: IsoAnimatedSprite | IsoTile, frames: Array<number>, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
-    /** Adds a new attribute-based animation. */
-    addAnimation(name: string, object: Object, attribute: string, endValue: number, speed: number, easing?: Function, type?: string, callbacks?: Array<IsoCallback>): IsoAnimationManager;
-    /** Adds a new playlist. */
-    addPlaylist(name: string, object: IsoMinimalObject | IsoText | IsoSprite, animations: Array<IsoAnimation>): IsoAnimationManager;
-    /** Plays an animation given by its name and the animated object.*/
-    play(name: string, object: Object): void;
-    /** Stops an animation given by its name and the animated object.*/
-    stop(name: string, object: Object): void;
-    /** Resumes an animation given by its name and the animated object.*/
-    resume(name: string, object: Object): void;
-    /** Pauses an animation given by its name and the animated object.*/
-    pause(name: string, object: Object): void;
-    /** Checks if an animation is playing given by its name and the animated object.*/
-    isPlaying(name: string, object: Object): boolean;
-    /** Sets the addiion type of the animation. */
-    setAdditionType(name: string, object: Object, type: string): void;
-    /** Plays a playlist given by its name and the animated object.*/
-    playPlaylist(name: string, object: IsoMinimalObject | IsoSprite | IsoText): void;
-    /** Stops a playlist given by its name and the animated object.*/
-    stopPlaylist(name: string, object: IsoMinimalObject | IsoSprite | IsoText): void;
-    /** Pauses a playlist given by its name and the animated object.*/
-    pausePlaylist(name: string, object: IsoMinimalObject | IsoSprite | IsoText): void;
-    /** Resumes a playlist given by its name and the animated object.*/
-    resumePlaylist(name: string, object: IsoMinimalObject | IsoSprite | IsoText): void;
-    /** Checks if a playlist is playing given by its name and the animated object.*/
-    isPlayingPlaylist(name: string, object: IsoMinimalObject | IsoSprite | IsoText): boolean;
-    /** Returns a specified animation given by its name and the animated object.*/
-    get(name: string, object: Object): IsoAnimation;
-    /** Returns all active animations of an object as an array. */
-    getActive(object: Object): Array<IsoAnimation>;
-    /** Returns a specified playlist given by its name and the animated object.*/
-    getPlaylist(name: string, object: Object): IsoAnimationPlaylist;
-}
-declare class IsoAnimationPlaylist extends IsoOn {
-    /** Name of the playlist. */
-    name: string;
-    /** The referencing object of the animation. */
-    object: IsoMinimalObject | IsoText | IsoSprite;
-    /** True, if the playlist is playing, else if not.*/
-    isPlaying: boolean;
-    /** All the animations of the playlist.*/
-    animations: Array<IsoAnimation>;
-    /** The current playing animation.*/
-    current: string;
-    /** The name of paused animation */
-    pausedAnimation: string;
-    /** Creates a new playlist.*/
-    constructor(name: string, object: IsoMinimalObject | IsoText | IsoSprite, animations: Array<IsoAnimation>);
-    private checkPlaylist(event);
-    /** Stops the playlist. */
-    stop(): void;
-    /** Pause the playlist and saves the current animation.*/
-    pause(): void;
-    /** Resumes the playlist. */
-    resume(): void;
-    /** Plays the next animation. */
-    next(animation: IsoAnimation): void;
-    /** Plays the playlist from the beginning. */
-    play(): void;
-}
-declare class IsoAudio extends IsoOn implements IIsoResource {
+declare class IsoEntityGroup extends IsoBaseEntity {
+    /** Includes all entities of a group. */
+    private _entities;
+    entities: Array<IsoBaseEntity>;
+    /** The type of the object for identification. */
     type: string;
-    audio: HTMLAudioElement;
+    constructor(name: string);
+    /** Adds a new entity to the group. */
+    add(entity: IsoBaseEntity): void;
+    /** Removes a entity to the group. */
+    remove(entity: any): boolean;
+    /** Updates the entity group. */
+    update(): void;
+    /** Updates the position on the x-axis of all including entities, when the position changed. */
+    updateEntitiesPositionX(value: any, oldValue: any): void;
+    /** Updates the position on the y-axis of all including entities, when the position changed. */
+    updateEntitiesPositionY(value: any, oldValue: any): void;
+    /** Sorts the entities by there indizies. */
+    sort(): void;
+}
+declare class IsoSprite extends IsoBaseEntity {
+    /** The texture of the box. */
+    private _texture;
+    texture: Array<IsoVideoTexture | IsoColorTexture | IsoImageTexture | IsoStripeTexture>;
+    /** The maks of the entity. */
+    private _mask;
+    mask: IsoImageTexture | IsoStripeTexture;
+    /** The scale of the texture. */
+    scale: IsoScale;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string);
+    /** Gets the absolute width dimension. */
+    getAbsoluteWidth(): number;
+    /** Gets the absolute height dimension. */
+    getAbsoluteHeight(): number;
+    /** Add a texture to the box. */
+    addTexture(texture: IsoImageTexture | IsoColorTexture | IsoVideoTexture | IsoStripeTexture): IsoSprite;
+    /** Get a texture by its name. */
+    getTexture(name: string): IsoImageTexture | IsoColorTexture | IsoVideoTexture | IsoStripeTexture;
+    /** Sets the mask of the sprite. */
+    setMask(mask: IsoImageTexture | IsoStripeTexture): IsoSprite;
+    /** Gets the mask of the sprite. */
+    getMask(): IsoImageTexture | IsoStripeTexture;
+    /** Removes a texture by its name. */
+    removeTexture(name: string): IsoSprite;
+    /** Returns the render data. */
+    getRenderData(): IRenderData;
+}
+declare class IsoImage extends IsoObject {
+    /** Path to the image. */
     src: string;
+    /** HTMLImageObject */
+    element: HTMLImageElement;
+    /** A callback when the image loaded. */
+    __onLoad: Function;
+    /** Indicates if the image was loaded. */
     isLoaded: boolean;
-    constructor(src: string);
-    create(src: string): void;
+    /** The size of the image. */
+    size: IsoSize;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(src?: string);
+    /** Sets the element to an existing HTML element. */
+    setElement(image: HTMLImageElement): IsoImage;
+    /** Creates a new image. */
+    create(src: string): IsoImage;
+    /** Loads the image for further work. */
     load(): void;
-    /**
-     * Called when the image file was loaded.
-     */
+    /** Called when the image file was loaded. */
     _onLoad(event: Event): void;
+    /**  Returns the image. */
+    get(): HTMLImageElement;
+    /** Gets the width of the image. */
+    getWidth(): number;
+    /** Gets the height of the image. */
+    getHeight(): number;
+    /** Returns the size. */
+    getSize(): IsoSize;
+    /** Sets the width of the image. */
+    setWidth(width: number): IsoImage;
+    /** Sets the height of the image. */
+    setHeight(height: number): IsoImage;
+    /** Sets the size of the image. */
+    setSize(size: IsoSize): IsoImage;
+    /** Resizes the video. */
+    resize(): IsoImage;
+}
+declare class IsoAudio extends IsoObject {
+    /** Sets the loadType to "LOAD" the audio load completly. */
+    static LOAD: string;
+    /** Sets the loadType to "STREAM" the audio streamed. */
+    static STREAM: string;
+    /** Path to the audio. */
+    src: Array<string>;
+    /** HTMLAudioObject */
+    element: HTMLAudioElement;
+    /** A callback when the audio loaded. */
+    __onLoad: Function;
+    /** Indicates if the audio was loaded. */
+    isLoaded: boolean;
+    /** Type of the object for identification. */
+    type: string;
+    /** Sets if the audio load completly or stream it. */
+    loadType: string;
+    constructor(src?: Array<string>);
+    /** Creates a new audio. */
+    create(src: Array<string>): IsoAudio;
+    /** Loads the audio for further work. */
+    load(): void;
+    /** Called when the audio file was loaded. */
+    _onLoad(event: Event): void;
+    /**  Returns the audio. */
     get(): HTMLAudioElement;
 }
-declare class IsoBillboard extends IsoObject {
-    static REPEATX: string;
-    static REPEATY: string;
-    static REPEAT: string;
-    static NOREPEAT: string;
-    /** Type of the object. */
+declare class IsoResource extends IsoObject {
+    /** Name of the resource. */
+    name: string;
+    /** Type of the object for identification. */
     type: string;
-    repeat: string;
-    /** Sets if the billboard will repeated. */
-    setRepeat(repeat: string): IsoBillboard;
+    constructor(name: string);
+    /** Sets the name of a resource. */
+    setName(name: string): IsoResource;
+    /** Gets the name of the resource. */
+    getName(): string;
+    get(): any;
 }
-declare class IsoCanvas {
-    canvasElement: HTMLCanvasElement;
-    context: any;
-    private clearColor;
-    private defaultOptions;
-    options: IIsoConfigWindowOptions;
-    Engine: IsoMetric;
-    constructor(Engine: IsoMetric);
-    create(id?: string): IsoCanvas;
-    set(canvas: HTMLCanvasElement): IsoCanvas;
-    setClass(cssClass: string): void;
-    updateScreen(): IsoCanvas;
-    updateSize(width: number, height: number): void;
-    clearScreen(): IsoCanvas;
-    get(): HTMLCanvasElement;
+declare class IsoImageResource extends IsoResource {
+    /** Name of the resource. */
+    name: string;
+    /** Source of the resource. */
+    source: IsoImage | IsoCanvas;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string, source: IsoImage | IsoCanvas);
+    /** Sets the source of a resource. */
+    setSource(source: IsoImage | IsoCanvas): IsoImageResource;
+    /** Gets the source. */
+    get(): IsoImage | IsoCanvas;
 }
-interface IIsoConfigWindowOptions {
+declare class IsoTexture extends IsoObject {
+    /** The animations of the texture. */
+    private _animations;
+    animations: IsoAnimationManager;
+    /** The alpha of the texture. */
+    private _alpha;
+    alpha: number;
+    /** The blendingmode of the texture. */
+    private _blendingMode;
+    blendingMode: string;
+    /** The name of the texture. */
+    private _name;
+    name: string;
+    /** Type of the object for identification. */
+    type: string;
+    __changed: boolean;
+    constructor(name: string);
+    /** Sets the name of the texture. */
+    setName(name: string): IsoTexture;
+    /** Retruns the texture data. */
+    getTextureData(): ITextureData;
+    /** Sets if a texture needs a redraw. */
+    changed(): void;
+    unchanged(): void;
+}
+declare class IsoColorTexture extends IsoTexture {
+    /** The color resource. */
+    private _color;
+    color: IsoColor;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string, color: IsoColor);
+    /** Sets the color of the texture. */
+    set(color: IsoColor): IsoColorTexture;
+    /** Resets the color of the texture. */
+    resetColor(): IsoColorTexture;
+    /** Returns the color data. */
+    getColorData(): IColorData;
+    /** Returns the texture data. */
+    getTextureData(): ITextureData;
+}
+declare class IsoImageTexture extends IsoTexture {
+    /** The image resource. */
+    private _src;
+    src: IsoImageResource;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string, src: IsoImageResource);
+    /** Sets the image of the texture. */
+    set(src: IsoImageResource): IsoImageTexture;
+    /** Resets the image of the texture. */
+    reset(): IsoImageTexture;
+    /** Returns the imagedata. */
+    getImageData(): IImageData;
+    /** Returns the texture data. */
+    getTextureData(): ITextureData;
+}
+interface IImageData {
+    x: number;
+    y: number;
     width: number;
     height: number;
-    fullscreen: boolean;
+    image: any;
 }
-declare class IsoConfig {
-    c: Object;
-    Engine: IsoMetric;
-    constructor(Engine: IsoMetric, c?: JSON);
-    setConfig(c: JSON): void;
-    set(name: string, value: any): void;
-    get(name: string): any;
+interface IColorData {
+    r: number;
+    g: number;
+    b: number;
+    hex: string;
 }
-interface IIsoRenderDetails {
-    image?: HTMLImageElement;
-    shape?: Function;
-    offset: IsoPoint;
-    tileSize?: IsoDimension;
+interface ITextureData {
+    imageData?: IImageData;
+    colorData?: IColorData;
+    blendingMode: string;
+    alpha: number;
+}
+interface IRenderData {
+    maskData?: IsoTexture;
+    textureData?: Array<ITextureData>;
     position: IsoVector2D;
-    mapPosition?: IsoMapVector2D;
-    renderSize: IsoDimension;
-    text?: string;
-    align?: string;
-    direction?: string;
-    filled?: boolean;
-    color?: string;
-    backgroundColor?: string;
-    baseline?: string;
-    size?: number;
-    font?: string;
-    strokeColor?: string;
-    strokeWidth?: number;
-    zoomLevel: number;
-    type: string;
+    rotation: number;
     anchor: IsoPoint;
+    size: IsoSize;
+    alpha?: number;
+    blendingMode?: string;
 }
-declare class IsoDrawer {
-    /** An instance of IsoMetric */
-    Engine: IsoMetric;
-    /** An instance of IsoCanvas */
-    canvas: IsoCanvas;
-    /** The context of the canvas-element */
-    context: any;
-    private __DEBUG_SHOW;
-    constructor(Engine: IsoMetric);
-    /** Redraw all elements on the screen */
-    update(): void;
-    /** Draws a single layer. */
-    drawLayer(layer: IsoLayer): void;
-    /** Draws a tilemap of a layer. */
-    drawTileMap(tileMap: IsoTileMap): void;
-    /** Draws all given objects. */
-    drawBillboards(objects: Array<IsoBillboard>): void;
-    /** Draws all given objects. */
-    drawObjects(objects: Array<IsoObject | IsoEmitter>): void;
-    /** Draws the particles of an emitter. */
-    drawParticles(renderDetails: IIsoRenderDetails, emitter: IsoEmitter): void;
-    /** Draws all given texts. */
-    drawTexts(objects: Array<IsoText>): void;
-    private drawImage(renderDetails);
-    private drawText(renderDetails);
-    /** Sets the anchor of an object. */
-    private translate(object, renderDetails);
-    /** Reset the anchor of an object. */
-    private resetTranslation(object, renderDetails);
-    /** Rotates an object. */
-    private rotate(object, renderDetails);
+interface IAnimationOptions {
+    endValue: number;
+    startValue?: number;
+    time?: number;
+    duration?: number;
+    effect?: Function;
+    playType?: string;
+    trackDirection?: string;
+    repetitions?: string | number;
+    property: string;
+    round?: Function;
+    object?: Object;
 }
-declare class IsoEmitter extends IsoMinimalObject {
-    /** The maximum particle count. */
-    particleCount: number;
-    /** The lifttime of a particle.*/
-    lifetime: number;
-    /** Sets how many particles will spreaded.*/
-    spreadCount: number;
-    oldTime: number;
-    /** The ressource for the particles.*/
-    ressource: IsoRessource;
-    /** A simple seed number.*/
-    variance: number;
-    /** Includes all the particles.*/
-    particles: Array<IsoParticle>;
-    /** The speed of the particles.*/
-    particleSpeed: number;
-    /** Height of the emitter.*/
-    height: number;
-    /** Width of the emitter.*/
-    width: number;
-    /** Sets if the emitter is emitting */
-    isEmitting: boolean;
-    /** The random library. */
-    rand: MersenneTwister;
-    /** Sets the typ of this object.*/
+interface IBodyOptions {
     type: string;
-    /** Creates a new particle emiter.*/
-    constructor(Engine: IsoMetric, ressource: IsoRessource, config?: any);
-    addParticle(particle: IsoParticle): void;
-    update(): void;
-    emit(): void;
-    getLifetime(): number;
-    getParticleCount(): number;
-    getParticleSpeed(): number;
-    getVariance(): number;
-    setLifetime(lifetime: number): IsoEmitter;
-    setParticleCount(count: number): IsoEmitter;
-    setParticleSpeed(speed: number): IsoEmitter;
-    setVariance(variance: number): IsoEmitter;
-    setSpreadCount(count: number): IsoEmitter;
-    freeParticle(particle: IsoParticle): boolean;
-    getRenderDetails(): {
-        position: IsoVector2D;
-        tileSize: {
-            width: number;
-            height: number;
-        };
-        renderSize: {
-            width: number;
-            height: number;
-        };
-        anchor: IsoPoint;
-        image: HTMLImageElement;
-        offset: IsoPoint;
-        zoomLevel: number;
-        type: string;
-    };
-    random(min: number, max: number): number;
-}
-interface __IsoDocument extends Document {
-    createEventObject?: any;
-    fireEvent?: any;
-}
-interface __IsoElement extends Element {
-    fireEvent?: any;
-}
-declare class IsoEvent {
-    type: string;
-    data: any;
-    constructor(type: string);
-    addData(data: any): IsoEvent;
-    /**
-     * @todo Find a solid solution */
-    trigger(target?: string | HTMLElement): void;
-    private __c(target?);
-    private __e(target?);
-}
-declare class IsoGroup extends IsoMinimalObject {
-    items: Array<IsoMinimalObject>;
-    addItem(object: IsoMinimalObject): void;
+    radius?: number;
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    maxSides?: number;
+    vertices?: Array<Array<number>>;
+    flagInternal?: boolean;
+    removeCollinear?: number;
+    minimumArea?: number;
+    sides?: number;
+    slope?: number;
+    options?: Matter.IBodyDefinition;
 }
 /**
- * This class helps you to building up a graphic user interface. Every Gui will drawn on top of all layers.
+ * IsoMetric is the main class. It includes all needed references and libs.
  */
-interface IsoGuiItem {
-    sprite?: IsoAnimatedSprite;
-    html?: HTMLElement;
-    text?: string;
-    fillStyle?: string;
-    fontStyle?: string;
+declare class IsoMetric extends IsoObject {
+    static self: IsoMetric;
+    /** The main canvas element. */
+    canvas: IsoCanvas;
+    /** The drawing library. */
+    drawer: IsoDrawer;
+    /** The configuration. */
+    config: IsoConfig;
+    /** The input library. */
+    input: IsoInput;
+    /** Includes all layers */
+    layers: IsoLayerManager;
+    /** Includes all physics objects. */
+    physics: IsoPhysicsManager;
+    /** Handles all ressources of a project. */
+    resources: IsoResourceManager;
+    /** The time one frames needs to drawn. */
+    frameTime: number;
+    /** A counter for frames */
+    frameCount: number;
+    /** An inteval for reseting the FPS */
+    frameCountInteral: any;
+    /** The time in milliseconds at the begin of a loop. */
+    startLoopTime: Date;
+    /** The frames per second */
+    FPS: number;
+    /** Optimal FPS. */
+    optimalFPS: number;
+    /** The default canvas configuration. */
+    defaultWindowOptions: {
+        fullscreen: boolean;
+        width: number;
+        height: number;
+    };
+    /**  An inteval for the drawing and game loop */
+    interval: Object;
+    animationFrame: Object;
+    constructor(config: IsoConfig);
+    /** Reset and set the FPS */
+    setFPS(): void;
+    /** Starts the game- and drawing-loop. */
+    startLoop(): void;
+    /** Sets the FPS after the drawing-loop completed. */
+    endLoop(): void;
+    /** The game- and drawing-loop. */
+    update(): void;
+}
+declare class IsoLayer extends IsoObject {
+    private _name;
     name: string;
-    tooltip?: string;
-    hover?: EventListener;
-    mouseup?: EventListener;
-    mousedown?: EventListener;
-    click?: EventListener;
-}
-interface IsoGuiGroup {
-    name: string;
-    items?: string;
-}
-declare class IsoGui {
-    Engine: IsoMetric;
-    groups: IsoGuiGroup;
-    constructor(Engine: IsoMetric);
-}
-declare class IsoImage extends IsoOn implements IIsoResource {
-    /**
-     * Path to the image
-     */
-    src: string;
-    /**
-     * HTMLImageObject
-     */
-    image: HTMLImageElement;
-    /**
-     * A callback when the image loaded
-     */
-    __onLoad: Function;
-    isLoaded: boolean;
-    /**
-     * The width of the image
-     */
-    width: number;
-    /**
-     * The height of the image
-     */
-    height: number;
-    offset: IsoPoint;
+    private _entities;
+    entities: Array<IsoEntityGroup | IsoBaseEntity>;
+    /** Indicates if the layer drawn or not. */
+    _hidden: boolean;
+    hidden: boolean;
+    /** Indicates if the layer should deleted or not. */
+    private _isFree;
+    isFree: boolean;
+    /** The index of the layer. */
+    private _index;
+    index: number;
+    /** Type of the object for identification. */
     type: string;
-    constructor(src?: string, local?: boolean);
-    /**
-     * Creates a new image.
-     */
-    create(src: string): IsoImage;
-    /**
-     * Loads the image for further work.
-     */
-    load(): void;
-    /**
-     * Called when the image file was loaded.
-     */
-    _onLoad(event: Event): void;
-    /**
-     * Returns the image.
-     */
-    get(): HTMLImageElement;
-    /**
-     * Deletes the image.
-     */
+    constructor(name: string);
+    /** Adds a new entity to the layer. */
+    add(entity: IsoBaseEntity | IsoEntityGroup): IsoLayer;
+    /** Get an entity by its name. */
+    get(name: string): IsoBaseEntity | IsoEntityGroup;
+    /** Sets the name of the layer. */
+    setName(name: string): IsoLayer;
+    /** Updates the layer. */
+    update(): IsoLayer;
+    /** Get all entities of the layer. */
+    getAll(): Array<IsoBaseEntity | IsoEntityGroup>;
+    /** Deletes the layer from the memory. */
     free(): void;
-    getWidth(): number;
-    getHeight(): number;
-    getOffset(): IsoPoint;
-    setOffset(x: number, y: number): void;
+    /** Hides the layer. */
+    hide(): void;
+    /** Shows the layer. */
+    show(): void;
+    /** Indicates wether a layer is hidden or not. */
+    isHidden(): boolean;
+    /** Sorts the entities by there indizies. */
+    sort(): void;
+}
+declare class IsoLayerManager extends IsoObject {
+    _layers: Array<IsoLayer>;
+    layers: Array<IsoLayer>;
+    /** Type of the object for identification. */
+    type: string;
+    constructor();
+    /** Adds a new layer to the layer manager. */
+    add(layer: IsoLayer): IsoLayer;
+    /** Removes a layer. */
+    remove(layer: IsoLayer): void;
+    /** Returns a layer by its name. */
+    get(name: string): IsoLayer;
+    /** Sorts the layers by there indizies. */
+    sort(): void;
+    /** Sort and updates all layers. */
+    update(): void;
+}
+declare class IsoConfig extends IsoObject {
+    /** Including the whole configuration. */
+    private _config;
+    config: Object;
+    constructor(config?: Object);
+    set(config: Object): IsoConfig;
+    get(name: string): any;
+    /** Checks the existing of a property. */
+    has(name: string): boolean;
+    /** Sets a property to a specified value. */
+    setProperty(name: string, value: any): IsoConfig;
+}
+declare class IsoDrawer extends IsoObject {
+    Engine: IsoMetric;
+    constructor();
+    /** Updates the whole scene. */
+    update(layers: IsoLayerManager): void;
+    /** Prepare a number of entities. */
+    prepareEntities(entities: Array<IsoBaseEntity | IsoEntityGroup>): void;
+    /** Draws a single entity. */
+    drawEntity(entity: IsoBaseEntity | IsoEntityGroup): void;
+    draw(entity: IsoBaseEntity, renderData: IRenderData): void;
+    drawEmitter(image: IsoCanvas, entity: IsoEmitter): void;
+    drawImage(image: IsoCanvas, renderData: IRenderData): void;
+    /** Sets the anchor of an object. */
+    private translate(anchor);
+    /** Reset the anchor of an object. */
+    private resetTranslation(anchor);
+    /** Rotates an object. */
+    private rotate(rotation);
 }
 interface IsoMouseEvent extends MouseEvent {
     wheelDelta?: number;
 }
-declare class IsoInput {
+declare class IsoInput extends IsoObject {
     static KEYDOWN: number;
     static KEYUP: number;
     static KEYLEFT: number;
@@ -963,457 +768,310 @@ declare class IsoInput {
     onTouch: Function;
     onInput: Function;
     oldEvent: Event;
-    constructor(Engine: IsoMetric);
+    constructor();
     addEvents(): void;
     checkKeyboard(event: KeyboardEvent): void;
     checkMouse(event: IsoMouseEvent): void;
     checkTouch(event: TouchEvent): void;
     reset(): void;
-    callCallback(event: Event): void;
 }
-declare class IsoLayer {
-    /** Includes all objects like IsoObject, IsoText, IsoSprite, IsoAnimatedSprite. */
-    objects: Array<any>;
-    texts: Array<IsoText>;
-    /** Include the tiled map of a layer. */
-    tileMap: IsoTileMap;
-    /** Includes all billboards of  a layer. */
-    billboards: Array<IsoBillboard>;
-    /** Name of the layer. */
-    name: string;
-    /** The index of the layer. */
-    index: number;
-    /** An instance of IsoMetric. */
-    Engine: IsoMetric;
-    /** Controls if the layer is hidden or not. */
-    hidden: boolean;
-    /** Creates a new layer. */
-    constructor(Engine: IsoMetric, index: number, name?: string);
-    /** Adds a new object to the layer */
-    addObject(name: string, image: IsoRessource): IsoObject;
-    /** Adds a new sprite to the layer. */
-    addSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoSprite;
-    /** Adds a new text to the layer. */
-    addText(name: string, text: string): IsoText;
-    /** Adds a new billboard to the layer. */
-    addBillboard(name: string, image: IsoRessource): IsoBillboard;
-    /** Adds a new particle emitter. */
-    addEmitter(name: string, ressource: IsoRessource): IsoEmitter;
-    /** Adds a new animated sprite to the layer. */
-    addAnimatedSprite(name: string, image: IsoRessource, tileObjectInfo: IsoTileObjectInfo): IsoAnimatedSprite;
-    /** Adds a new tilemap to the layer. */
-    addTileMap(name: string, image: IsoRessource, tileWidth: number, tileHeight: number, map?: Array<Array<Array<number>>>): IsoTileMap;
-    /** Sets the name of the layer. */
-    setName(name: string): IsoLayer;
-    /** Gets a billboard by its name. */
-    getBillboard(name: string): IsoBillboard;
-    /** Gets a object by its name. */
-    getObject(name: string): IsoObject | IsoSprite | IsoAnimatedSprite | IsoText;
-    /** Equal to IsoLayer.getObject. */
-    getSprite(name: string): IsoObject | IsoSprite | IsoAnimatedSprite | IsoText;
-    /** Equal to IsoLayer.getObject. */
-    getAnimatedSprite(name: string): IsoObject | IsoSprite | IsoAnimatedSprite | IsoText;
-    /** Equal to IsoLayer.getObject. */
-    getText(name: string): IsoText;
-    /** Gets the tilemap of the layer. */
-    getTileMap(): IsoTileMap;
-    /** Zoom all objects, tilemap and billboards of the layer. */
-    zoom(zoom: number): void;
-    /** Scrolls all objects, tilemap and billboards of the layer. */
-    scroll(deltaX: number, deltaY: number): void;
-    /** Rotates all objects, tilemap and billboards of the layer. */
-    rotate(degrees: number): void;
-    /** Sets the zooming point of all objects, tilemap and billboards of the layer. */
-    setZoomPoint(point: IsoPoint): void;
-    /** Sets the speed of all objects, tilemap and billboards of the layer. */
-    setSpeed(speed: number): void;
-    /** Hides the layer. */
-    hide(): IsoLayer;
-    /** Show the layer. */
-    show(): IsoLayer;
-    /** Return true if the layer is hidden. Else false. */
-    isHidden(): boolean;
-    /** Removes an object or sprite from the layer. */
-    freeObject(object: IsoMinimalObject): void;
-    /** Removes an object from the layer. */
-    freeText(text: IsoText): void;
-    /** Removes a billboard from the layer. */
-    freeBillboard(billboard: IsoBillboard): void;
-    /** Removes the tilemap form the layer.*/
-    freeTileMap(): void;
-}
-declare class IsoLayers {
-    layers: Array<IsoLayer>;
-    Engine: IsoMetric;
-    length: number;
-    constructor(Engine: IsoMetric);
-    add(name: string, index?: number): IsoLayer;
-    get(name: string): IsoLayer;
-    sort(): void;
-    _sort(layerA: IsoLayer, layerB: IsoLayer): number;
-    getByIndex(index: number): IsoLayer;
-}
-interface IIsoMapPoint {
-    row: number;
-    column: number;
-}
-declare class IsoMapPoint {
-    row: number;
-    column: number;
-    constructor(row?: number, column?: number);
-    set(row: number, column: number): void;
-    get(): IIsoMapPoint;
-}
-/**
- * IsoMapVector2D represents a point on the map.
- */
-declare class IsoMapVector2D extends IsoMapPoint {
-    /** Creates a new vector */
-    constructor(row?: number, column?: number);
-    /** Gets the distance between two points */
-    getDistance(vec: IsoMapVector2D): number;
-}
-interface IIsoResource {
-    type: string;
-    load(): any;
-    get(): any;
-}
-declare class IsoRessource extends IsoOn {
-    static ISO_EVENT_RESSOURCE_LOADED: string;
-    static ISO_EVENT_RESSOURCE_PROGRESS: string;
-    static ISO_EVENT_RESSOURCE_PROGRESS_ALL: string;
-    static IMAGE: string;
-    static AUDIO: string;
-    static SHAPE: string;
-    ressource: IsoImage;
-    name: string;
-    type: string;
-    loaded: boolean;
-    constructor(name: string, ressource: IsoImage | any);
-    load(): void;
-    onload(): void;
-    get(): HTMLImageElement;
-}
-declare class IsoRessourceManager extends IsoOn {
-    ressources: Array<IsoRessource>;
-    Engine: IsoMetric;
-    private numberAutoload;
-    private autoloaded;
-    __onProgress: Function;
-    __onProgressAll: Function;
-    __then: Function;
-    __beforeLoad: Function;
-    constructor(Engine: IsoMetric);
-    add(name: string, ressource: IsoImage): void;
-    onBeforeLoad(callback: Function): void;
-    _onBeforeLoad(): void;
-    get(name: string): IsoRessource;
-    load(): IsoRessourceManager;
-    onProgress(callback: Function): void;
-    _onProgress(event: Event): IsoRessourceManager;
-    _then(): void;
-    then(callback: Function): IsoRessourceManager;
-    _onProgressAll(): void;
-    onProgressAll(callback: Function): void;
-}
-interface IsoCallback {
-    eventType: string;
-    callback: EventListener;
-}
-/**
- * The mainclass of IsoMetric and the starting point for the gameloop.
- * @class IsoMetric
- * @constructor
- *
- */
-declare class IsoMetric extends IsoOn {
-    /**
-     * The configuration.
-     */
-    config: IsoConfig;
-    /**
-     * The canvas object
-     */
-    canvas: IsoCanvas;
-    /** Includes all layers */
-    layers: IsoLayers;
-    /** The drawing lib. */
-    drawer: IsoDrawer;
-    /** The physics library */
-    physics: IsoPhysicsManager;
-    /** The animation library */
-    animation: IsoAnimationManager;
-    /** The input library */
-    input: IsoInput;
-    /** Handles all ressources of a project. */
-    ressources: IsoRessourceManager;
-    /** The time one frames needs to drawn. */
-    frameTime: number;
-    /** A counter for frames */
-    frameCount: number;
-    /** An inteval for reseting the FPS */
-    frameCountInteral: any;
-    /** The time in milliseconds at the begin of a loop. */
-    startLoopTime: Date;
-    /** The frames per second */
-    FPS: number;
-    /** The default canvas configuration. */
-    defaultWindowOptions: IIsoConfigWindowOptions;
-    /**  An inteval for the drawing and game loop */
-    interval: Object;
-    animationFrame: Object;
-    /** Creates a new instance of IsoMetric */
-    constructor(windowOptions?: Object);
-    /** Reset and set the FPS */
-    setFPS(): void;
-    /** Starts the game- and drawing-loop. */
-    startLoop(): void;
-    /** Sets the FPS after the drawing-loop completed. */
-    endLoop(): void;
-    /** The game- and drawing-loop. */
-    update(): void;
-}
-declare class IsoParticle {
-    position: IsoVector2D;
-    life: number;
-    originalLife: number;
-    velocity: IsoVector2D;
-    color: IsoColor;
-    Engine: IsoMetric;
+declare class IsoEmitter extends IsoSprite {
+    speed: IsoVector2D;
     alpha: number;
-    scale: IsoScale;
-    originalScale: IsoScale;
-    rotation: number;
-    renderSize: {
-        width: number;
-        height: number;
-    };
     blendingMode: string;
-    ressource: IsoRessource;
-    constructor(Engine: IsoMetric, ressource: IsoRessource, position: IsoPoint, life: number, angle: number, scale: IsoScale, speed: number);
-    update(dt: number): void;
-    getRenderDetails(): IIsoRenderDetails;
-}
-interface IIsoPoint {
-    x: number;
-    y: number;
-}
-declare class IsoPoint {
-    /** Position on the x axis */
-    x: number;
-    /** Position on the y axis */
-    y: number;
-    constructor(x?: number, y?: number);
-    /** Sets or resets the point */
-    set(x: number, y: number): void;
-    /** Gets the point on the screen. */
-    get(): IsoPoint;
-}
-/**
- * An implementation of the MersenneTwister for TypeScript.
- * This library produces much better random numbers than Math.random().
- */
-/**
- * Written for JavaScript by Sean McCullough (banksean@gmail.com).
- * Written for TypeScript by Benjamin Werner
- */
-declare class MersenneTwister {
-    N: number;
-    M: number;
-    /** constant vector a */
-    MATRIX_A: number;
-    /** most significant w-r bits */
-    UPPER_MASK: number;
-    /** least significant r bits */
-    LOWER_MASK: number;
-    /** the array for the state vector */
-    mt: Array<number>;
-    /** mti==N+1 means mt[N] is not initialized */
-    mti: number;
-    constructor(seed?: number);
-    init_genrand(s: number): void;
-    init_by_array(init_key: any, key_length: any): void;
-    genrand_int32(): number;
-    genrand_int31(): number;
-    /** Generates an number between 0 and 1. */
-    genrand_real1(): number;
-    random(): number;
-    genrand_real3(): number;
-    genrand_res53(): number;
-}
-interface IsoColor {
-    red: number;
-    green: number;
-    blue: number;
-}
-declare class IsoText extends IsoMinimalObject {
-    static INHERIT: string;
-    static LEFTTORIGHT: string;
-    static RIGHTTOLEFT: string;
-    static TOP: string;
-    static HANGING: string;
-    static MIDDLE: string;
-    static ALPHABETIC: string;
-    static IDEOGRAPHIC: string;
-    static BOTTOM: string;
-    static LEFT: string;
-    static RIGHT: string;
-    static START: string;
-    static END: string;
-    static CENTER: string;
-    /** Font of the text */
-    font: string;
-    /** Color of the text as string or as RGB */
-    color: string | IsoColor;
-    /** The background color of the text as string or as RGB */
-    backgroundColor: string | IsoColor;
-    /** The strokecolor of the text. */
-    strokeColor: string;
-    /** The stroke width. */
-    strokeWidth: number;
-    /** The font size of the text in pixel. Default is 10. */
-    size: number;
-    /** Color of the text as RGB calculated from IsoText.color */
-    colorRGB: IsoColor;
-    /** Background color of the text as RGB calculated from IsoText.backgroundColor */
-    backgroundColorRGB: IsoColor;
-    /** Stroke color of the text as RGB calculated from IsoText.strokeColor. */
-    strokeColorRGB: IsoColor;
-    /** Text of this object. */
-    text: string;
-    /** The fill style. If true the text is filled, else its stroked. */
-    filled: boolean;
-    /** The direction of the text. Possible values are IsoText.INHERIT, IsoText.LEFTTORIGHT or IsoText.RIGHTTOLEFT. Default is IsoText.INHERIT. */
-    direction: string;
-    /** The baseline of the text. Possible values are IsoText.TOP, IsoText.HANGING, IsoText.MIDDLE, IsoText.ALPHABETIC, IsoText.IDEOGRAPHIC and IsoText.BOTTOM. The default is IsoText.ALPHABETIC. */
-    baseline: string;
-    /** The allignment of the text. Possible values are IsoText.START, IsoText.END, IsoText.LEFT, IsoText.RIGHT or IsoText.CENTER. Default is IsoText.START. */
-    align: string;
-    /** Type of the object. */
-    type: string;
-    /** Creates a new text object. */
-    constructor(Engine: IsoMetric, name: string, text?: string);
-    /** Sets the text. */
-    setText(text: string): IsoText;
-    /** Sets the font-size of the text. size can be a number in pixel or a string. */
-    setSize(size: number): IsoText;
-    /** Sets the value of the color red of the text. red is a value between 0 and 255. */
-    setColorRed(red: number): IsoText;
-    /** Sets the value of the color green of the text. green is a value between 0 and 255. */
-    setColorGreen(green: number): IsoText;
-    /** Sets the value of the color blue of the text. blue is a value between 0 and 255. */
-    setColorBlue(blue: number): IsoText;
-    /** Sets the value of the background color red of the text. red is a value between 0 and 255. */
-    setBackgroundColorRed(red: number): IsoText;
-    /** Sets the value of the background color green of the text. green is a value between 0 and 255. */
-    setBackgroundColorGreen(green: number): IsoText;
-    /** Sets the value of the background color blue of the text. blue is a value between 0 and 255. */
-    setBackgroundColorBlue(blue: number): IsoText;
-    /** Sets the value of the stroke color red of the text. red is a value between 0 and 255. */
-    setStrokeColorRed(red: number): IsoText;
-    /** Sets the value of the stroke color green of the text. green is a value between 0 and 255. */
-    setStrokeColorGreen(green: number): IsoText;
-    /** Sets the value of the stroke color blue of the text. blue is a value between 0 and 255. */
-    setStrokeColorBlue(blue: number): IsoText;
-    /** Sets the color of a text. color can be a hex value or an object of IsoColor. */
-    setColor(color: string | IsoColor): IsoText;
-    /** Sets te background color of the text. color can be a hex value or an object of IsoColor. */
-    setBackgroundColor(color: string | IsoColor): IsoText;
-    /** Sets the stroke color of a text. color can be a hex value or an object of IsoColor. */
-    setStrokeColor(color: string | IsoColor): IsoText;
-    /** Sets the stroke width of the text. */
-    setStrokeWidth(width: number): IsoText;
-    /** Sets the font of the text.*/
-    setFont(font: string): IsoText;
-    /** Sets if the text is filled or not. */
-    setFilled(fill: boolean): IsoText;
-    /** Sets the direction of the text. */
-    setDirection(direction: string): IsoText;
-    /** Sets the baseline of the text. */
-    setBaseline(baseline: string): IsoText;
-    /** Sets the allignment of the text. */
-    setAlign(align: string): IsoText;
-    /** Gets the allignment of the text. */
-    getAlign(): string;
-    /** Gets the baseline of the text. */
-    getBaseline(): string;
-    /** Gets the direction of the text. */
-    getDirection(): string;
-    /** Gets if the text is filled or not. */
-    getFilled(): boolean;
-    /** Returns the text.*/
-    getText(): string;
-    /** Returns the size of the text. The returnd value can be a number or a string.*/
-    getSize(): number | string;
-    /** Returns the color of the text as an IsoColor object.*/
-    getColorRGB(): IsoColor;
-    /** Returns the background color of the text as an IsoColor object.*/
-    getBackgroundColorRGB(): IsoColor;
-    /** Returns the stroke color of the text as an IsoColor object.*/
-    getStrokeColorRGB(): IsoColor;
-    /** Retruns the font.*/
-    getFont(): string;
-    /** Gets the stroke width of the text. */
-    getStrokeWidth(): number | string;
-    /**
-     * Converts a hex value to a RGB-color and return it.
-     * Code by Time Down @ stackoverflow.com
-     * @see http://www.stackoverflow.com/user/96100/tim-down
-     */
-    private hexToRGB(hex);
-    /**
-     * Converts a RGB-color to a hex value and return it.
-     * Code by Time Down @ stackoverflow.com
-     * @see http://www.stackoverflow.com/user/96100/tim-down
-     */
-    private rgbToHex(r, g, b);
-    private ptToPx(size);
-    /** Gets the position on the screen. */
-    getAbsolutePosition(): IsoVector2D;
-    /** Gets the original dimension of a text in pixel. @todo convert %, pt, em to px */
-    getOriginalDimension(): IsoDimension;
-    /** Gets the dimension of the object on the screen. */
-    getAbsoluteDimension(): IsoDimension;
-    /** Gets all important information for rendering an object. */
-    getRenderDetails(): IIsoRenderDetails;
-}
-declare class IsoPhysicsManager {
-    /** Includes all registered rigid bodies */
-    rigidBodies: Array<IsoObject>;
-    /** Includes all registred mass bodies */
-    massBodies: Array<IsoObject>;
-    /** The global gravity */
-    gravity: number;
-    /** Registers a new mass body */
-    addMassBody(object: IsoObject): void;
-    /** Registers a new rigid body */
-    addRigidBody(object: IsoObject): void;
-    /** Removes a rigid body */
-    removeRigidBody(object: IsoObject): void;
-    /** Removes a mass body */
-    removeMassBody(object: IsoObject): void;
-    /** Sets the global gravity */
-    setGravity(g: number): void;
-    /**
-    * Updates the physics.
-    * @todo find a much better solution
-    * @todo implement more physics
-    */
+    /** An array including all particles. */
+    particles: Array<IsoParticle>;
+    /** The possible angle where particles spreaded to. */
+    spread: number;
+    /** The magnitude of the emitter's velocity. Updated automaticly. */
+    magnitude: number;
+    /** The maximal particle count. */
+    maxParticles: number;
+    /** Indecates if the scale of the particles effected during the lifetime. */
+    effectScale: boolean;
+    /** Indecates if the alpha of the particles effected during the lifetime. */
+    effectAlpha: boolean;
+    /** The liftime of a particle. Notice, that the lifetime is also effected by the randomseed */
+    lifetime: number;
+    /** The emissionrate of the emitter. */
+    emissionRate: number;
+    /** Indecates wether the emitter emits or not. */
+    isEmitting: boolean;
+    /** Creates a new particle emitter. */
+    constructor(name: string, spread?: number);
+    /** Adds a new particles to the emitter. */
+    add(particle: IsoParticle): IsoEmitter;
+    /** Sets the spread angle of the emitter. */
+    setSpread(spread: number): IsoEmitter;
+    /** Gets the spread angle of the emitter. */
+    getSpread(): number;
+    /** Updates the emitter. */
     update(): void;
+    /** Emits a particle. */
+    emitParticle(): void;
+    /** Sets the emission rate. */
+    setEmissionRate(rate: number): IsoEmitter;
+    /** Returns the emission rate. */
+    getEmissionRate(): number;
+    /** Start emitting. */
+    emit(): IsoEmitter;
+    /** Stops emitting. */
+    stopEmitting(): IsoEmitter;
+    /** Emits particles */
+    emitParticles(): void;
+}
+declare class IsoParticle extends IsoBaseEntity {
+    lifetime: number;
+    scale: IsoScale;
+    startLife: number;
+    oldTime: number;
+    currentTime: number;
+    effectScale: boolean;
+    effectAlpha: boolean;
+    alpha: number;
+    constructor(velocity?: IsoVector2D, position?: IsoVector2D, scale?: IsoScale, size?: IsoSize, alpha?: number, lifetime?: number, effectScale?: boolean, effectAlpha?: boolean);
+    updatePosition(): IsoParticle;
+    update(): void;
+    getRenderData(): IRenderData;
+}
+declare class IsoPhysics extends IsoObject {
+    body: Matter.Body;
+    entity: IsoBaseEntity;
+    constructor();
+    addBody(options: IBodyOptions): IsoPhysics;
+    updateEntity(): void;
+    hasBody(): boolean;
 }
 /**
- * IsoVector2D represents a point on the screen.
+ * This class is a bridge to the javascript physics engine 'MatterJs'.
+ * Matter.js is licensed under The MIT License (MIT)
+ * Copyright (c) 2014 Liam Brummitt
+ * https://github.com/liabru/matter-js/
  */
-declare class IsoVector2D extends IsoPoint {
-    /** Creates a new vector */
-    constructor(x?: number, y?: number);
-    /** Gets the distance between two points */
-    getDistance(vec: IsoVector2D): number;
-    /** Gets the length of a vector. */
-    getMagnitude(): number;
-    /** Gets the angle of a vector. */
-    getAngle(): number;
-    /** Sets the vector from an angle and a length.*/
-    createFromAngle(angle: number, length: number): void;
-    add(vector: IsoVector2D): void;
+declare class IsoPhysicsManager extends IsoObject {
+    physicsEngine: Matter.Engine;
+    turnedOn: boolean;
+    constructor();
+    create(): void;
+    turnOn(): void;
+    turnOff(): void;
+    isTurnedOn(): boolean;
+}
+declare class IsoAudioResource extends IsoResource {
+    /** Name of the resource. */
+    name: string;
+    /** Source of the resource. */
+    source: IsoAudio;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string, source: IsoAudio);
+    /** Sets the source of a resource. */
+    setSource(source: IsoAudio): IsoAudioResource;
+    /** Gets the source. */
+    get(): IsoAudio;
+}
+declare class IsoCanvas extends IsoObject {
+    /** The canvas HTML element. */
+    private _element;
+    element: HTMLCanvasElement;
+    src: string;
+    /** The context for drawing. */
+    private _context;
+    context: CanvasRenderingContext2D;
+    /** The size of the canvas. */
+    size: IsoSize;
+    private _autoResize;
+    autoResize: boolean;
+    _fullscreen: boolean;
+    fullscreen: boolean;
+    type: string;
+    constructor(width: number, height: number, fullscreen?: boolean, autoResize?: boolean);
+    /** Creates a new canvas element. */
+    load(): void;
+    /** Appends the canvas element to a given HTML element. */
+    append(element: Element): IsoCanvas;
+    /** Remove the canvas element from a given HTML element. */
+    remove(element: HTMLElement): IsoCanvas;
+    /** Resize the canvas in case of fullscreen and autoResize is true. */
+    resize(): void;
+    /** Refreshes the canvas size. */
+    refresh(): void;
+    /** Clears the canvas. */
+    clear(): void;
+    /**  Returns the image. */
+    get(): HTMLCanvasElement;
+    /** Gets the width of the image. */
+    getWidth(): number;
+    /** Gets the height of the image. */
+    getHeight(): number;
+    /** Returns the size. */
+    getSize(): IsoSize;
+    /** Sets the width of the image. */
+    setWidth(width: number): IsoCanvas;
+    /** Sets the height of the image. */
+    setHeight(height: number): IsoCanvas;
+    /** Sets the size of the image. */
+    setSize(size: IsoSize): IsoCanvas;
+}
+declare class IsoResourceManager extends IsoObject {
+    private _resources;
+    resources: Array<IsoAudioResource | IsoImageResource | IsoVideoResource>;
+    type: string;
+    loaded: number;
+    /** Adds a resource. */
+    add(resource: IsoAudioResource | IsoImageResource | IsoVideoResource): void;
+    /** Removes a resource. */
+    remove(resource: any): IsoResourceManager;
+    /** Returns a resource by its name. */
+    get(name: string): IsoImageResource | IsoAudioResource | IsoVideoResource;
+    /** Loads all resources. */
+    load(): IsoResourceManager;
+    /** Checks the process of loading. */
+    process(): void;
+    /** Get the percent of the loading process. */
+    getPercent(): number;
+}
+declare class IsoVideo extends IsoObject {
+    /** Sets the loadType to "LOAD" the video load completly. */
+    static LOAD: string;
+    /** Sets the loadType to "STREAM" the video streamed. */
+    static STREAM: string;
+    /** Path to the video. */
+    src: Array<string>;
+    /** HTMLVideoObject */
+    element: HTMLVideoElement;
+    /** A callback when the video loaded. */
+    __onLoad: Function;
+    /** Indicates if the video was loaded. */
+    isLoaded: boolean;
+    /**  The size of the video. */
+    size: IsoSize;
+    /** Type of the object for identification. */
+    type: string;
+    /** Sets if the video load completly or stream it. */
+    loadType: string;
+    constructor(src?: Array<string>);
+    /** Creates a new video. */
+    create(src: Array<string>): IsoVideo;
+    /** Loads the video for further work. */
+    load(): void;
+    /** Called when the video file was loaded. */
+    _onLoad(event: Event): void;
+    /**  Returns the video. */
+    get(): HTMLVideoElement;
+    /** Gets the width of the video. */
+    getWidth(): number;
+    /** Gets the height of the video. */
+    getHeight(): number;
+    /** Gets the size of the video. */
+    getSize(): IsoSize;
+    /** Sets the width of the video. */
+    setWidth(width: number): IsoVideo;
+    /** Sets the height of the video. */
+    setHeight(height: number): IsoVideo;
+    /** Sets the size of the video. */
+    setSize(size: IsoSize): IsoVideo;
+    /** Resizes the video. */
+    resize(): IsoVideo;
+}
+declare class IsoVideoResource extends IsoResource {
+    /** Name of the resource. */
+    name: string;
+    /** Source of the resource. */
+    source: IsoVideo;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string, source: IsoVideo);
+    /** Sets the source of a resource. */
+    setSource(source: IsoVideo): IsoVideoResource;
+    /** Gets the source. */
+    get(): IsoVideo;
+    /** Gets the HTMLElement. */
+    getElement(): HTMLVideoElement;
+}
+declare class IsoStripeTexture extends IsoImageTexture {
+    /** The current tile of the stripe. */
+    private _tile;
+    tile: number;
+    /** The tile to start with. */
+    _tileOffset: number;
+    tileOffset: number;
+    /** The tilesize. */
+    _tileSize: IsoSize;
+    tileSize: IsoSize;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string, src: IsoImageResource, tileSize: IsoSize);
+    /** Sets the image of the texture. */
+    set(src: IsoImageResource): IsoStripeTexture;
+    /** Returns the current tile. */
+    getTile(): number;
+    /** Returns the tile offset */
+    getTileOffset(): number;
+    /** Returns the absolute tile, which means the tile number plus the tile offset. */
+    getAbsoluteTile(): number;
+    /** Resets the image of the texture. */
+    reset(): IsoStripeTexture;
+    /** Retruns the imagedata. */
+    getImageData(): IImageData;
+    /** Returns the texture data. */
+    getTextureData(): ITextureData;
+}
+declare class IsoTextureCache extends IsoObject {
+    _renderData: IRenderData;
+    renderData: IRenderData;
+    type: string;
+    canvas: IsoCanvas;
+    needRedraw(renderData: IRenderData): boolean;
+    cache(renderData: IRenderData): IsoCanvas;
+    render(renderData: IRenderData): IsoCanvas;
+    getImageData(): ImageData;
+}
+declare class IsoTextureProcessor extends IsoTexture {
+    /** The mask of the texture. */
+    private _mask;
+    mask: Array<IsoImageTexture>;
+    /** All textures of the texture. */
+    private _textures;
+    textures: Array<IsoImageTexture | IsoColorTexture>;
+    /** The final texture. */
+    private _src;
+    src: IsoImageResource;
+    /** Type of the object for identification. */
+    type: string;
+    constructor(name: string);
+    /** Adds a new mask to the texture. */
+    addMask(mask: IsoImageTexture): void;
+    /** Adds a new textue to the texture. */
+    addTexture(texture: IsoColorTexture | IsoImageTexture): void;
+    /** Removes a mask from the texture. */
+    removeMask(mask: IsoImageTexture): IsoTextureProcessor;
+    /** Removes a texture from the texture. */
+    removeTexture(texture: IsoColorTexture | IsoImageTexture): IsoTextureProcessor;
+    /** Proceed the new texture and save the result as the texture source.*/
+    render(): void;
+}
+declare class IsoVideoTexture extends IsoTexture {
+    /** The video resource. */
+    private _src;
+    src: IsoVideoResource;
+    constructor(name: string, src: IsoVideoResource);
+    /** Sets the image of the texture. */
+    set(src: IsoVideoResource): IsoVideoTexture;
+    /** Type of the object for identification. */
+    type: string;
+    /** Resets the image of the texture. */
+    reset(): IsoVideoTexture;
+    /** Plays or resumes the video. */
+    play(): IsoVideoTexture;
+    /** Stops the video. */
+    stop(): IsoVideoTexture;
+    /** Pause the video. */
+    pause(): IsoVideoTexture;
+    /** Sets the current time in seconds of the video. */
+    setCurrentTime(time: number): IsoVideoTexture;
+    /** Returns the imagedata. */
+    getImageData(): IImageData;
+    /** Returns the texture data. */
+    getTextureData(): ITextureData;
 }

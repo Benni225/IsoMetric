@@ -1,44 +1,24 @@
-﻿///<reference path="IsoConfig.ts" />
-///<reference path="IsoCanvas.ts" />
-///<reference path="IsoEvent.ts" />
-///<reference path="IsoMap.ts" />
-///<reference path="IsoRessourceManager.ts" />
-// <reference path="IsoTileSet.ts" />
-///<reference path="IsoLayers.ts" />
-///<reference path="IsoOn.ts" />
-///<reference path="IsoDrawer.ts" />
-interface IsoCallback {
-    eventType: string;
-    callback: EventListener;
-}
-"use strict";
-/**
- * The mainclass of IsoMetric and the starting point for the gameloop.
- * @class IsoMetric
- * @constructor 
- * 
+﻿"use strict";
+///<reference path="include.ts" />
+/** 
+ * IsoMetric is the main class. It includes all needed references and libs.
  */
-class IsoMetric extends IsoOn{
-    /**
-     * The configuration.
-     */
-    config: IsoConfig;
-    /**
-     * The canvas object
-     */
+class IsoMetric extends IsoObject {
+    static self: IsoMetric;
+    /** The main canvas element. */
     canvas: IsoCanvas;
-    /** Includes all layers */
-    layers: IsoLayers;
-    /** The drawing lib. */
+    /** The drawing library. */
     drawer: IsoDrawer;
-    /** The physics library */
-    physics: IsoPhysicsManager;
-    /** The animation library */
-    animation: IsoAnimationManager;
-    /** The input library */
+    /** The configuration. */
+    config: IsoConfig;
+    /** The input library. */
     input: IsoInput;
+    /** Includes all layers */
+    layers: IsoLayerManager;
+    /** Includes all physics objects. */
+    physics: IsoPhysicsManager;
     /** Handles all ressources of a project. */
-    ressources: IsoRessourceManager;
+    resources: IsoResourceManager;
     /** The time one frames needs to drawn. */
     frameTime: number;
     /** A counter for frames */
@@ -49,8 +29,10 @@ class IsoMetric extends IsoOn{
     startLoopTime: Date;
     /** The frames per second */
     FPS: number = 0;
+    /** Optimal FPS. */
+    optimalFPS = 60;
     /** The default canvas configuration. */
-    defaultWindowOptions: IIsoConfigWindowOptions = {
+    defaultWindowOptions = {
         fullscreen: true,
         width: window.innerWidth,
         height: window.innerHeight
@@ -58,24 +40,30 @@ class IsoMetric extends IsoOn{
     /**  An inteval for the drawing and game loop */
     interval: Object;
     animationFrame: Object;
-    /** Creates a new instance of IsoMetric */
-    constructor(windowOptions?: Object) {
+    constructor(config: IsoConfig) {
         super();
-        this.config = new IsoConfig(this);
-        this.canvas = new IsoCanvas(this);
-        this.layers = new IsoLayers(this);
-        this.input = new IsoInput(this);
-        this.animation = new IsoAnimationManager();
-        this.ressources = new IsoRessourceManager(this);
-        this.physics = new IsoPhysicsManager();
+        try {
+            this.log("Initialize IsoMetric.", IsoLogger.INFO);
+            IsoMetric.self = this;
+            this.config = config;
+            if (!this.config.has("windowOptions")) {
+                this.log("Could not find any options for the window. The window configuration is default, now.", IsoLogger.INFO);
+                this.config.setProperty("windowOptions", this.defaultWindowOptions);
+            }
+            this.canvas = new IsoCanvas(this.config.get("windowOptions").width, this.config.get("windowOptions").height, this.config.get("windowOptions")["fullscreen"], this.config.get("windowOptions")["autoResize"]);
+            this.drawer = new IsoDrawer();
+            this.input = new IsoInput();          
+            this.canvas.load();
+            this.canvas.append(document.querySelector("body"));
+            this.resources = new IsoResourceManager();
+            this.layers = new IsoLayerManager();
+            this.physics = new IsoPhysicsManager();
+            this.frameCountInteral = setInterval(() => this.setFPS(), 1000);
 
-        if (windowOptions === undefined) {
-            windowOptions = this.defaultWindowOptions;
+            this.log("Finished the initialization of IsoMetric.", IsoLogger.INFO);
+        } catch (e) {
+            this.log(e, IsoLogger.ERROR);
         }
-        this.config.set("windowOptions", windowOptions);
-        this.canvas.create();
-        this.drawer = new IsoDrawer(this);
-        this.frameCountInteral = setInterval(() => this.setFPS(), 1000);
     }
     /** Reset and set the FPS */
     setFPS() {
@@ -95,6 +83,6 @@ class IsoMetric extends IsoOn{
     /** The game- and drawing-loop. */
     update() {
         this.startLoopTime = new Date();
-        this.drawer.update();
+        this.drawer.update(this.layers);
     }
 }

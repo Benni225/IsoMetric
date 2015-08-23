@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{4D4F241C-ADCF-481C-B85C-982282A1050C}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.5</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Engine\2d\IsoBlendingModes.ts" />
+    <TypeScriptCompile Include="Engine\2d\IsoColor.ts" />
+    <TypeScriptCompile Include="Engine\2d\IsoScale.ts" />
+    <TypeScriptCompile Include="Engine\2d\IsoSize.ts" />
+    <TypeScriptCompile Include="Engine\animation\IsoAnimation.ts" />
+    <TypeScriptCompile Include="Engine\animation\IsoAnimationManager.ts" />
+    <TypeScriptCompile Include="Engine\animation\IsoEasing.ts" />
+    <TypeScriptCompile Include="Engine\main\IsoConfig.ts" />
+    <TypeScriptCompile Include="Engine\main\IsoInput.ts" />
+    <TypeScriptCompile Include="Engine\particles\IsoEmitter.ts" />
+    <TypeScriptCompile Include="Engine\particles\IsoParticles.ts" />
+    <TypeScriptCompile Include="Engine\physics\IsoPhysicsManager.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoCanvas.ts" />
+    <TypeScriptCompile Include="Engine\core\IsoLogger.ts" />
+    <TypeScriptCompile Include="Engine\core\IsoEvent.ts" />
+    <TypeScriptCompile Include="Engine\core\IsoObject.ts" />
+    <TypeScriptCompile Include="Engine\core\IsoWatcher.ts" />
+    <TypeScriptCompile Include="Engine\main\IsoDrawer.ts" />
+    <TypeScriptCompile Include="Engine\include.ts" />
+    <TypeScriptCompile Include="Engine\interfaces\interfaces.ts" />
+    <TypeScriptCompile Include="Engine\IsoMetric.ts" />
+    <TypeScriptCompile Include="Engine\2d\IsoPoint.ts" />
+    <TypeScriptCompile Include="Engine\2d\IsoVector2d.ts" />
+    <TypeScriptCompile Include="Engine\entities\IsoBaseEntity.ts" />
+    <TypeScriptCompile Include="Engine\entities\IsoEntityGroup.ts" />
+    <TypeScriptCompile Include="Engine\entities\IsoSprite.ts" />
+    <TypeScriptCompile Include="Engine\layer\IsoLayer.ts" />
+    <TypeScriptCompile Include="Engine\layer\IsoLayerManager.ts" />
+    <TypeScriptCompile Include="Engine\physics\IsoPhysics.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoAudioResource.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoResourceManager.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoVideo.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoVideoResource.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoImageTexture.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoStripeTexture.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoTexture.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoAudio.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoColorTexture.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoImage.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoImageResource.ts" />
+    <TypeScriptCompile Include="Engine\resources\IsoResource.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoTextureCache.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoTextureProcessor.ts" />
+    <TypeScriptCompile Include="Engine\texture\IsoVideoTexture.ts" />
+    <TypeScriptCompile Include="Engine\typings\matterJs.d.ts" />
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>IsoMetric3</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>52085</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:52085/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>None</TypeScriptModuleKind>
+    <TypeScriptOutFile>IsoMetric.js</TypeScriptOutFile>
+    <TypeScriptOutDir>C:\Users\camel\Documents\Visual Studio 2013\Projects\Isometroc\IsoMetric3</TypeScriptOutDir>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>

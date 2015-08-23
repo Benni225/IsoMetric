@@ -1,256 +1,3 @@
-var IsoOn = (function () {
-    function IsoOn() {
-        this.onCallbacks = new Array();
-    }
-    IsoOn.prototype.fire = function (type, data, element) {
-        var e = new CustomEvent(type);
-        e.initCustomEvent(type, true, true, data);
-        if (element !== undefined) {
-            element.dispatchEvent(e);
-        }
-        else {
-            document.dispatchEvent(e);
-        }
-    };
-    IsoOn.prototype.onEvent = function (eventType, callback) {
-        document.addEventListener(eventType, callback);
-    };
-    IsoOn.prototype.unbindEvent = function (eventType, callback) {
-        document.removeEventListener(eventType, callback);
-    };
-    IsoOn.prototype.on = function (eventType, callback) {
-        this.onCallbacks[eventType] = callback;
-        return this;
-    };
-    IsoOn.prototype.callOn = function (eventType) {
-        if (this.checkOn(eventType))
-            this.onCallbacks[eventType].call(this);
-    };
-    IsoOn.prototype.checkOn = function (eventType) {
-        if (this.onCallbacks[eventType] !== undefined) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    return IsoOn;
-})();
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-///<reference path="IsoOn.ts" />
-var IsoMinimalObject = (function (_super) {
-    __extends(IsoMinimalObject, _super);
-    function IsoMinimalObject(Engine) {
-        _super.call(this);
-        /** The position of the object */
-        this.position = new IsoVector2D(0, 0);
-        /** The scroll-position of the object */
-        this.scrollPosition = new IsoVector2D(0, 0);
-        /** An offset relative to the position */
-        this.offset = new IsoPoint(0, 0);
-        /** The scale of an object given as a factor */
-        this.scale = { factorX: 1, factorY: 1 };
-        /** The zooming level of an object */
-        this.zoomLevel = 1;
-        /** By using the method zoom, this factor controls the zooming level */
-        this.zoomStrength = 1 / 1000;
-        /** A point on the screen where zoomed to */
-        this.zoomPoint = new IsoVector2D(0, 0);
-        /** Rotation in degrees */
-        this.rotation = 0;
-        /** When moving this factor controls the speed of moving */
-        this.speed = 1;
-        /** The anchor of the object for rotation */
-        this.anchor = new IsoPoint(0, 0);
-        /** The blending mode. See IsoBlendingModes */
-        this.blendingMode = IsoBlendingModes.NORMAL;
-        /** The alpha of the object */
-        this.alpha = 1;
-        /** If hidden is true, the object will not be drawn. */
-        this.hidden = false;
-        /** Optional additional properties */
-        this.properties = {};
-        /** The friction of the object */
-        this.friction = 1;
-        /** The velocity when moving an object. */
-        this.velocity = new IsoVector2D(0, 0);
-        /** Sets if a object could clear from the memory. */
-        this.free = false;
-        /** Type of the object. */
-        this.type = "IsoMinimalObject";
-        this.Engine = Engine;
-    }
-    /** Adds an animation. The animation will animate a given attribute of the object. */
-    IsoMinimalObject.prototype.addAnimation = function (name, attribute, endValue, duration, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = "once"; }
-        if (callbacks === void 0) { callbacks = new Array(); }
-        this.Engine.animation.addAnimation(name, this, attribute, endValue, duration, easing, type, callbacks);
-        return this;
-    };
-    /** Gets an animation */
-    IsoMinimalObject.prototype.getAnimation = function (name) {
-        return this.Engine.animation.get(name, this);
-    };
-    /** Adds a new playlist. The playlist includes animations which animates the attributes of an object.*/
-    IsoMinimalObject.prototype.addPlaylist = function (name, animations) {
-        this.Engine.animation.addPlaylist(name, this, animations);
-        return this;
-    };
-    /** Gets one of the additional properties. */
-    IsoMinimalObject.prototype.getProperty = function (name) {
-        return this.properties[name];
-    };
-    /** Gets all the additional properties. */
-    IsoMinimalObject.prototype.getProperties = function () {
-        return this.properties;
-    };
-    /** Gets the position on the screen. */
-    IsoMinimalObject.prototype.getAbsolutePosition = function () {
-        var x = 0, y = 0;
-        x = ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
-        y = ((this.position.y + this.offset.y + this.scrollPosition.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
-        return new IsoVector2D(x, y);
-    };
-    /** Gets the rotation of an object in dregrees. */
-    IsoMinimalObject.prototype.getRotation = function () {
-        return this.rotation;
-    };
-    /** Move an object relative to the current position. */
-    IsoMinimalObject.prototype.move = function (deltaX, deltaY) {
-        this.velocity.x += deltaX;
-        this.velocity.y += deltaY;
-        if (this.velocity.x > this.speed) {
-            this.velocity.x = this.speed;
-        }
-        if (this.velocity.x < -this.speed) {
-            this.velocity.x = -this.speed;
-        }
-        if (this.velocity.y > this.speed) {
-            this.velocity.y = this.speed;
-        }
-        if (this.velocity.y < -this.speed) {
-            this.velocity.y = -this.speed;
-        }
-        return this;
-    };
-    /** Rotates an object relative to the current rotation. */
-    IsoMinimalObject.prototype.rotate = function (degrees) {
-        this.rotation = this.rotation + degrees;
-        return this;
-    };
-    /** Set the scrolling position relative to the current scroll position. */
-    IsoMinimalObject.prototype.scroll = function (deltaX, deltaY) {
-        this.scrollPosition.set(this.scrollPosition.x + (deltaX * this.speed), this.scrollPosition.y + (deltaY * this.speed));
-        return this;
-    };
-    /** Sets the alpha of an object. */
-    IsoMinimalObject.prototype.setAlpha = function (alpha) {
-        this.alpha = alpha;
-        return this;
-    };
-    /** Sets the blending mode. See IsoBlending. */
-    IsoMinimalObject.prototype.setBlendingMode = function (blendingMode) {
-        this.blendingMode = blendingMode;
-        return this;
-    };
-    /** Sets the name of an object. */
-    IsoMinimalObject.prototype.setName = function (name) {
-        this.name = name;
-        return this;
-    };
-    /** Sets an additional property. */
-    IsoMinimalObject.prototype.setProperty = function (name, value) {
-        this.properties[name] = value;
-        return this;
-    };
-    /** Sets all properties. */
-    IsoMinimalObject.prototype.setProperties = function (properties) {
-        this.properties = properties;
-        return this;
-    };
-    /** Sets the rotation of an object in degrees. */
-    IsoMinimalObject.prototype.setRotation = function (degrees) {
-        this.rotation = degrees;
-        return this;
-    };
-    /** Sets the scale of an object. */
-    IsoMinimalObject.prototype.setScale = function (factorX, factorY) {
-        this.scale.factorX = factorX;
-        this.scale.factorY = factorY;
-        return this;
-    };
-    /** Sets the speed for moving of an object. */
-    IsoMinimalObject.prototype.setSpeed = function (speed) {
-        this.speed = speed;
-        return this;
-    };
-    /** Sets the absolute zooming-level. */
-    IsoMinimalObject.prototype.setZoomLevel = function (zoomLevel) {
-        this.zoomLevel = zoomLevel;
-        return this;
-    };
-    /** Sets the strength of zooming, when using the method IsoObject.zoom */
-    IsoMinimalObject.prototype.setZoomStrength = function (zoomStrength) {
-        this.zoomStrength = this.zoomStrength / 1000;
-        return this;
-    };
-    /** Calculate the zoom level */
-    IsoMinimalObject.prototype.zoom = function (zoom) {
-        this.setZoomLevel(this.zoomLevel + (zoom * this.zoomStrength));
-        return this;
-    };
-    /** Plays an animation. */
-    IsoMinimalObject.prototype.play = function (name) {
-        this.Engine.animation.play(name, this);
-        return this;
-    };
-    /** Stops an animation. */
-    IsoMinimalObject.prototype.stop = function (name) {
-        this.Engine.animation.stop(name, this);
-        return this;
-    };
-    /** Resumes an animation. */
-    IsoMinimalObject.prototype.resume = function (name) {
-        this.Engine.animation.resume(name, this);
-        return this;
-    };
-    /** Pause an animation. */
-    IsoMinimalObject.prototype.pause = function (name) {
-        this.Engine.animation.pause(name, this);
-        return this;
-    };
-    /** Checks whether an animation is playing or not. */
-    IsoMinimalObject.prototype.isPlaying = function (name) {
-        return this.Engine.animation.isPlaying(name, this);
-        ;
-    };
-    /** Sets the addition type of an animation: */
-    IsoMinimalObject.prototype.setAdditionType = function (name, type) {
-        this.Engine.animation.setAdditionType(name, this, type);
-    };
-    /** Calculat the new position. */
-    IsoMinimalObject.prototype.updatePosition = function () {
-        this.velocity.x *= this.friction;
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
-    };
-    /** Updates the object. */
-    IsoMinimalObject.prototype.update = function () {
-        this.updatePosition();
-        var a = this.Engine.animation.getActive(this);
-        for (var i = 0; i < this.addAnimation.length; i++) {
-            if (a[i] !== undefined)
-                a[i].update();
-        }
-    };
-    return IsoMinimalObject;
-})(IsoOn);
 var IsoBlendingModes = {
     NORMAL: "normal",
     MULTIPLY: "multiply",
@@ -267,971 +14,834 @@ var IsoBlendingModes = {
     HUE: "hue",
     SATURATION: "saturation",
     COLOR: "color",
-    LUMINOSITY: "luminosity"
+    LUMINOSITY: "luminosity",
+    SOURCE_IN: "source-in",
+    SOURCE_OVER: "source-over",
+    SOURCE_OUT: "source-out",
+    SOURCE_ATOP: "source-atop",
+    DESTINATION_OVER: "destination-over",
+    DESTINATION_IN: "destination-in",
+    DESTINATION_OUT: "destination-out",
+    DESTINATION_ATOP: "destination-atop",
+    LIGHTER: "lighter",
+    COPY: "copy",
+    XOR: "xor",
 };
-///<reference path="IsoMinimalObject.ts" />
-///<reference path="IsoBlendingModes.ts" />
-var IsoObject = (function (_super) {
-    __extends(IsoObject, _super);
-    /** Creates a new object */
-    function IsoObject(Engine, image, name) {
-        _super.call(this, Engine);
-        /** The collsion type of the object */
-        this.collisionType = "box";
-        /** If the object has the collisiontype "pixel" this property controls the accuracy of the collision. */
-        this.collisionResolution = 0;
-        /** Mass of the object for physics */
-        this.mass = 0;
-        /** Type of the object. */
-        this.type = "IsoObbject";
-        try {
-            this.setImage(image);
-            this.setWidth(image.ressource.width);
-            this.setHeight(image.ressource.height);
-            if (name !== undefined) {
-                this.setName(name);
+var IsoLogger = (function () {
+    function IsoLogger() {
+    }
+    IsoLogger.prototype.log = function (error, warnLevel) {
+        var e = "";
+        if (typeof error === "Error") {
+            e = error.message;
+        }
+        else if (typeof error === "string") {
+            e = error;
+        }
+        if (this.lastError === undefined || this.lastError !== e) {
+            switch (warnLevel) {
+                case IsoLogger.ERROR:
+                    this.debug("This object throws an error:");
+                    this.debug(this);
+                    console.error(error);
+                    break;
+                case IsoLogger.WARN:
+                    console.warn(error);
+                    break;
+                case IsoLogger.INFO:
+                    console.info(error);
+                    break;
             }
-            this.rigidBody = {
-                x: 0,
-                y: 0,
-                width: image.ressource.getWidth(),
-                height: image.ressource.getHeight()
-            };
-            return this;
+            this.lastError = e;
+        }
+    };
+    IsoLogger.prototype.debug = function (o) {
+        if (IsoLogger.DEBUG === true) {
+            console.debug(o);
+        }
+    };
+    IsoLogger.ERROR = 0;
+    IsoLogger.WARN = 1;
+    IsoLogger.INFO = 2;
+    IsoLogger.DEBUG = false;
+    return IsoLogger;
+})();
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+///<reference path="IsoLogger.ts" />
+var IsoEvent = (function (_super) {
+    __extends(IsoEvent, _super);
+    function IsoEvent() {
+        _super.apply(this, arguments);
+        this.__onCallbacks = new Array();
+    }
+    IsoEvent.prototype.fire = function (type, data, element) {
+        try {
+            if (CustomEvent !== undefined) {
+                var e = new CustomEvent(type);
+                e.initCustomEvent(type, true, true, data);
+                if (element !== undefined) {
+                    element.dispatchEvent(e);
+                }
+                else {
+                    document.dispatchEvent(e);
+                }
+            }
+            else if (document.createEvent !== undefined) {
+                var oe = document.createEvent("Events");
+                oe.initEvent(type, true, true);
+                oe["detail"] = data;
+                if (element !== undefined) {
+                    element.dispatchEvent(oe);
+                }
+                else {
+                    document.dispatchEvent(oe);
+                }
+            }
+            else if (document["createEventObject"] !== undefined) {
+                var oie = document["createEventObject"]();
+                oie.initEvent(type, true, true);
+                oie["detail"] = data;
+                if (element !== undefined) {
+                    element.dispatchEvent(oie);
+                }
+                else {
+                    document.dispatchEvent(oie);
+                }
+            }
+            else {
+                throw new Error("This browser is not compatible. No events can be fired.");
+            }
         }
         catch (e) {
-            throw ("Can not create object with error message: " + e);
-        }
-    }
-    IsoObject.prototype.createCollidingMask = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = this.ressource.ressource.getWidth();
-        canvas.height = this.ressource.ressource.getHeight();
-        var c = canvas.getContext("2d");
-        c.drawImage(this.ressource.ressource.get(), 0, 0);
-        for (var y = 1; y < canvas.height / this.collisionResolution; y++) {
-            for (var x = 1; x < canvas.width / this.collisionResolution; x++) {
-                if (this.collsionMask === undefined) {
-                    this.collsionMask = new Array();
-                }
-                if (this.collsionMask[y] === undefined) {
-                    this.collsionMask[y] = new Array();
-                }
-                var data = c.getImageData(x * this.collisionResolution, y * this.collisionResolution, this.collisionResolution, this.collisionResolution);
-                this.collsionMask[y][x] = data;
-            }
+            this.log(e, IsoLogger.ERROR);
         }
     };
-    /** Checks if the object collides with an another given object. */
-    IsoObject.prototype.collide = function (object) {
-        if (this.collisionType === IsoObject.BOX_COLLISION) {
-            if (object.collisionType === IsoObject.BOX_COLLISION) {
-                return this.isBoxCollision(object.getCoords(), this.getCoords());
-            }
-            else if (object.collisionType === IsoObject.PIXEL_COLLISION) {
-                return this.isPixelBoxCollision(object, this.getCoords());
-            }
-        }
-        else if (this.collisionType === IsoObject.PIXEL_COLLISION) {
-            if (object.collisionType === IsoObject.BOX_COLLISION) {
-                return this.isPixelBoxCollision(this, object.getCoords());
-            }
-            else if (object.collisionType === IsoObject.PIXEL_COLLISION) {
-                return this.isPixelCollision(object, this);
-            }
-        }
+    IsoEvent.prototype.bind = function (eventType, callback) {
+        document.addEventListener(eventType, callback);
     };
-    /** Get the position of the object on the screen. */
-    IsoObject.prototype.getCoords = function () {
-        var r = this.getRenderDetails();
-        return {
-            x: r.position.x,
-            y: r.position.y,
-            width: r.renderSize.width,
-            height: r.renderSize.height
-        };
+    IsoEvent.prototype.unbind = function (eventType, callback) {
+        document.removeEventListener(eventType, callback);
     };
-    /** Gets the original dimension of the object. */
-    IsoObject.prototype.getOriginalDimension = function () {
-        return {
-            width: this.width,
-            height: this.height
-        };
+    IsoEvent.prototype.on = function (eventType, callback) {
+        this.__onCallbacks[eventType] = callback;
+        return this;
     };
-    /** Gets the originall height of the object */
-    IsoObject.prototype.getOriginalHeight = function () {
-        return this.height;
+    IsoEvent.prototype.call = function (eventType, args) {
+        if (args === void 0) { args = new Array(); }
+        if (this.__checkOn(eventType))
+            this.__onCallbacks[eventType].apply(this, args);
     };
-    /** Gets the original width of the obect */
-    IsoObject.prototype.getOriginalWidth = function () {
-        return this.width;
-    };
-    /** Gets the position on the screen. */
-    IsoObject.prototype.getAbsolutePosition = function () {
-        var x = 0, y = 0;
-        x = ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
-        y = ((this.position.y + this.offset.y + this.scrollPosition.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
-        return new IsoVector2D(x, y);
-    };
-    /** Gets the dimension of the object on the screen. */
-    IsoObject.prototype.getAbsoluteDimension = function () {
-        return {
-            width: this.getOriginalDimension().width * this.zoomLevel * this.scale.factorX,
-            height: this.getOriginalDimension().height * this.zoomLevel * this.scale.factorY
-        };
-    };
-    /** Gets all important information for rendering an object. */
-    IsoObject.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.width * this.scale.factorX, fy = this.anchor.y / this.height * this.scale.factorY;
-        return {
-            position: this.getAbsolutePosition(),
-            tileSize: this.getOriginalDimension(),
-            renderSize: this.getAbsoluteDimension(),
-            anchor: new IsoPoint((this.position.x + (this.width * this.scale.factorX * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.height * this.scale.factorY * this.zoomLevel * fy * this.scale.factorY))),
-            image: this.ressource.get(),
-            offset: this.offset.get(),
-            zoomLevel: this.zoomLevel,
-            type: "IsoObject"
-        };
-    };
-    /** Checks the collision of two object with collision type "box". */
-    IsoObject.prototype.isBoxCollision = function (coordsSource, coordsTarget) {
-        if ((coordsSource.x < coordsTarget.x && coordsSource.x + coordsSource.width > coordsTarget.x || coordsSource.x < coordsTarget.x + coordsTarget.width && coordsSource.x + coordsSource.width > coordsTarget.x) &&
-            (coordsSource.y < coordsTarget.y + coordsTarget.height && coordsSource.y + coordsSource.height > coordsTarget.y)) {
+    IsoEvent.prototype.__checkOn = function (eventType) {
+        if (this.__onCallbacks[eventType] !== undefined) {
             return true;
         }
         else {
             return false;
         }
     };
-    /** @todo implement pixel-box-collision */
-    IsoObject.prototype.isPixelBoxCollision = function (sourceObject, targetCoords) {
-        return false;
-    };
-    /** @todo implement pixel-collision */
-    IsoObject.prototype.isPixelCollision = function (sourceObject, targetObject) {
-        return false;
-    };
-    /** Move an object relative to the current position. */
-    IsoObject.prototype.move = function (deltaX, deltaY) {
-        this.velocity.x += deltaX;
-        this.velocity.y += deltaY;
-        if (this.velocity.x > this.speed) {
-            this.velocity.x = this.speed;
-        }
-        if (this.velocity.x < -this.speed) {
-            this.velocity.x = -this.speed;
-        }
-        if (this.mass === 0) {
-            if (this.velocity.y > this.speed) {
-                this.velocity.y = this.speed;
-            }
-            if (this.velocity.y < -this.speed) {
-                this.velocity.y = -this.speed;
-            }
-        }
-        return this;
-    };
-    /** Sets the width. */
-    IsoObject.prototype.setHeight = function (height) {
-        this.height = height;
-        return this;
-    };
-    /** sets the image-ressource */
-    IsoObject.prototype.setImage = function (image) {
-        this.ressource = image;
-        return this;
-    };
-    /** Sets the width and height of an object. */
-    IsoObject.prototype.setSize = function (width, height) {
-        this.width = width;
-        this.height = height;
-        return this;
-    };
-    /** Sets the width of an object. */
-    IsoObject.prototype.setWidth = function (width) {
-        this.width = width;
-        return this;
-    };
-    /** Calculat the new position. */
-    IsoObject.prototype.updatePosition = function () {
-        this.velocity.x *= this.friction;
-        if (this.mass === 0) {
-            this.velocity.y *= this.friction;
-        }
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
-        this.rigidBody = this.getCoords();
-    };
-    /** Gets all tiles of a given tilemap where the object collides with. */
-    IsoObject.prototype.getCollidingTiles = function (tilemap) {
-        var collisionBody = this.rigidBody;
-        if (collisionBody === undefined) {
-            collisionBody = {
-                x: 0,
-                y: 0,
-                width: this.width,
-                height: this.height
+    return IsoEvent;
+})(IsoLogger);
+///<reference path="IsoEvent.ts" />
+/** This class helps to observe special values of a class. */
+var IsoWatcher = (function (_super) {
+    __extends(IsoWatcher, _super);
+    function IsoWatcher() {
+        _super.apply(this, arguments);
+        this.__watch = new Array();
+    }
+    IsoWatcher.prototype.watch = function (property, callback) {
+        var val = this[property];
+        if (this.__watch[property] === undefined) {
+            this.__watch[property] = {
+                callback: new Array(callback),
+                oldValue: val
             };
         }
-        return tilemap.getTilesInRadius(this.position.x + collisionBody.x, this.position.y + collisionBody.y, collisionBody.width, collisionBody.height);
+        else {
+            this.__watch[property].callback.push(callback);
+        }
     };
-    IsoObject.BOX_COLLISION = "box";
-    IsoObject.PIXEL_COLLISION = "pixel";
+    IsoWatcher.prototype.__propertyChanged = function (property, value) {
+        if (this.__watch[property] !== undefined) {
+            for (var i = 0; i < this.__watch[property].callback.length; i++) {
+                this.__watch[property].callback[i].call(this, value, this.__watch[property].oldValue);
+            }
+            this.__watch[property].oldValue = value;
+        }
+    };
+    return IsoWatcher;
+})(IsoEvent);
+///<reference path="IsoWatcher.ts" />
+var IsoObject = (function (_super) {
+    __extends(IsoObject, _super);
+    function IsoObject() {
+        _super.apply(this, arguments);
+    }
+    Object.defineProperty(IsoObject.prototype, "type", {
+        get: function () {
+            return "IsoObject";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    ;
+    IsoObject.prototype.apply = function (object, to) {
+        for (var k in object) {
+            if (to === undefined)
+                this[k] = object[k];
+            else
+                to[k] = object[k];
+        }
+    };
     return IsoObject;
-})(IsoMinimalObject);
-///<reference path="IsoObject.ts" />
-"use strict";
-var IsoTileObject = (function (_super) {
-    __extends(IsoTileObject, _super);
-    function IsoTileObject(Engine, image, tileInfo) {
-        _super.call(this, Engine, image);
-        this.tileOffset = new IsoPoint(0, 0);
-        this.tileHeight = 0;
-        this.startTile = 0;
-        try {
-            if (tileInfo !== undefined) {
-                this.set(tileInfo);
-            }
-            return this;
-        }
-        catch (e) {
-            throw (e);
-        }
+})(IsoWatcher);
+///<reference path="../core/IsoObject.ts" />
+var IsoColor = (function (_super) {
+    __extends(IsoColor, _super);
+    function IsoColor(color) {
+        _super.call(this);
+        this.set(color);
     }
-    IsoTileObject.prototype.setTileOffset = function (x, y) {
-        this.tileOffset.set(x, y);
-        return this;
-    };
-    IsoTileObject.prototype.getTileOffset = function () {
-        return this.tileOffset;
-    };
-    IsoTileObject.prototype.getAbsolutePosition = function () {
-        var x = 0, y = 0;
-        x =
-            ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-                - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x);
-        y =
-            ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
-                - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y);
-        return new IsoVector2D(x, y);
-    };
-    IsoTileObject.prototype.getRelativeDimension = function () {
-        return {
-            width: this.tileSize.width * this.zoomLevel,
-            height: this.tileSize.height * this.zoomLevel
-        };
-    };
-    IsoTileObject.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.tileSize.width * this.scale.factorX, fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
-        return {
-            position: this.getAbsolutePosition(),
-            tileSize: this.tileSize,
-            renderSize: {
-                width: this.tileSize.width * this.zoomLevel,
-                height: this.tileSize.height * this.zoomLevel
-            },
-            anchor: new IsoPoint((this.position.x + (this.tileSize.width * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.tileSize.height * this.zoomLevel * fy * this.scale.factorY))),
-            image: this.ressource.get(),
-            offset: this.getTileOffset(),
-            zoomLevel: this.zoomLevel,
-            type: "IsoTileObject"
-        };
-    };
-    IsoTileObject.prototype.getTileImage = function () {
-        var x = this.tileOffset.x;
-        var y = this.tileOffset.y;
-        var width = this.tileSize.width;
-        var height = this.tileSize.height + this.tileHeight;
-        return {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            image: this.ressource.get()
-        };
-    };
-    IsoTileObject.prototype.setTile = function (tile) {
-        try {
-            this.tileOffset.set(0, 0);
-            this.tile = tile + this.startTile;
-            this.tileOffset.x =
-                (this.tile % (this.width / this.tileSize.width)) * (this.tileSize.width + this.ressource.ressource.offset.x);
-            this.tileOffset.y =
-                (Math.floor(this.tile / (this.width / this.tileSize.width))) * (this.tileSize.height + this.ressource.ressource.offset.y);
-            return this;
+    Object.defineProperty(IsoColor.prototype, "r", {
+        get: function () {
+            return this._r;
+        },
+        set: function (value) {
+            this.__propertyChanged("r", value);
+            this._r = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoColor.prototype, "g", {
+        get: function () {
+            return this._g;
+        },
+        set: function (value) {
+            this.__propertyChanged("g", value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoColor.prototype, "b", {
+        get: function () {
+            return this._b;
+        },
+        set: function (value) {
+            this.__propertyChanged("b", value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoColor.prototype, "type", {
+        /** The object type for identification. */
+        get: function () {
+            return "IsoColor";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the color with an hex value or an color object like {r: 255,g: 255,b: 255}. */
+    IsoColor.prototype.set = function (color) {
+        if (typeof color === "Object") {
+            this.apply(color);
         }
-        catch (e) {
-            throw (e);
+        else if (typeof color === "string") {
+            var rgb = this.hexToRgb(color);
+            if (rgb) {
+                this.apply(rgb);
+            }
         }
     };
-    IsoTileObject.prototype.set = function (tile) {
-        this.tileHeight = tile.height;
-        this.tileSize = tile.size;
-        this.rigidBody.width = tile.size.width;
-        this.rigidBody.height = tile.size.height;
-        this.setTile(tile.tile);
-        return this;
+    /** Returns the color as a hex-value. */
+    IsoColor.prototype.getHex = function () {
+        return this.rgbToHex(this.r, this.g, this.b);
     };
-    return IsoTileObject;
+    /** Turns a number to a hex-value. */
+    IsoColor.prototype.componentToHex = function (c) {
+        var hex = c.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    };
+    /** Turns 3 numbers to a hex-value. */
+    IsoColor.prototype.rgbToHex = function (r, g, b) {
+        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+    };
+    /** Turns a hex-value to 3 numbers. */
+    IsoColor.prototype.hexToRgb = function (hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    };
+    return IsoColor;
 })(IsoObject);
-///<reference path="IsoTileObject.ts" />
-"use strict";
-var IsoTile = (function (_super) {
-    __extends(IsoTile, _super);
-    function IsoTile(Engine, image, tileInfo) {
-        _super.call(this, Engine, image);
-        this.tileOffset = new IsoPoint(0, 0);
-        this.tileHeight = 0;
-        this.mapPosition = new IsoMapVector2D(0, 0);
-        this.updateType = "automatic";
-        try {
-            if (tileInfo !== undefined) {
-                this.set(tileInfo);
-            }
-            return this;
+///<reference path="../core/IsoWatcher.ts" />
+var IsoPoint = (function (_super) {
+    __extends(IsoPoint, _super);
+    function IsoPoint(x, y) {
+        _super.call(this);
+        if (x !== undefined) {
+            this.x = x;
         }
-        catch (e) {
-            throw ("Can not create tile with following error message: " + e);
+        if (y !== undefined) {
+            this.y = y;
         }
     }
-    /**
-     * Create a new frame-animation.
-     *
-     * @param  {string}                name   Name of the new animation.
-     * @param  {Array<number>}         frames An array that includes the frame numbers.
-     * @param  {number}                duration The duration in milliseconds of the animation.
-     * @param  {Function}  easing    The animation-easing. For more information see IsoEasing. By default: IsoEasing.Linear.
-     * @param  {string} type      The playing-type. Possible values are: IsoAnimation.ONCE, IsoAnimation.ENDLESS, IsoAnimation.PINGPONG. By Default: IsoAnimation.ONCE.
-     * @param  {Array<IsoCallback>} callbacks An array including callback. The events are 'onPlaying', 'onStop', 'onPause', 'onResume'
-     * @return {IsoAnimatedSprite}            The sprite.
-     */
-    IsoTile.prototype.addFrameAnimation = function (name, frames, duration, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = IsoAnimation.ONCE; }
-        if (callbacks === void 0) { callbacks = new Array(); }
-        this.Engine.animation.addFrameAnimation(name, this, frames, duration, easing, type, callbacks);
+    Object.defineProperty(IsoPoint.prototype, "x", {
+        get: function () {
+            return this._x;
+        },
+        set: function (value) {
+            this.__propertyChanged("x", value);
+            this._x = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoPoint.prototype, "y", {
+        get: function () {
+            return this._y;
+        },
+        set: function (value) {
+            this.__propertyChanged("y", value);
+            this._y = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets or resets the point */
+    IsoPoint.prototype.set = function (x, y) {
+        this.x = x;
+        this.y = y;
+    };
+    /** Gets the point on the screen. */
+    IsoPoint.prototype.get = function () {
         return this;
     };
-    IsoTile.prototype.setUpdateType = function (type) {
-        this.updateType = type;
+    return IsoPoint;
+})(IsoWatcher);
+///<reference path="../core/IsoWatcher.ts" />
+var IsoScale = (function (_super) {
+    __extends(IsoScale, _super);
+    function IsoScale(fx, fy) {
+        _super.call(this);
+        if (fx !== undefined) {
+            this.fx = fx;
+        }
+        if (fy !== undefined) {
+            this.fy = fy;
+        }
+    }
+    Object.defineProperty(IsoScale.prototype, "fx", {
+        get: function () {
+            return this._fx;
+        },
+        set: function (value) {
+            this.__propertyChanged("fx", value);
+            this._fx = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoScale.prototype, "fy", {
+        get: function () {
+            return this._fy;
+        },
+        set: function (value) {
+            this.__propertyChanged("fy", value);
+            this._fy = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets or resets the scale */
+    IsoScale.prototype.set = function (fx, fy) {
+        this.fx = fx;
+        this.fy = fy;
+    };
+    /** Gets the scale. */
+    IsoScale.prototype.get = function () {
         return this;
     };
-    IsoTile.prototype.set = function (tile) {
-        this.tileHeight = tile.height;
-        this.tileSize = tile.size;
-        this.mapPosition = tile.mapPosition;
-        this.setTile(tile.tile);
+    return IsoScale;
+})(IsoWatcher);
+///<reference path="../core/IsoWatcher.ts" />
+var IsoSize = (function (_super) {
+    __extends(IsoSize, _super);
+    function IsoSize(width, height) {
+        _super.call(this);
+        this.width = width;
+        this.height = height;
+    }
+    Object.defineProperty(IsoSize.prototype, "width", {
+        get: function () {
+            return this._width;
+        },
+        set: function (value) {
+            this.__propertyChanged("width", value);
+            this._width = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoSize.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        set: function (value) {
+            this.__propertyChanged("height", value);
+            this._height = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets or resets the size */
+    IsoSize.prototype.set = function (width, height) {
+        this.width = width;
+        this.height = height;
+    };
+    /** Gets the size. */
+    IsoSize.prototype.get = function () {
         return this;
     };
-    IsoTile.prototype.getCoords = function () {
-        var r = this.getRenderDetails();
-        return {
-            x: r.position.x + (r.mapPosition.column * r.tileSize.width * r.zoomLevel),
-            y: r.position.y + (r.mapPosition.row * r.tileSize.height * r.zoomLevel) - this.tileHeight,
-            width: this.tileSize.width * this.zoomLevel,
-            height: this.tileSize.height * this.zoomLevel
-        };
-    };
-    IsoTile.prototype.getMapPosition = function () {
-        return this.mapPosition;
-    };
-    IsoTile.prototype.getAbsolutePosition = function () {
-        var x = 0, y = 0;
-        x =
-            ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-                - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x) + (this.mapPosition.column * this.tileSize.width * this.zoomLevel);
-        y =
-            ((this.position.y + this.offset.y + this.scrollPosition.y + this.tileHeight) * this.zoomLevel)
-                - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y) + (this.mapPosition.row * this.tileSize.height * this.zoomLevel) - this.tileHeight;
-        return new IsoVector2D(x, y);
-    };
-    IsoTile.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.tileSize.width, fy = this.anchor.y / this.tileSize.height;
-        return {
-            position: this.getAbsolutePosition(),
-            mapPosition: this.mapPosition,
-            tileSize: this.tileSize,
-            renderSize: {
-                width: this.tileSize.width * this.zoomLevel,
-                height: this.tileSize.height * this.zoomLevel
-            },
-            anchor: new IsoPoint((this.getAbsolutePosition().x + (this.tileSize.width * this.zoomLevel * fx)), (this.getAbsolutePosition().y + (this.tileSize.height * this.zoomLevel * fy))),
-            image: this.ressource.get(),
-            offset: this.getTileOffset(),
-            zoomLevel: this.zoomLevel,
-            type: "IsoTile"
-        };
-    };
-    IsoTile.prototype.updatePosition = function () {
-        this.velocity.x *= this.friction;
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
-        this.rigidBody = this.getCoords();
-    };
-    IsoTile.AUTOMATIC = "automatic";
-    IsoTile.MANUAL = "manual";
-    IsoTile.POSITION = "position";
-    IsoTile.ZOOM = "zoom";
-    return IsoTile;
-})(IsoTileObject);
-"use strict";
-/*
- * IsoMap
- * This class stores a map. A map has the following form:
- * |-------------------X
- * |[
- * |    [[tileNumber, tileHeight], [tileNumber, tileHeight], [tileNumber, tileHeight]],
- * |    [[tileNumber, tileHeight], [tileNumber, tileHeight], [tileNumber, tileHeight]],
- * |    [[tileNumber, tileHeight], [tileNumber, tileHeight], [tileNumber, tileHeight]]
- * |]
- * Y
- * This is a map with the dimension 3x3 tiles. 3 tiles on the x-axis and 3 tiles on the y-axis. Every item can have
- * to values. one for the tileimage, which means, what tileimmage should be rendered, and the height.
+    return IsoSize;
+})(IsoWatcher);
+///<reference path="IsoPoint.ts" />
+/**
+ * IsoVector2D represents a point on the screen.
  */
-var IsoMap = (function () {
-    function IsoMap(map, name) {
-        this.properties = new Array();
-        this.updated = false;
-        if (map !== undefined) {
-            this.set(map);
-        }
-        if (name !== undefined) {
-            this.setName(name);
-        }
-        return this;
+var IsoVector2D = (function (_super) {
+    __extends(IsoVector2D, _super);
+    /** Creates a new vector */
+    function IsoVector2D(x, y) {
+        _super.call(this, x, y);
     }
-    IsoMap.prototype.set = function (map) {
-        this.map = map;
-        return this;
+    /** Gets the distance between two points */
+    IsoVector2D.prototype.getDistance = function (vec) {
+        // c2 = a2 + b2 --> c = sqrt(a2 + b2) --> c = is distance
+        return Math.sqrt(((this.x - vec.x) * (this.x - vec.x)) + ((this.y - vec.y) * (this.y - vec.y)));
     };
-    IsoMap.prototype.setName = function (name) {
+    /** Gets the length of a vector. */
+    IsoVector2D.prototype.getMagnitude = function () {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    };
+    /** Gets the angle of a vector. */
+    IsoVector2D.prototype.getAngle = function () {
+        var ratio = 0;
+        var offset = 0;
+        if (this.x > 0) {
+            if (this.y > 0) {
+                offset = 0;
+                ratio = this.y / this.x;
+            }
+            else {
+                offset = (3 * Math.PI) / 2;
+                ratio = this.x / this.y;
+            }
+        }
+        else {
+            if (this.y > 0) {
+                offset = Math.PI / 2;
+                ratio = this.x / this.y;
+            }
+            else {
+                offset = Math.PI;
+                ratio = this.y / this.x;
+            }
+        }
+        var angle = Math.atan(Math.abs(ratio)) + offset;
+        return angle;
+    };
+    IsoVector2D.prototype.getAngleDegrees = function () {
+        return this.getAngle() * 180 / Math.PI;
+    };
+    /** Sets the vector from an angle and a length.*/
+    IsoVector2D.prototype.createFromAngle = function (angle, length) {
+        this.x = length * Math.cos(angle);
+        this.y = length * Math.sin(angle);
+    };
+    /** Add a second vector to the vector. */
+    IsoVector2D.prototype.add = function (vector) {
+        this.x += vector.x;
+        this.y += vector.y;
+    };
+    return IsoVector2D;
+})(IsoPoint);
+/// <reference path="../core/IsoObject.ts" />
+var IsoAnimation = (function (_super) {
+    __extends(IsoAnimation, _super);
+    function IsoAnimation(name, options) {
+        _super.call(this);
+        /** The duraion of the animation in milliseconds. */
+        this._duration = 1000;
+        /** The time in milliseconds after the animations starts.*/
+        this._time = 0;
+        /** Indecates wether the animation played once or loops.*/
+        this._playType = IsoAnimation.PLAY_ONCE;
+        /** Indecates wether the animation played normal or as ping-pong.*/
+        this._trackDirection = IsoAnimation.TRACK_NORMAL;
+        /** Indecates how often the animation is played.*/
+        this._repetitions = 1;
+        this.isPlaying = false;
+        this.pingPongFlag = false;
+        this.initStartValue = 0;
+        this.currentIteration = 0;
+        this.FPS = 60;
+        this.played = 0;
+        this.startTime = 0;
+        this.pauseTime = 0;
+        this.endValue = options.endValue;
+        this.duration = options.duration || 1000;
+        this.time = options.time || 0;
+        this.trackDirection = options.trackDirection || IsoAnimation.TRACK_NORMAL;
+        this.playType = options.playType || IsoAnimation.PLAY_ONCE;
+        this.repetitions = options.repetitions || 1;
+        this.property = options.property;
+        this.effect = options.effect || IsoEasing.Linear;
+        this.round = options.round || function (n) { return n; };
+        this.object = options.object;
+        this.startValue = options.startValue || this.getObjectValue();
+        this.initStartValue = this.startValue;
+        this.currentValue = this.startValue;
+        this.Engine = IsoMetric.self;
+    }
+    Object.defineProperty(IsoAnimation.prototype, "name", {
+        get: function () {
+            return this._name;
+        },
+        set: function (value) {
+            this.__propertyChanged("name", value);
+            this._name = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "object", {
+        get: function () {
+            return this._object;
+        },
+        set: function (value) {
+            this.__propertyChanged("object", value);
+            this._object = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "startValue", {
+        get: function () {
+            return this._startValue;
+        },
+        set: function (value) {
+            this.__propertyChanged("startValue", value);
+            this._startValue = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "endValue", {
+        get: function () {
+            return this._endValue;
+        },
+        set: function (value) {
+            this.__propertyChanged("endValue", value);
+            this._endValue = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "currentValue", {
+        get: function () {
+            return this._currentValue;
+        },
+        set: function (value) {
+            this.__propertyChanged("currentValue", value);
+            this._currentValue = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "duration", {
+        get: function () {
+            return this._duration;
+        },
+        set: function (value) {
+            this.__propertyChanged("duration", value);
+            this._duration = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "time", {
+        get: function () {
+            return this._time;
+        },
+        set: function (value) {
+            this.__propertyChanged("time", value);
+            this._time = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "playType", {
+        get: function () {
+            return this._playType;
+        },
+        set: function (value) {
+            this.__propertyChanged("playType", value);
+            this._playType = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "trackDirection", {
+        get: function () {
+            return this._trackDirection;
+        },
+        set: function (value) {
+            this.__propertyChanged("trackDirection", value);
+            this._trackDirection = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "repetitions", {
+        get: function () {
+            return this._repetitions;
+        },
+        set: function (value) {
+            this.__propertyChanged("repetition", value);
+            this._repetitions = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "property", {
+        get: function () {
+            return this._property;
+        },
+        set: function (value) {
+            this.__propertyChanged("property", value);
+            this._property = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "effect", {
+        get: function () {
+            return this._effect;
+        },
+        set: function (value) {
+            this.__propertyChanged("effect", value);
+            this._effect = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoAnimation.prototype, "round", {
+        get: function () {
+            return this._effect;
+        },
+        set: function (value) {
+            this.__propertyChanged("round", value);
+            this._round = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the name of the animation. */
+    IsoAnimation.prototype.setName = function (name) {
         this.name = name;
         return this;
     };
-    IsoMap.prototype.get = function () {
-        return this.map;
+    /** Returns the name of the animation. */
+    IsoAnimation.prototype.getName = function () {
+        return this.name;
     };
-    IsoMap.prototype.getValue = function (row, column) {
-        return this.map[row][column];
-    };
-    IsoMap.prototype.getPropertiy = function (property, row, column) {
-        if (this.properties[name] !== undefined) {
-            if (this.map[row] !== undefined && this.map[row][column] !== undefined) {
-                if (this.map[row][column][this.properties[name]] !== undefined) {
-                    return this.map[row][column][this.properties[name]];
+    /** Updates the animation. */
+    IsoAnimation.prototype.update = function () {
+        if (this.isPlaying === false) {
+            return;
+        }
+        if (this.startTime > new Date().getTime()) {
+            return;
+        }
+        this.currentIteration++;
+        var iterations = this.duration * (this.FPS / 1000);
+        this.currentValue = this.effect(this.currentIteration, this.startValue, this.endValue, iterations);
+        this.setValue(this.currentValue);
+        // Trigger the new frame
+        this.call("frame", [this.currentValue]);
+        if (this.currentIteration === iterations) {
+            this.played++;
+            if (this.playType === IsoAnimation.PLAY_ONCE) {
+                if (this.trackDirection === IsoAnimation.TRACK_NORMAL || this.trackDirection === IsoAnimation.TRACK_PINGPONG && this.pingPongFlag === true) {
+                    this.stop();
                 }
-                else {
-                    throw ("The property '" + property + "' with index '" + this.properties[name] + "' does not exist in the map.");
+                if (this.trackDirection === IsoAnimation.TRACK_PINGPONG && this.pingPongFlag === false) {
+                    this.pingPongFlag = true;
+                    var e = this.endValue;
+                    this.endValue = this.startValue;
+                    this.startValue = e;
+                    this.currentIteration = 0;
+                    this.currentValue = this.startValue;
                 }
             }
-            else {
-                throw ("Row " + row + " or Column " + column + " does not exist.");
-            }
-        }
-        else {
-            throw ("Property '" + property + "' does not exist.");
-        }
-    };
-    IsoMap.prototype.nameProperty = function (name, valueIndex) {
-        if (valueIndex > 1) {
-            this.properties[name] = valueIndex;
-        }
-        else {
-            throw ("valueIndex in IsoMap.nameProperty has to be bigger 1.");
-        }
-    };
-    IsoMap.prototype.editProperty = function (name, valueIndex) {
-        if (valueIndex > 1) {
-            this.properties[name] = valueIndex;
-        }
-        else {
-            throw ("valueIndex in IsoMap.nameProperty has to be bigger 1.");
-        }
-    };
-    IsoMap.prototype.edit = function (x, y, value) {
-        if (this.map === undefined) {
-            this.map = new Array();
-        }
-        if (this.map[y] === undefined) {
-            this.map[y] = new Array();
-        }
-        this.map[y][x] = value;
-        return this;
-    };
-    return IsoMap;
-})();
-///<reference path="IsoMap" />
-///<reference path="IsoTile" />
-"use strict";
-/**
- * IsoTileMap draws a tile-based map on the screen.
- */
-var IsoTileMap = (function () {
-    /**
-     * Creates a new tiled map.
-     */
-    function IsoTileMap(Engine, name, tileWidth, tileHeight, image, map) {
-        this.tiles = new Array();
-        this.offset = new IsoPoint(0, 0);
-        this.scrollPosition = new IsoVector2D(0, 0);
-        this.speed = 1;
-        this.zoomLevel = 1;
-        this.zoomStrength = 1 / 1000;
-        this.zoomPoint = new IsoPoint(0, 0);
-        this.Engine = Engine;
-        if (name !== undefined) {
-            this.setName(name);
-        }
-        if (tileWidth !== undefined && tileHeight !== undefined) {
-            this.setTileSize({ width: tileWidth, height: tileHeight });
-        }
-        if (image !== undefined) {
-            this.setImage(image);
-        }
-        if (map !== undefined) {
-            this.setMap(map);
-        }
-        this.offset.set(0, 0);
-        this.scrollPosition.set(0, 0);
-        return this;
-    }
-    /**
-     * Sets the map of the tilemap
-     */
-    IsoTileMap.prototype.setMap = function (map) {
-        this.map = new IsoMap(map);
-        return this;
-    };
-    /**
-     * Create a new empty map.
-     */
-    IsoTileMap.prototype.createMap = function (numTilesX, numTilesY, defaultValue) {
-        if (defaultValue === undefined) {
-            defaultValue = new Array(0);
-        }
-        var map = new Array();
-        for (var y = 0; y < numTilesY; y++) {
-            for (var x = 0; x < numTilesX; x++) {
-                if (map[y] === undefined) {
-                    map[y] = new Array();
-                }
-                map[y][x] = defaultValue;
-            }
-        }
-        return this.setMap(map);
-    };
-    /**
-     * Creates all tile for the tilemap based on the map.
-     */
-    IsoTileMap.prototype.createTiles = function () {
-        try {
-            this.tiles = new Array();
-            if (this.verify()) {
-                var map = this.map.get(), rows = map.length, columns = map[0].length;
-                for (var y = 0; y < rows; y++) {
-                    for (var x = 0; x < columns; x++) {
-                        if (this.tiles[y] === undefined) {
-                            this.tiles[y] = new Array();
+            if (this.playType === IsoAnimation.PLAY_LOOP) {
+                if (this.repetitions === IsoAnimation.REPEAT_ENDLESS || this.repetitions >= this.played) {
+                    if (this.trackDirection === IsoAnimation.TRACK_PINGPONG) {
+                        if (this.pingPongFlag === false) {
+                            this.pingPongFlag = true;
                         }
-                        var tile = map[y][x][0], height = 0;
-                        if (map[y][x][1] !== undefined) {
-                            height = map[y][x][1];
+                        else {
+                            this.pingPongFlag = false;
+                            if (this.time > 0)
+                                this.startTime = new Date().getTime() + this.time;
                         }
-                        this.tiles[y][x] = new IsoTile(this.Engine, this.image, {
-                            tile: tile,
-                            height: height,
-                            size: this.tileSize,
-                            mapPosition: new IsoMapVector2D(y, x)
-                        });
+                        var e = this.endValue;
+                        this.endValue = this.startValue;
+                        this.startValue = e;
+                        this.currentIteration = 0;
+                        this.currentValue = this.startValue;
+                    }
+                    else if (this.trackDirection === IsoAnimation.TRACK_NORMAL) {
+                        this.currentValue = this.startValue;
+                        this.currentIteration = 0;
+                        if (this.time > 0)
+                            this.startTime = new Date().getTime() + this.time;
                     }
                 }
-            }
-            else {
-                throw ("The tilemap '" + this.name + "' is not valid. Please check the properties image, map and tileSize.");
-            }
-            return this;
-        }
-        catch (e) {
-            console.log(e);
-        }
-    };
-    /**
-     * Get a tile given by its name.
-     */
-    IsoTileMap.prototype.getTile = function (name) {
-        for (var i = 0; i < this.tiles.length; i++) {
-            for (var p = 0; p < this.tiles[0].length; p++) {
-                if (this.tiles[i][p].name === name) {
-                    return this.tiles[i][p];
-                }
-            }
-        }
-    };
-    /**
-     * Returns all tiles which are visible on the screen.
-     */
-    IsoTileMap.prototype.getTilesInView = function () {
-        if (this.verify()) {
-            var canvasWidth = this.Engine.canvas.canvasElement.width, canvasHeight = this.Engine.canvas.canvasElement.height, map = this.map.get(), mapLengthY = map.length, mapLengthX = map[0].length, startPointX = (((this.offset.x - this.scrollPosition.x) * this.zoomLevel)
-                + ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x)), startPointY = (((this.offset.y - this.scrollPosition.y) * this.zoomLevel)
-                + ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y)), columnStart = Math.floor(startPointX / (this.tileSize.width * this.zoomLevel)), columnEnd = Math.floor((canvasWidth + startPointX) / (this.tileSize.width * this.zoomLevel)) + 1, rowStart = Math.floor(startPointY / (this.tileSize.height * this.zoomLevel)), rowEnd = Math.floor((canvasHeight + startPointY) / (this.tileSize.height * this.zoomLevel)) + 1;
-            if (columnStart < 0) {
-                columnStart = 0;
-            }
-            if (rowStart < 0) {
-                rowStart = 0;
-            }
-            if (columnEnd >= mapLengthX) {
-                columnEnd = mapLengthX;
-            }
-            if (rowEnd >= mapLengthY) {
-                rowEnd = mapLengthY;
-            }
-            var tiles = new Array();
-            for (var y = 0; y < rowEnd - rowStart; y++) {
-                for (var x = 0; x < columnEnd - columnStart; x++) {
-                    if (tiles[y] === undefined) {
-                        tiles[y] = new Array();
-                    }
-                    tiles[y][x] = this.tiles[y + rowStart][x + columnStart];
-                }
-            }
-            return {
-                rowStart: rowStart,
-                rowEnd: rowEnd,
-                columnEnd: columnEnd,
-                columnStart: columnStart,
-                tiles: tiles
-            };
-        }
-        else {
-            throw ("The tilemap '" + this.name + "' is not valid. Please check the properties image, map and tileSize.");
-        }
-    };
-    /**
-     * Gets all tiles in specified area.
-     */
-    IsoTileMap.prototype.getTilesInRadius = function (x, y, width, height) {
-        x = x - (((this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-            - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x));
-        y = y - (((this.offset.y + this.scrollPosition.y) * this.zoomLevel)
-            - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y));
-        var map = this.map.get(), mapLengthY = map.length, mapLengthX = map[0].length, rowStart = rowStart = Math.floor(y / (this.tileSize.height * this.zoomLevel)), columnStart = Math.floor(x / (this.tileSize.width * this.zoomLevel)), columnEnd = Math.floor((x + width) / (this.tileSize.width * this.zoomLevel)), rowEnd = Math.floor((y + height) / (this.tileSize.height * this.zoomLevel));
-        if (columnStart < 0) {
-            columnStart = 0;
-        }
-        if (rowStart < 0) {
-            rowStart = 0;
-        }
-        if (columnEnd >= mapLengthX) {
-            columnEnd = mapLengthX;
-        }
-        if (rowEnd >= mapLengthY) {
-            rowEnd = mapLengthY;
-        }
-        var tiles = new Array();
-        for (var row = rowStart; row < rowEnd; row++) {
-            for (var column = columnStart; column < columnEnd; column++) {
-                tiles[row][column] = this.tiles[row][column];
-            }
-        }
-        return tiles;
-    };
-    /**
-     * Return the tile placed on the given position.
-     */
-    IsoTileMap.prototype.getTileOnPosition = function (position) {
-        if (this.map.get() !== undefined) {
-            var mapLengthY = this.map.map.length, mapLengthX = this.map.map[0].length;
-            if (position.x > (mapLengthX * (this.tileSize.width * this.zoomLevel)) ||
-                position.y > (mapLengthY * (this.tileSize.height * this.zoomLevel)) ||
-                typeof position.x === "NaN" ||
-                typeof position.y === "NaN" ||
-                position.x === undefined ||
-                position.y === undefined) {
-                return null;
-            }
-            else {
-                position.x = position.x - (((this.offset.x + this.scrollPosition.x) * this.zoomLevel)
-                    - ((this.zoomPoint.x * this.zoomLevel) - this.zoomPoint.x));
-                position.y = position.y - (((this.offset.y + this.scrollPosition.y) * this.zoomLevel)
-                    - ((this.zoomPoint.y * this.zoomLevel) - this.zoomPoint.y));
-                if (position.y > 0 && position.x > 0) {
-                    var row = Math.floor(position.y / (this.tileSize.height * this.zoomLevel)), column = Math.floor(position.x / (this.tileSize.width * this.zoomLevel));
-                    return this.tiles[row][column];
-                }
                 else {
-                    return null;
+                    this.stop();
                 }
             }
         }
-        else {
-            return undefined;
-        }
     };
-    /**
-     * Sets the image ressource for the tilemap.
-     */
-    IsoTileMap.prototype.setImage = function (image) {
-        this.image = image;
-        return this;
+    /** Plays the animation. */
+    IsoAnimation.prototype.play = function () {
+        this.isPlaying = true;
+        this.startTime = new Date().getTime() + this.time;
+        this.call("play");
     };
-    /**
-     * Sets the maximum value for zooming.
-     */
-    IsoTileMap.prototype.setMaxZoomLevel = function (zoomLevel) {
-        this.maxZoomLevel = zoomLevel;
-        return this;
-    };
-    /**
-     * Sets the minimum value for zooming.
-     */
-    IsoTileMap.prototype.setMinZoomLevel = function (zoomLevel) {
-        this.minZoomLevel = zoomLevel;
-        return this;
-    };
-    /**
-     * Sets the name of the tilemap
-     */
-    IsoTileMap.prototype.setName = function (name) {
-        this.name = name;
-        return this;
-    };
-    /**
-     * Sets the offset of the tilemap. Alias for offset.set.
-     */
-    IsoTileMap.prototype.setOffset = function (x, y) {
-        this.offset.set(x, y);
-        return this;
-    };
-    /**
-     * Sets the scroll-position of the tilemap. Alias for scrollPosition.set.
-     */
-    IsoTileMap.prototype.setScroll = function (x, y) {
-        this.scrollPosition.set(x, y);
-        return this;
-    };
-    /**
-     * Sets the speed  for scrolling and moving for the tilemap.
-     */
-    IsoTileMap.prototype.setSpeed = function (speed) {
-        this.speed = speed;
-        return this;
-    };
-    /**
-     * Scrolls the tilemap relative to the actual position.
-     */
-    IsoTileMap.prototype.scroll = function (x, y) {
-        x = x + this.scrollPosition.x;
-        y = y + this.scrollPosition.y;
-        this.scrollPosition.set(x, y);
-        return this;
-    };
-    /**
-     * Sets the tilesize of the tilemap.
-     */
-    IsoTileMap.prototype.setTileSize = function (size) {
-        this.tileSize = size;
-        return this;
-    };
-    /**
-     * Sets the zoomLevel of the tilemap.
-     */
-    IsoTileMap.prototype.setZoomLevel = function (zoomLevel) {
-        this.zoomLevel = zoomLevel;
-        return this;
-    };
-    /**
-     * Sets the zooming point of the tilemap.
-     */
-    IsoTileMap.prototype.setZoomPoint = function (point) {
-        this.zoomPoint = point;
-        return this;
-    };
-    /**
-     * Sets the strength of zooming.
-     */
-    IsoTileMap.prototype.setZoomStrength = function (zoomStrength) {
-        this.zoomStrength = zoomStrength / 1000;
-        return this;
-    };
-    /**
-     * Update the tilemap and with this all the tiles of the tilemap.
-     */
-    IsoTileMap.prototype.update = function () {
-        if (this.tiles === undefined || this.tiles.length === 0) {
-            this.createTiles();
-        }
-        for (var y = 0; y < this.tiles.length; y++) {
-            for (var x = 0; x < this.tiles[0].length; x++) {
-                this.updateTile(this.tiles[y][x]);
-            }
-        }
-    };
-    /**
-     * Update all tiles of the tilemap.
-     */
-    IsoTileMap.prototype.updateTile = function (tile) {
-        if (tile !== undefined) {
-            if (tile.updateType === IsoTile.AUTOMATIC) {
-                tile.offset = this.offset;
-                tile.scrollPosition = this.scrollPosition;
-                tile.setZoomLevel(this.zoomLevel);
-                tile.zoomPoint.set(this.zoomPoint.x, this.zoomPoint.y);
-            }
-            else if (tile.updateType === IsoTile.POSITION) {
-                tile.offset = this.offset;
-                tile.scrollPosition = this.scrollPosition;
-            }
-            else if (tile.updateType === IsoTile.ZOOM) {
-                tile.setZoomLevel(this.zoomLevel);
-                tile.zoomPoint.set(this.zoomPoint.x, this.zoomPoint.y);
-            }
-            if (tile.tileHeight === undefined || typeof tile.tileHeight === "NaN") {
-                tile.tileHeight = 0;
-            }
-        }
-    };
-    /**
-     * Verify the tilemap.
-     * @private
-     */
-    IsoTileMap.prototype.verify = function () {
-        if (this.image === undefined || this.image.loaded === false) {
-            return false;
-        }
-        if (this.tileSize === undefined) {
-            return false;
-        }
-        if (this.map === undefined && this.map.get() === undefined && this.map.get()[0] === undefined) {
-            return false;
-        }
-        return true;
-    };
-    /**
-     * Set te zoom of the tilemap relative to the current zoom.
-     */
-    IsoTileMap.prototype.zoom = function (zoom) {
-        var zoomLevel = this.zoomLevel + (this.zoomStrength * zoom);
-        if (this.maxZoomLevel !== undefined && this.minZoomLevel !== undefined) {
-            if (zoomLevel >= this.minZoomLevel && zoomLevel <= this.maxZoomLevel) {
-                this.setZoomLevel(zoomLevel);
-            }
-        }
-        else if (this.maxZoomLevel !== undefined) {
-            if (zoomLevel <= this.maxZoomLevel) {
-                this.setZoomLevel(zoomLevel);
-            }
-        }
-        else if (this.minZoomLevel !== undefined) {
-            if (zoomLevel >= this.minZoomLevel) {
-                this.setZoomLevel(zoomLevel);
-            }
+    /** Stops the animation. */
+    IsoAnimation.prototype.stop = function () {
+        this.isPlaying = false;
+        this.played = 0;
+        if (this.startValue === this.initStartValue) {
+            this.currentValue = this.startValue;
         }
         else {
-            this.setZoomLevel(zoomLevel);
+            this.endValue = this.startValue;
+            this.startValue = this.initStartValue;
+            this.currentValue = this.startValue;
         }
-        return this;
+        this.call("stop");
     };
-    return IsoTileMap;
-})();
-///<reference path="IsoTile" />
-///<reference path="IsoTileMap" />
-"use strict";
-var IsoSprite = (function (_super) {
-    __extends(IsoSprite, _super);
-    function IsoSprite(Engine, image, tileInfo, name) {
-        _super.call(this, Engine, image, tileInfo);
-        /** Type of the object. */
-        this.type = "IsoSprite";
-        if (name !== undefined) {
-            this.setName(name);
+    /** Pause the animation. */
+    IsoAnimation.prototype.pause = function () {
+        this.isPlaying = false;
+        this.pauseTime = new Date().getTime();
+        this.call("pause");
+    };
+    /** Resumes the animation.*/
+    IsoAnimation.prototype.resume = function () {
+        this.isPlaying = true;
+        this.startTime += new Date().getTime() - this.pauseTime;
+        this.call("resume");
+    };
+    /** Sets a value to the object. */
+    IsoAnimation.prototype.setValue = function (value) {
+        var a = this.property.split(".");
+        var s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
         }
-        return this;
+        var f = new Function("o", "v", "o" + s + " = v;");
+        f(this.object, value);
+    };
+    /** Parse the object and return the given attribute. */
+    IsoAnimation.prototype.getObjectValue = function () {
+        var a = this.property.split("."), s = "";
+        for (var i = 0; i < a.length; i++) {
+            s += "['" + a[i] + "']";
+        }
+        var f = new Function("o", "return o" + s + ";");
+        return f(this.object);
+    };
+    /** The play types of an animation. */
+    IsoAnimation.PLAY_ONCE = "once";
+    IsoAnimation.PLAY_LOOP = "loop";
+    /** The play direction of the animation. */
+    IsoAnimation.TRACK_NORMAL = "normal";
+    IsoAnimation.TRACK_PINGPONG = "pingpong";
+    /** Repetition type */
+    IsoAnimation.REPEAT_ENDLESS = "endless";
+    return IsoAnimation;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoAnimationManager = (function (_super) {
+    __extends(IsoAnimationManager, _super);
+    function IsoAnimationManager(object) {
+        _super.call(this);
+        this.animations = new Array();
+        this.object = object;
     }
-    IsoSprite.prototype.getTileImage = function () {
-        var x = this.tileOffset.x;
-        var y = this.tileOffset.y;
-        var width = this.tileSize.width;
-        var height = this.tileSize.height + this.tileHeight;
-        return {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            image: this.ressource.get()
-        };
+    IsoAnimationManager.prototype.add = function (name, animation) {
+        animation["object"] = this.object;
+        var a = new IsoAnimation(name, animation);
+        this.animations.push(a);
+        return a;
     };
-    IsoSprite.prototype.setFrame = function (frame) {
-        this.tileSize = frame.dimension;
-        this.tileOffset.set(frame.offset.x, frame.offset.y);
-        return this;
-    };
-    IsoSprite.prototype.set = function (tile) {
-        this.tileHeight = tile.height | 0;
-        this.tileSize = tile.size;
-        this.setTile(tile.tile);
-        return this;
-    };
-    /** Gets the dimension of the object on the screen. */
-    IsoSprite.prototype.getAbsoluteDimension = function () {
-        return {
-            width: this.tileSize.width * this.zoomLevel * this.scale.factorX,
-            height: this.tileSize.height * this.zoomLevel * this.scale.factorY
-        };
-    };
-    IsoSprite.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.tileSize.width * this.scale.factorX, fy = this.anchor.y / this.tileSize.height * this.scale.factorY;
-        return {
-            position: this.getAbsolutePosition(),
-            tileSize: this.tileSize,
-            renderSize: this.getAbsoluteDimension(),
-            anchor: new IsoPoint((this.position.x + (this.width * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.height * this.zoomLevel * fy * this.scale.factorY))),
-            image: this.ressource.get(),
-            offset: this.getTileOffset(),
-            zoomLevel: this.zoomLevel,
-            type: "IsoSprite"
-        };
-    };
-    return IsoSprite;
-})(IsoTileObject);
-///<reference path="IsoSprite.ts" />
-"use strict";
-/**
- * This sprite type is an animated sprite, which uses frames of a tileset for animations.
- */
-var IsoAnimatedSprite = (function (_super) {
-    __extends(IsoAnimatedSprite, _super);
-    /**
-     * Creats a new frame-animated sprite
-     */
-    function IsoAnimatedSprite(Engine, image, tileInfo, name) {
-        _super.call(this, Engine, image, tileInfo);
-        /** Type of the object. */
-        this.type = "IsoAnimatedSprite";
-        if (name !== undefined) {
-            this.setName(name);
+    IsoAnimationManager.prototype.remove = function (name) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name) {
+                for (var l = i; l < this.animations.length; l++) {
+                    this.animations[l] = null;
+                    this.animations[l] = this.animations[l + 1];
+                }
+                this.animations.pop();
+                return this;
+            }
         }
-        return this;
-    }
-    /**
-     * Create a new frame-based animation.
-     */
-    IsoAnimatedSprite.prototype.addFrameAnimation = function (name, frames, duration, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = IsoAnimation.ONCE; }
-        if (callbacks === void 0) { callbacks = new Array(); }
-        this.Engine.animation.addFrameAnimation(name, this, frames, duration, easing, type, callbacks);
-        return this;
     };
-    /** Adds a new playlist. The playlist includes animations which animates both: the attributes and/or the frames of an object.*/
-    IsoAnimatedSprite.prototype.addPlaylist = function (name, animations) {
-        this.Engine.animation.addPlaylist(name, this, animations);
-        return this;
+    IsoAnimationManager.prototype.play = function (name) {
+        this.get(name).play();
+        return this.get(name);
     };
-    return IsoAnimatedSprite;
-})(IsoSprite);
+    IsoAnimationManager.prototype.pause = function (name) {
+        this.get(name).pause();
+        return this.get(name);
+    };
+    IsoAnimationManager.prototype.resume = function (name) {
+        this.get(name).resume();
+        return this.get(name);
+    };
+    IsoAnimationManager.prototype.stop = function (name) {
+        this.get(name).stop();
+        return this.get(name);
+    };
+    IsoAnimationManager.prototype.get = function (name) {
+        for (var i = 0; i < this.animations.length; i++) {
+            if (this.animations[i].name === name) {
+                return this.animations[i];
+            }
+        }
+        this.log("Can not find the animation: '" + name + "'. :(", IsoLogger.WARN);
+    };
+    IsoAnimationManager.prototype.update = function () {
+        for (var i = 0; i < this.animations.length; i++) {
+            this.animations[i].update();
+        }
+    };
+    return IsoAnimationManager;
+})(IsoObject);
 /**
  * A library including all easing-functions.
  */
@@ -1322,1229 +932,1462 @@ var IsoEasing = {
         return (endValue - startValue) / 2 * (Math.sqrt(1 - (currentIteration -= 2) * currentIteration) + 1) + startValue;
     }
 };
-///<reference path="IsoEasing.ts" />
-///<reference path="IsoOn.ts" />
-/**
- * Controls an animations.
- * There are two types of animations:
- * 1. "attribute-animation" - animates the attribute of an object. Nearly every object can be animated. The type of the value has to be a number.
- * 2. "frame-animation" - animates the frames of a sprite or a tile. The type of the animated object has to be an IsoAnimatedSprite or IsoTile.W
- */
-var IsoAnimation = (function (_super) {
-    __extends(IsoAnimation, _super);
-    function IsoAnimation() {
+///<reference path="../core/IsoObject.ts" />
+var IsoBaseEntity = (function (_super) {
+    __extends(IsoBaseEntity, _super);
+    /** Creates a new entity by its name. */
+    function IsoBaseEntity(name) {
         _super.call(this);
-        this.easing = IsoEasing.Linear;
-        this.isPlaying = false;
-        this.currentIteration = 0;
-        this.framesPerSecond = 60;
-        this.__debug = 0;
-        this.animationType = "attribute";
-        this.additionType = IsoAnimation.ADDTION_RELATIVE;
-        this.impulsePlaying = 0;
+        /** Name of the entity. */
+        this._name = "";
+        /** The friction of the entity. */
+        this._friction = 1;
+        /** The mass of the entity. */
+        this._mass = 0;
+        /** The acceleration of the entity. */
+        this.acceleration = new IsoVector2D(0, 0);
+        /** The velocity of the entity. */
+        this.velocity = new IsoVector2D(0, 0);
+        /** The position of the entity. */
+        this.position = new IsoVector2D(0, 0);
+        /** The rotation in degrees of the entity. */
+        this._rotation = 0;
+        /** The size of the entity. */
+        this.size = new IsoSize(0, 0);
+        /** The anchor of the entity. */
+        this.anchor = new IsoPoint(0, 0);
+        /** Includes all animations of the entity. */
+        this.animations = new IsoAnimationManager(this);
+        /** Indicates if an entity could be deleted.*/
+        this._isFree = false;
+        /** Hide or show an entity. */
+        this._hidden = false;
+        /** The drawing index of the entity. */
+        this._index = 0;
+        this.chache = new IsoTextureCache();
+        this.setName(name);
+        this.physics = new IsoPhysics();
+        this.setIndex(0);
         return this;
     }
-    /**
-     * Creates a new frame-based animation.
-     */
-    IsoAnimation.prototype.createFrameAnimation = function (name, object, frames, duration, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = "once"; }
-        if (callbacks === void 0) { callbacks = new Array(); }
+    Object.defineProperty(IsoBaseEntity.prototype, "name", {
+        get: function () {
+            return this._name;
+        },
+        set: function (value) {
+            this.__propertyChanged("name", value);
+            this._name = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "friction", {
+        get: function () {
+            return this._friction;
+        },
+        set: function (value) {
+            this.__propertyChanged("friction", value);
+            this._friction = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "mass", {
+        get: function () {
+            return this._mass;
+        },
+        set: function (value) {
+            this.__propertyChanged("mass", value);
+            this._mass = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "rotation", {
+        get: function () {
+            return this._rotation;
+        },
+        set: function (value) {
+            this.__propertyChanged("rotation", value);
+            this._rotation = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "isFree", {
+        get: function () {
+            return this._isFree;
+        },
+        set: function (value) {
+            this.__propertyChanged("isFree", value);
+            this._isFree = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "hidden", {
+        get: function () {
+            return this._hidden;
+        },
+        set: function (value) {
+            this.__propertyChanged("hidden", value);
+            this._hidden = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "type", {
+        /** The type of the object for identification. */
+        get: function () {
+            return "IsoBaseEntity";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoBaseEntity.prototype, "index", {
+        get: function () {
+            return this._index;
+        },
+        set: function (value) {
+            this.__propertyChanged("index", value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the name of the entity. */
+    IsoBaseEntity.prototype.setName = function (name) {
         this.name = name;
-        this.sprite = object;
-        this.frames = frames;
-        this.startValue = frames[0] - 1;
-        this.endValue = frames[frames.length - 1];
-        this.duration = duration;
-        this.easing = easing;
-        this.type = type;
-        this.callbacks = callbacks;
-        this.animationType = IsoAnimation.ANIMATION_TYPE_FRAME;
         return this;
     };
-    /**
-     * Creates a new frame-based animation.
-     */
-    IsoAnimation.prototype.createAnimation = function (name, object, attribute, endValue, duration, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = "once"; }
-        if (callbacks === void 0) { callbacks = new Array(); }
-        this.name = name;
-        this.object = object;
-        this.attribute = attribute;
-        this.startValue = this.getObjectValue();
-        this.endValue = endValue;
-        this.duration = duration;
-        this.easing = easing;
-        this.type = type;
-        this.callbacks = callbacks;
-        this.animationType = IsoAnimation.ANIMATION_TYPE_ATTRIBUTE;
+    /** Gets the name of the entity. */
+    IsoBaseEntity.prototype.getName = function () {
+        return this.name;
+    };
+    /** Sets the rotation of the entity. */
+    IsoBaseEntity.prototype.setRotation = function (rotation) {
+        this.rotation = rotation;
+    };
+    /** Gets the rotation of the entity. */
+    IsoBaseEntity.prototype.getRotation = function () {
+        return this.rotation;
+    };
+    /** Sets the friction of the entity. */
+    IsoBaseEntity.prototype.setFriction = function (friction) {
+        this.friction = friction;
         return this;
     };
-    /**
-     * Starts the animation.
-     */
-    IsoAnimation.prototype.play = function () {
-        if (this.isPlaying === false) {
-            this.iterations = (this.duration / 1000) * this.framesPerSecond;
-            this.currentIteration = 0;
-            this.isPlaying = true;
-            if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
-                this.__playAttribute();
-            }
-            else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
-                this.__playFrame();
-            }
+    /** Gets the friction of the entity. */
+    IsoBaseEntity.prototype.getFriction = function () {
+        return this.friction;
+    };
+    /** Updates the position of the entity. */
+    IsoBaseEntity.prototype.updatePosition = function () {
+        this.acceleration.x *= this.friction;
+        this.acceleration.y *= this.friction;
+        this.velocity.add(this.acceleration);
+        this.position.add(this.velocity);
+        return this;
+    };
+    /** Updates the entity. */
+    IsoBaseEntity.prototype.update = function () {
+        this.updatePosition();
+        this.animations.update();
+        this.physics.updateEntity();
+    };
+    /** Free the memory. */
+    IsoBaseEntity.prototype.free = function () {
+        this.hide();
+        this.isFree = true;
+    };
+    /** Hides the entity. */
+    IsoBaseEntity.prototype.hide = function () {
+        this.hidden = true;
+        return this;
+    };
+    /** Shows the entity. */
+    IsoBaseEntity.prototype.show = function () {
+        this.hidden = false;
+        return this;
+    };
+    /** Checks if the entity is hidden. */
+    IsoBaseEntity.prototype.isHidden = function () {
+        return this.hidden;
+    };
+    /** Sets the index of the entity. */
+    IsoBaseEntity.prototype.setIndex = function (index) {
+        this.index = index;
+        return this;
+    };
+    /** returns the index of the entity. */
+    IsoBaseEntity.prototype.getIndex = function () {
+        return this.index;
+    };
+    /** Returns the render data. */
+    IsoBaseEntity.prototype.getRenderData = function () {
+        try {
+            return {
+                position: this.position,
+                anchor: this.anchor,
+                rotation: this.rotation,
+                size: this.size
+            };
         }
-        return this;
-    };
-    /** Update the animation. */
-    IsoAnimation.prototype.update = function () {
-        if (this.isPlaying === true) {
-            if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
-                this.__playAttribute();
-            }
-            else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
-                this.__playFrame();
-            }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
         }
     };
-    /**
-     * Starts an animation of the type "attribute".
-     */
-    IsoAnimation.prototype.__playAttribute = function () {
-        if (this.isPlaying === true) {
-            if (this.currentIteration === 0) {
-                this.actualValue = this.startValue;
-            }
-            this.currentIteration++;
-            this.actualValue = this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations);
-            if (this.additionType !== IsoAnimation.ADDITION_ABSOLUTE)
-                this.setObjectValue(this.actualValue);
-            else
-                this.setObjectValueAbsolute(this.actualValue);
-            if (this.actualValue === this.endValue) {
-                switch (this.type) {
-                    case IsoAnimation.ONCE:
-                        this.fire(IsoAnimation.PLAYED, this);
-                        if (this.checkOn(IsoAnimation.PLAYED)) {
-                            this.callOn(IsoAnimation.PLAYED);
-                        }
-                        this.isPlaying = false;
-                        this.stop();
-                        return;
-                        break;
-                    case IsoAnimation.PINGPONG:
-                        this.fire(IsoAnimation.EVERYPLAYED, this);
-                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
-                            this.callOn(IsoAnimation.EVERYPLAYED);
-                        }
-                        var endValue = this.endValue;
-                        this.endValue = this.startValue;
-                        this.startValue = endValue;
-                        this.actualValue = this.startValue;
-                        this.isPlaying = false;
-                        this.play();
-                        break;
-                    case IsoAnimation.IMPULSE:
-                        this.fire(IsoAnimation.EVERYPLAYED, this);
-                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
-                            this.callOn(IsoAnimation.EVERYPLAYED);
-                        }
-                        var endValue = this.endValue;
-                        this.impulsePlaying++;
-                        this.endValue = this.startValue;
-                        this.startValue = endValue;
-                        this.actualValue = this.startValue;
-                        if (this.impulsePlaying == 2) {
-                            this.stop();
-                        }
-                        this.isPlaying = false;
-                        this.play();
-                        break;
-                    case IsoAnimation.ENDLESS:
-                        this.fire(IsoAnimation.EVERYPLAYED, this);
-                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
-                            this.callOn(IsoAnimation.EVERYPLAYED);
-                        }
-                        this.actualValue = this.startValue;
-                        this.isPlaying = false;
-                        this.play();
-                        break;
-                }
-            }
+    /** Checks if this entity intersects with another entity. */
+    IsoBaseEntity.prototype.isBoxIntersection = function (entityB) {
+        var dataA = this.getRenderData();
+        var dataB = entityB.getRenderData();
+        if ((dataA.position.x < dataB.position.x && dataA.position.x + dataA.size.width > dataB.position.x ||
+            dataA.position.x < dataB.position.x + dataB.size.width && dataA.position.x + dataA.size.width > dataB.position.x) &&
+            (dataA.position.y < dataB.position.y + dataB.size.height && dataA.position.y + dataA.size.height > dataB.position.y)) {
+            return true;
         }
         else {
-            return;
+            return false;
         }
     };
-    /**
-     * Starts an animation of the type "frame".
-     */
-    IsoAnimation.prototype.__playFrame = function () {
-        if (this.isPlaying === true) {
-            if (this.currentIteration === 0) {
-                this.actualValue = this.startValue;
-            }
-            this.currentIteration++;
-            var __t = Math.floor(this.easing(this.currentIteration, this.startValue, this.endValue, this.iterations));
-            this.actualValue = Math.floor(__t);
-            if (this.actualValue !== this.sprite.tile) {
-                this.sprite.setTile(Math.round(this.actualValue));
-            }
-            if (__t === this.endValue) {
-                switch (this.type) {
-                    case IsoAnimation.ONCE:
-                        this.fire(IsoAnimation.PLAYED, this);
-                        if (this.checkOn(IsoAnimation.PLAYED)) {
-                            this.callOn(IsoAnimation.PLAYED);
-                        }
-                        this.stop();
-                        break;
-                    case IsoAnimation.PINGPONG:
-                        this.fire(IsoAnimation.EVERYPLAYED, this);
-                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
-                            this.callOn(IsoAnimation.EVERYPLAYED);
-                        }
-                        var endValue = this.endValue;
-                        this.endValue = this.startValue;
-                        this.startValue = endValue;
-                        this.actualValue = this.startValue;
-                        this.isPlaying = false;
-                        this.play();
-                        break;
-                    case IsoAnimation.IMPULSE:
-                        this.fire(IsoAnimation.EVERYPLAYED, this);
-                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
-                            this.callOn(IsoAnimation.EVERYPLAYED);
-                        }
-                        var endValue = this.endValue;
-                        this.impulsePlaying++;
-                        this.endValue = this.startValue;
-                        this.startValue = endValue;
-                        this.actualValue = this.startValue;
-                        if (this.impulsePlaying == 2) {
-                            this.stop();
-                        }
-                        this.isPlaying = false;
-                        this.play();
-                        break;
-                    case IsoAnimation.ENDLESS:
-                        this.fire(IsoAnimation.EVERYPLAYED, this);
-                        if (this.checkOn(IsoAnimation.EVERYPLAYED)) {
-                            this.callOn(IsoAnimation.EVERYPLAYED);
-                        }
-                        this.actualValue = this.startValue;
-                        this.isPlaying = false;
-                        this.play();
-                        break;
-                }
-            }
-        }
-    };
-    /**
-     * Stop playing the animation.
-     */
-    IsoAnimation.prototype.stop = function () {
-        this.isPlaying = false;
-        // this.impulsePlaying = 0;
-        // this.actualValue = this.startValue;
-        // this.fire(IsoAnimation.STOPPED, this);
-        return this;
-    };
-    /**
-     * Pause the animation
-     */
-    IsoAnimation.prototype.pause = function () {
-        this.fire(IsoAnimation.PAUSE, this);
-        if (this.checkOn(IsoAnimation.PAUSE)) {
-            this.callOn(IsoAnimation.PAUSE);
-        }
-        this.isPlaying = false;
-        return this;
-    };
-    /**
-     * Resume the animation.
-     */
-    IsoAnimation.prototype.resume = function () {
-        this.fire(IsoAnimation.RESUME, this);
-        if (this.checkOn(IsoAnimation.RESUME)) {
-            this.callOn(IsoAnimation.RESUME);
-        }
-        this.isPlaying = true;
-        if (this.animationType === IsoAnimation.ANIMATION_TYPE_ATTRIBUTE) {
-            this.__playAttribute();
-        }
-        else if (this.animationType === IsoAnimation.ANIMATION_TYPE_FRAME) {
-            this.__playFrame();
-        }
-        return this;
-    };
-    /**
-     * Parse the object and return the given attribute.
-     */
-    IsoAnimation.prototype.getObjectValue = function () {
-        var a = this.attribute.split("."), s = "";
-        for (var i = 0; i < a.length; i++) {
-            s += "['" + a[i] + "']";
-        }
-        var f = new Function("o", "return o" + s + ";");
-        return f(this.object);
-    };
-    /**
-     * Parse the object and set the given attribute in a relative way.
-     */
-    IsoAnimation.prototype.setObjectValue = function (value) {
-        var a = this.attribute.split(".");
-        var s = "";
-        for (var i = 0; i < a.length; i++) {
-            s += "['" + a[i] + "']";
-        }
-        var f = new Function("o", "v", "o" + s + "+= v;");
-        f(this.object, value - this.getObjectValue());
-    };
-    /**
-     * Parse the object and set the given attribute in a absolute way.
-     */
-    IsoAnimation.prototype.setObjectValueAbsolute = function (value) {
-        var a = this.attribute.split(".");
-        var s = "";
-        for (var i = 0; i < a.length; i++) {
-            s += "['" + a[i] + "']";
-        }
-        var f = new Function("o", "v", "o" + s + "= v;");
-        f(this.object, value);
-    };
-    IsoAnimation.prototype.setAdditionType = function (type) {
-        this.additionType = type;
-    };
-    IsoAnimation.ADDITION_ABSOLUTE = "absolute";
-    IsoAnimation.ADDTION_RELATIVE = "relative";
-    IsoAnimation.ONCE = "once";
-    IsoAnimation.PINGPONG = "pingpong";
-    IsoAnimation.ENDLESS = "endless";
-    IsoAnimation.IMPULSE = "impulse";
-    IsoAnimation.ANIMATION_TYPE_FRAME = "frame";
-    IsoAnimation.ANIMATION_TYPE_ATTRIBUTE = "attribute";
-    // Events
-    IsoAnimation.PLAYED = "played";
-    IsoAnimation.EVERYPLAYED = "everyPlayed";
-    IsoAnimation.STOPPED = "stopped";
-    IsoAnimation.RESUME = "resume";
-    IsoAnimation.PAUSE = "pause";
-    return IsoAnimation;
-})(IsoOn);
-///<reference path="IsoAnimation.ts" />
-"use strict";
-var IsoAnimationManager = (function () {
-    function IsoAnimationManager() {
-        /** Includes all object animations. */
-        this.animations = new Array();
-    }
-    /** Adds a new frame-based animation. */
-    IsoAnimationManager.prototype.addFrameAnimation = function (name, object, frames, speed, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = "once"; }
-        if (callbacks === void 0) { callbacks = new Array(); }
-        this.animations.push(new IsoAnimation().createFrameAnimation(name, object, frames, speed, easing, type, callbacks));
-        return this;
-    };
-    /** Adds a new attribute-based animation. */
-    IsoAnimationManager.prototype.addAnimation = function (name, object, attribute, endValue, speed, easing, type, callbacks) {
-        if (easing === void 0) { easing = IsoEasing.Linear; }
-        if (type === void 0) { type = "once"; }
-        if (callbacks === void 0) { callbacks = new Array(); }
-        this.animations.push(new IsoAnimation().createAnimation(name, object, attribute, endValue, speed, easing, type, callbacks));
-        return this;
-    };
-    /** Adds a new playlist. */
-    IsoAnimationManager.prototype.addPlaylist = function (name, object, animations) {
-        this.playLists.push(new IsoAnimationPlaylist(name, object, animations));
-        return this;
-    };
-    /** Plays an animation given by its name and the animated object.*/
-    IsoAnimationManager.prototype.play = function (name, object) {
-        this.get(name, object).play();
-    };
-    /** Stops an animation given by its name and the animated object.*/
-    IsoAnimationManager.prototype.stop = function (name, object) {
-        this.get(name, object).stop();
-    };
-    /** Resumes an animation given by its name and the animated object.*/
-    IsoAnimationManager.prototype.resume = function (name, object) {
-        this.get(name, object).resume();
-    };
-    /** Pauses an animation given by its name and the animated object.*/
-    IsoAnimationManager.prototype.pause = function (name, object) {
-        this.get(name, object).pause();
-    };
-    /** Checks if an animation is playing given by its name and the animated object.*/
-    IsoAnimationManager.prototype.isPlaying = function (name, object) {
-        return this.get(name, object).isPlaying;
-    };
-    /** Sets the addiion type of the animation. */
-    IsoAnimationManager.prototype.setAdditionType = function (name, object, type) {
-        this.get(name, object).setAdditionType(type);
-    };
-    /** Plays a playlist given by its name and the animated object.*/
-    IsoAnimationManager.prototype.playPlaylist = function (name, object) {
-        this.getPlaylist(name, object).play();
-    };
-    /** Stops a playlist given by its name and the animated object.*/
-    IsoAnimationManager.prototype.stopPlaylist = function (name, object) {
-        this.getPlaylist(name, object).stop();
-    };
-    /** Pauses a playlist given by its name and the animated object.*/
-    IsoAnimationManager.prototype.pausePlaylist = function (name, object) {
-        this.getPlaylist(name, object).pause();
-    };
-    /** Resumes a playlist given by its name and the animated object.*/
-    IsoAnimationManager.prototype.resumePlaylist = function (name, object) {
-        this.getPlaylist(name, object).resume();
-    };
-    /** Checks if a playlist is playing given by its name and the animated object.*/
-    IsoAnimationManager.prototype.isPlayingPlaylist = function (name, object) {
-        return this.getPlaylist(name, object).isPlaying;
-    };
-    /** Returns a specified animation given by its name and the animated object.*/
-    IsoAnimationManager.prototype.get = function (name, object) {
-        for (var i = 0; i < this.animations.length; i++) {
-            if (this.animations[i].name === name && (this.animations[i].object === object || this.animations[i].sprite === object)) {
-                return this.animations[i];
-            }
-        }
-    };
-    /** Returns all active animations of an object as an array. */
-    IsoAnimationManager.prototype.getActive = function (object) {
-        var animations = new Array();
-        for (var i = 0; i < this.animations.length; i++) {
-            if ((this.animations[i].object === object || this.animations[i].sprite === object) && this.animations[i].isPlaying === true) {
-                animations.push(this.animations[i]);
-            }
-        }
-        return animations;
-    };
-    /** Returns a specified playlist given by its name and the animated object.*/
-    IsoAnimationManager.prototype.getPlaylist = function (name, object) {
-        for (var i = 0; i < this.playLists.length; i++) {
-            if (this.playLists[i].name === name && (this.playLists[i].object === object)) {
-                return this.playLists[i];
-            }
-        }
-    };
-    return IsoAnimationManager;
-})();
-///<reference path="IsoOn.ts" />
-"use strict";
-var IsoAnimationPlaylist = (function (_super) {
-    __extends(IsoAnimationPlaylist, _super);
-    /** Creates a new playlist.*/
-    function IsoAnimationPlaylist(name, object, animations) {
-        var _this = this;
-        _super.call(this);
-        /** True, if the playlist is playing, else if not.*/
-        this.isPlaying = false;
-        /** All the animations of the playlist.*/
-        this.animations = new Array();
-        /** The current playing animation.*/
-        this.current = "";
-        this.name = name;
-        this.object = object;
-        this.animations = animations;
-        document.addEventListener(IsoAnimation.PLAYED, function (event) { return _this.checkPlaylist(event); });
-    }
-    IsoAnimationPlaylist.prototype.checkPlaylist = function (event) {
-        if (event.detail.object === this.object && this.isPlaying === true) {
-            for (var i = 0; i < this.animations.length; i++) {
-                if (i < this.animations.length - 1 && event.detail.name === this.current) {
-                    this.next(this.animations[i + 1]);
-                }
-                else if (event.detail.name === this.current) {
-                    this.stop();
-                }
-            }
-        }
-    };
-    /** Stops the playlist. */
-    IsoAnimationPlaylist.prototype.stop = function () {
-        for (var i = 0; i < this.animations.length; i++) {
-            if (this.animations[i].isPlaying === true) {
-                this.animations[i].stop();
-            }
-        }
-        this.isPlaying = false;
-        this.current = "";
-    };
-    /** Pause the playlist and saves the current animation.*/
-    IsoAnimationPlaylist.prototype.pause = function () {
-        for (var i = 0; i < this.animations.length; i++) {
-            if (this.animations[i].isPlaying === true) {
-                this.animations[i].pause();
-                this.pausedAnimation = this.animations[i].name;
-            }
-        }
-        this.isPlaying = false;
-    };
-    /** Resumes the playlist. */
-    IsoAnimationPlaylist.prototype.resume = function () {
-        for (var i = 0; i < this.animations.length; i++) {
-            if (this.animations[i].name === this.pausedAnimation) {
-                this.animations[i].resume();
-            }
-        }
-    };
-    /** Plays the next animation. */
-    IsoAnimationPlaylist.prototype.next = function (animation) {
-        this.current = animation.name;
-        animation.play();
-    };
-    /** Plays the playlist from the beginning. */
-    IsoAnimationPlaylist.prototype.play = function () {
-        if (this.animations !== undefined && this.animations.length > 0 && this.isPlaying === false) {
-            this.isPlaying = true;
-            this.animations[0].play();
-        }
-    };
-    return IsoAnimationPlaylist;
-})(IsoOn);
-///<reference path="IsoOn.ts" />
-"use strict";
-var IsoAudio = (function (_super) {
-    __extends(IsoAudio, _super);
-    function IsoAudio(src) {
-        _super.call(this);
-        this.type = IsoRessource.AUDIO;
-        this.src = "";
-        this.isLoaded = false;
-        this.create(src);
-    }
-    IsoAudio.prototype.create = function (src) {
-        this.src = src;
-    };
-    IsoAudio.prototype.load = function () {
-        var _this = this;
-        this.audio = document.createElement("audio");
-        this.audio.addEventListener("canplaythrough", function (event) { return _this._onLoad(event); }, false);
-        this.audio.src = this.src;
-    };
-    /**
-     * Called when the image file was loaded.
-     */
-    IsoAudio.prototype._onLoad = function (event) {
-        this.isLoaded = true;
-        this.callOn("load");
-    };
-    IsoAudio.prototype.get = function () {
-        return this.audio;
-    };
-    return IsoAudio;
-})(IsoOn);
-"use strict";
-var IsoBillboard = (function (_super) {
-    __extends(IsoBillboard, _super);
-    function IsoBillboard() {
-        _super.apply(this, arguments);
-        /** Type of the object. */
-        this.type = "IsoBillboard";
-        this.repeat = IsoBillboard.NOREPEAT;
-    }
-    /** Sets if the billboard will repeated. */
-    IsoBillboard.prototype.setRepeat = function (repeat) {
-        this.repeat = repeat;
-        return this;
-    };
-    IsoBillboard.REPEATX = "repeatx";
-    IsoBillboard.REPEATY = "repeaty";
-    IsoBillboard.REPEAT = "repeat";
-    IsoBillboard.NOREPEAT = "norepeat";
-    return IsoBillboard;
+    return IsoBaseEntity;
 })(IsoObject);
-"use strict";
-var IsoCanvas = (function () {
-    function IsoCanvas(Engine) {
-        this.defaultOptions = {
-            width: 640,
-            height: 480,
-            fullscreen: true
-        };
-        this.Engine = Engine;
-    }
-    IsoCanvas.prototype.create = function (id) {
+///<reference path="IsoBaseEntity.ts" />
+var IsoEntityGroup = (function (_super) {
+    __extends(IsoEntityGroup, _super);
+    function IsoEntityGroup(name) {
         var _this = this;
-        this.canvasElement = document.createElement("canvas");
-        if (id === undefined) {
-            id = "isoMetricCanvas";
-        }
-        this.canvasElement.id = id;
-        this.options = this.defaultOptions;
-        if (this.Engine.config.get("windowOptions") !== undefined) {
-            this.options = this.Engine.config.get("windowOptions");
-        }
-        this.canvasElement.width = this.options.width;
-        this.canvasElement.height = this.options.height;
-        this.canvasElement.style.width = this.options.width + "px";
-        this.canvasElement.style.height = this.options.height + "px";
-        if (this.options.fullscreen === true) {
-            this.canvasElement.width = window.innerWidth;
-            this.canvasElement.height = window.innerHeight;
-            this.canvasElement.style.width = window.innerWidth + "px";
-            this.canvasElement.style.height = window.innerHeight + "px";
-            window.onresize = window.onload = function () { return _this.updateScreen(); };
-            this.canvasElement.style.overflow = "hidden";
-        }
-        if (document.body === null) {
-            document.body = document.createElement("body");
-        }
-        document.body.appendChild(this.canvasElement);
-        this.context = this.canvasElement.getContext("2d");
-        new IsoEvent("IsoCanvasReady").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.set = function (canvas) {
-        if (this.canvasElement !== undefined) {
-            this.canvasElement.remove();
-        }
-        this.canvasElement = canvas;
-        this.context = this.canvasElement.getContext("2d");
-        new IsoEvent("IsoCanvasReady").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.setClass = function (cssClass) {
-        this.canvasElement.className = cssClass;
-    };
-    IsoCanvas.prototype.updateScreen = function () {
-        this.canvasElement.width = window.innerWidth;
-        this.canvasElement.height = window.innerHeight;
-        this.canvasElement.style.width = this.canvasElement.width + "px";
-        this.canvasElement.style.height = this.canvasElement.height + "px";
-        new IsoEvent("IsoCanvasUpdate").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.updateSize = function (width, height) {
-        this.canvasElement.width = width;
-        this.canvasElement.height = height;
-        this.canvasElement.style.width = width + "px";
-        this.canvasElement.style.height = height + "px";
-        this.options.height = height;
-        this.options.width = width;
-    };
-    IsoCanvas.prototype.clearScreen = function () {
-        /**
-         * @todo:
-         * Finding a better solution for redraw the canvas.
-         */
-        this.canvasElement.width = this.canvasElement.width;
-        if (this.clearColor === undefined) {
-            this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-        }
-        else {
-            this.context.fillStyle = this.clearColor;
-            this.context.rect(0, 0, this.canvasElement.width, this.canvasElement.height);
-            this.context.fill();
-        }
-        new IsoEvent("IsoCanvasClearScreen").trigger();
-        return this;
-    };
-    IsoCanvas.prototype.get = function () {
-        return this.canvasElement;
-    };
-    return IsoCanvas;
-})();
-"use strict";
-var IsoConfig = (function () {
-    function IsoConfig(Engine, c) {
-        this.Engine = Engine;
-        if (c !== undefined) {
-            this.c = c;
-        }
-        else {
-            this.c = {};
-        }
+        _super.call(this, name);
+        /** Includes all entities of a group. */
+        this._entities = new Array();
+        this.position.watch("x", function () { return _this.updateEntitiesPositionX; });
+        this.position.watch("y", function () { return _this.updateEntitiesPositionY; });
     }
-    IsoConfig.prototype.setConfig = function (c) {
-        this.c = c;
-    };
-    IsoConfig.prototype.set = function (name, value) {
-        this.c[name] = value;
-    };
-    IsoConfig.prototype.get = function (name) {
-        if (this.c[name] !== undefined) {
-            return this.c[name];
+    Object.defineProperty(IsoEntityGroup.prototype, "entities", {
+        get: function () {
+            return this._entities;
+        },
+        set: function (value) {
+            this.__propertyChanged("entities", value);
+            this._entities = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoEntityGroup.prototype, "type", {
+        /** The type of the object for identification. */
+        get: function () {
+            return "IsoEntityGroup";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Adds a new entity to the group. */
+    IsoEntityGroup.prototype.add = function (entity) {
+        try {
+            this.entities.push(entity);
         }
-        else {
+        catch (e) {
+            if (this.entities === undefined) {
+                this.entities = new Array(entity);
+                this.log(e, IsoLogger.WARN);
+                this.log("Created a new array for you.", IsoLogger.INFO);
+            }
+            else {
+                throw new Error("There is an big fat unknown error.");
+            }
+        }
+        finally {
+            this.log(new Error("There is an big fat unknown error."), IsoLogger.ERROR);
+        }
+    };
+    /** Removes a entity to the group. */
+    IsoEntityGroup.prototype.remove = function (entity) {
+        try {
+            for (var i = 0; i < this.entities.length; i++) {
+                if (this.entities[i] === entity) {
+                    this.entities[i] = null;
+                    for (var l = i + 1; l < this.entities.length - 1; l++) {
+                        this.entities[l - 1] = this.entities[l];
+                    }
+                    this.entities.pop();
+                    return true;
+                }
+            }
+        }
+        catch (e) {
+            if (this.entities === undefined) {
+                this.entities = new Array();
+            }
+            this.log("Can not remove an entity, when entities is undefined. I created an new empty array.", IsoLogger.WARN);
+        }
+        finally {
+            this.log(new Error("There is a real big fat unknown error."), IsoLogger.ERROR);
+        }
+        return false;
+    };
+    /** Updates the entity group. */
+    IsoEntityGroup.prototype.update = function () {
+        try {
+            this.updatePosition();
+            this.sort();
+            this.animations.update();
+            this.physics.updateEntity();
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Updates the position on the x-axis of all including entities, when the position changed. */
+    IsoEntityGroup.prototype.updateEntitiesPositionX = function (value, oldValue) {
+        try {
+            var d = value - oldValue;
+            for (var i = 0; i < this.entities.length; i++) {
+                this.entities[i].position.add(new IsoVector2D(d, 0));
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Updates the position on the y-axis of all including entities, when the position changed. */
+    IsoEntityGroup.prototype.updateEntitiesPositionY = function (value, oldValue) {
+        try {
+            var d = value - oldValue;
+            for (var i = 0; i < this.entities.length; i++) {
+                this.entities[i].position.add(new IsoVector2D(0, d));
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Sorts the entities by there indizies. */
+    IsoEntityGroup.prototype.sort = function () {
+        this.entities.sort(_sort);
+        function _sort(entityA, entityB) {
+            if (entityA.index > entityB.index) {
+                return 1;
+            }
+            else if (entityA.index < entityB.index) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        }
+    };
+    return IsoEntityGroup;
+})(IsoBaseEntity);
+///<reference path="IsoBaseEntity.ts" />
+var IsoSprite = (function (_super) {
+    __extends(IsoSprite, _super);
+    function IsoSprite(name) {
+        _super.call(this, name);
+        /** The texture of the box. */
+        this._texture = new Array();
+        /** The scale of the texture. */
+        this.scale = new IsoScale(1, 1);
+        this.texture = new Array();
+        this.animations = new IsoAnimationManager(this);
+    }
+    Object.defineProperty(IsoSprite.prototype, "texture", {
+        get: function () {
+            return this._texture;
+        },
+        set: function (value) {
+            this.__propertyChanged("texture", value);
+            this._texture = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoSprite.prototype, "mask", {
+        get: function () {
+            return this._mask;
+        },
+        set: function (value) {
+            this.__propertyChanged("texture", value);
+            this._mask = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoSprite.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoSprite";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Gets the absolute width dimension. */
+    IsoSprite.prototype.getAbsoluteWidth = function () {
+        return this.size.width * this.scale.fx;
+    };
+    /** Gets the absolute height dimension. */
+    IsoSprite.prototype.getAbsoluteHeight = function () {
+        return this.size.height * this.scale.fy;
+    };
+    /** Add a texture to the box. */
+    IsoSprite.prototype.addTexture = function (texture) {
+        try {
+            this.texture.push(texture);
+        }
+        catch (e) {
+            if (this.texture === undefined) {
+                this.texture = new Array(texture);
+                this.log("Can not add a texture to undefined. I created a new array for you.", IsoLogger.WARN);
+            }
+        }
+        return this;
+    };
+    /** Get a texture by its name. */
+    IsoSprite.prototype.getTexture = function (name) {
+        try {
+            if (this.texture === undefined) {
+                this.log("The textures are undefined. I created a new array for you.", IsoLogger.WARN);
+            }
+            for (var i = 0; i < this.texture.length; i++) {
+                if (this.texture[i].name === name) {
+                    return this.texture[i];
+                }
+            }
+            this.log("I am sorry. The texture '" + name + "' can not be found.", IsoLogger.WARN);
             return undefined;
         }
+        catch (e) {
+            this.texture = new Array();
+            this.log(e, IsoLogger.WARN);
+        }
     };
-    return IsoConfig;
-})();
-"use strict";
-var IsoDrawer = (function () {
-    function IsoDrawer(Engine) {
-        this.__DEBUG_SHOW = false;
-        this.Engine = Engine;
-        this.canvas = Engine.canvas;
-        this.context = Engine.canvas.context;
-    }
-    /** Redraw all elements on the screen */
-    IsoDrawer.prototype.update = function () {
-        this.canvas.clearScreen();
-        this.Engine.layers.sort();
-        for (var i = 0; i < this.Engine.layers.layers.length; i++) {
-            if (!this.Engine.layers.layers[i].isHidden()) {
-                this.drawLayer(this.Engine.layers.layers[i]);
+    /** Sets the mask of the sprite. */
+    IsoSprite.prototype.setMask = function (mask) {
+        this.mask = mask;
+        return this;
+    };
+    /** Gets the mask of the sprite. */
+    IsoSprite.prototype.getMask = function () {
+        return this.mask;
+    };
+    /** Removes a texture by its name. */
+    IsoSprite.prototype.removeTexture = function (name) {
+        try {
+            if (this.texture === undefined) {
+                this.log("The textures are undefined. I created a new array for you.", IsoLogger.WARN);
             }
-        }
-        this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
-        new IsoEvent("drawComplete").trigger();
-        this.Engine.endLoop();
-    };
-    /** Draws a single layer. */
-    IsoDrawer.prototype.drawLayer = function (layer) {
-        if (layer.billboards.length > 0) {
-            this.drawBillboards(layer.billboards);
-        }
-        if (layer.getTileMap() !== undefined) {
-            this.drawTileMap(layer.getTileMap());
-        }
-        if (layer.objects.length > 0) {
-            this.drawObjects(layer.objects);
-        }
-        if (layer.texts.length > 0) {
-            this.drawTexts(layer.texts);
-        }
-    };
-    /** Draws a tilemap of a layer. */
-    IsoDrawer.prototype.drawTileMap = function (tileMap) {
-        tileMap.update();
-        var tiles = tileMap.getTilesInView();
-        for (var y = 0; y < tiles.rowEnd - tiles.rowStart; y++) {
-            for (var x = 0; x < tiles.columnEnd - tiles.columnStart; x++) {
-                tiles.tiles[y][x].updatePosition();
-                var detail = tiles.tiles[y][x].getRenderDetails();
-                if (tiles.tiles[y][x].rotation !== 0) {
-                    this.translate(tiles.tiles[y][x], detail);
-                    this.rotate(tiles.tiles[y][x], detail);
-                    this.resetTranslation(tiles.tiles[y][x], detail);
-                }
-                this.context.globalCompositeOperation = tiles.tiles[y][x].blendingMode;
-                this.context.globalAlpha = tiles.tiles[y][x].alpha;
-                this.context.drawImage(detail.image, detail.offset.x, detail.offset.y, detail.tileSize.width, detail.tileSize.height, detail.position.x, detail.position.y, detail.renderSize.width, detail.renderSize.height);
-                this.context.setTransform(1, 0, 0, 1, 0, 0);
-                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
-                this.context.globalAlpha = 1;
-            }
-        }
-    };
-    /** Draws all given objects. */
-    IsoDrawer.prototype.drawBillboards = function (objects) {
-        for (var i = 0; i < objects.length; i++) {
-            var o = objects[i];
-            if (o.hidden === false) {
-                o.updatePosition();
-                var renderDetails = o.getRenderDetails();
-                if (o.rotation !== 0) {
-                    this.translate(o, renderDetails);
-                    this.rotate(o, renderDetails);
-                    this.resetTranslation(o, renderDetails);
-                }
-                this.context.globalCompositeOperation = o.blendingMode;
-                this.context.globalAlpha = o.alpha;
-                if (o.repeat !== IsoBillboard.NOREPEAT) {
-                    if (o.repeat === IsoBillboard.REPEAT) {
-                        if (o.scrollPosition.x <= -o.width || o.scrollPosition.x >= o.width) {
-                            o.scrollPosition.x = 0;
-                        }
-                        if (o.scrollPosition.y <= -o.height || o.scrollPosition.y >= o.height) {
-                            o.scrollPosition.y = 0;
-                        }
+            for (var i = 0; i < this.texture.length; i++) {
+                if (this.texture[i].name === name) {
+                    for (var l = i; l < this.texture.length; l++) {
+                        this.texture[l] = this.texture[l + 1];
                     }
-                    if (o.repeat === IsoBillboard.REPEATX) {
-                        if (o.scrollPosition.x <= -o.width || o.scrollPosition.x >= o.width) {
-                            o.scrollPosition.x = 0;
-                        }
-                    }
-                    if (o.repeat === IsoBillboard.REPEATY) {
-                        if (o.scrollPosition.y <= -o.height || o.scrollPosition.y >= o.height) {
-                            o.scrollPosition.y = 0;
-                        }
-                    }
-                    o.updatePosition();
-                    for (var ii = -1; ii < Math.ceil(this.canvas.canvasElement.height / o.height) + 1; ii++) {
-                        for (var i = -1; i < Math.ceil(this.canvas.canvasElement.width / o.width) + 1; i++) {
-                            var rx = renderDetails.position.x, ry = renderDetails.position.y, fx = o.scrollPosition.x > 0 ? -1 : 1, fy = o.scrollPosition.y > 0 ? -1 : 1;
-                            if (o.repeat === IsoBillboard.REPEAT) {
-                                rx += i * (fx * renderDetails.renderSize.width);
-                                ry += ii * (fy * renderDetails.renderSize.height);
-                            }
-                            if (o.repeat === IsoBillboard.REPEATX) {
-                                rx += i * (fx * renderDetails.renderSize.width);
-                            }
-                            if (o.repeat === IsoBillboard.REPEATY) {
-                                ry += ii * (fy * renderDetails.renderSize.height);
-                            }
-                            this.drawImage({
-                                image: renderDetails.image,
-                                offset: new IsoPoint(renderDetails.offset.x, renderDetails.offset.y),
-                                tileSize: renderDetails.tileSize,
-                                position: new IsoVector2D(rx, ry),
-                                renderSize: renderDetails.renderSize
-                            });
-                        }
-                    }
+                    this.texture.pop();
+                    return this;
                 }
-                else {
-                    this.drawImage(renderDetails);
-                }
-                this.context.setTransform(1, 0, 0, 1, 0, 0);
-                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
-                this.context.globalAlpha = 1;
             }
         }
-    };
-    /** Draws all given objects. */
-    IsoDrawer.prototype.drawObjects = function (objects) {
-        for (var i = 0; i < objects.length; i++) {
-            var o = objects[i];
-            if (o.hidden === false) {
-                o.update();
-                var renderDetails = o.getRenderDetails();
-                if (o.rotation !== 0) {
-                    this.translate(o, renderDetails);
-                    this.rotate(o, renderDetails);
-                    this.resetTranslation(o, renderDetails);
-                }
-                this.context.globalCompositeOperation = o.blendingMode;
-                this.context.globalAlpha = o.alpha;
-                if (renderDetails.type === "IsoObject" || renderDetails.type === "IsoSprite") {
-                    if (o.ressource.ressource.type === IsoRessource.IMAGE) {
-                        this.drawImage(renderDetails);
-                    }
-                }
-                else if (renderDetails.type === "IsoEmitter") {
-                    this.drawParticles(renderDetails, o);
-                }
-                this.context.setTransform(1, 0, 0, 1, 0, 0);
-                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
-                this.context.globalAlpha = 1;
-            }
+        catch (e) {
+            this.texture = new Array();
+            this.log(e, IsoLogger.WARN);
         }
     };
-    /** Draws the particles of an emitter. */
-    IsoDrawer.prototype.drawParticles = function (renderDetails, emitter) {
-        if (emitter.oldTime === 0) {
-            emitter.oldTime = new Date().getTime();
-        }
-        var currentTime = new Date().getTime();
-        var particles = emitter.particles;
-        for (var i = 0; i < particles.length; i++) {
-            particles[i].update(currentTime - emitter.oldTime);
-            if (particles[i].rotation !== 0) {
-                this.translate(particles[i], particles[i].getRenderDetails());
-                this.rotate(particles[i], particles[i].getRenderDetails());
-                this.resetTranslation(particles[i], particles[i].getRenderDetails());
-            }
-            this.context.globalCompositeOperation = particles[i].blendingMode;
-            this.context.globalAlpha = particles[i].alpha;
-            this.drawImage(particles[i].getRenderDetails());
-            this.context.setTransform(1, 0, 0, 1, 0, 0);
-            this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
-            this.context.globalAlpha = 1;
-        }
-        emitter.oldTime = currentTime;
-    };
-    /** Draws all given texts. */
-    IsoDrawer.prototype.drawTexts = function (objects) {
-        for (var i = 0; i < objects.length; i++) {
-            var o = objects[i];
-            if (o.hidden === false) {
-                o.updatePosition();
-                var renderDetails = o.getRenderDetails();
-                if (o.rotation !== 0) {
-                    this.translate(o, renderDetails);
-                    this.rotate(o, renderDetails);
-                    this.resetTranslation(o, renderDetails);
-                }
-                this.context.globalCompositeOperation = o.blendingMode;
-                this.context.globalAlpha = o.alpha;
-                this.drawText(renderDetails);
-                this.context.setTransform(1, 0, 0, 1, 0, 0);
-                this.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
-                this.context.globalAlpha = 1;
-            }
-        }
-    };
-    IsoDrawer.prototype.drawImage = function (renderDetails) {
-        this.context.drawImage(renderDetails.image, renderDetails.offset.x, renderDetails.offset.y, renderDetails.tileSize.width, renderDetails.tileSize.height, renderDetails.position.x, renderDetails.position.y, renderDetails.renderSize.width, renderDetails.renderSize.height);
-    };
-    IsoDrawer.prototype.drawText = function (renderDetails) {
-        var actualColor = this.canvas.context.fillStyle;
-        var actualFont = this.canvas.context.font;
-        var actualAlign = this.canvas.context.textAlign;
-        var actualBaseline = this.canvas.context.textBaseline;
-        var actualDirection = this.canvas.context.direction;
-        if (typeof renderDetails.size === "string")
-            this.canvas.context.font = renderDetails.size + " " + renderDetails.font;
-        else
-            this.canvas.context.font = renderDetails.size + "px " + renderDetails.font;
-        if (renderDetails.backgroundColor !== null && renderDetails.backgroundColor !== "transparent") {
-            this.canvas.context.beginPath();
-            var x = renderDetails.position.x;
-            var y = renderDetails.position.y;
-            if (renderDetails.align === IsoText.CENTER) {
-                x = x - (renderDetails.renderSize.width / 2);
-            }
-            else if (renderDetails.align === IsoText.RIGHT) {
-                x = x + renderDetails.renderSize.width;
-            }
-            this.canvas.context.rect(x, y, renderDetails.renderSize.width, renderDetails.renderSize.height);
-            this.canvas.context.fillStyle = renderDetails.backgroundColor;
-            this.canvas.context.fill();
-        }
-        this.canvas.context.direction = renderDetails.direction;
-        this.canvas.context.textAlign = renderDetails.align;
-        this.canvas.context.textBaseline = renderDetails.baseline;
-        if (renderDetails.filled === true) {
-            this.canvas.context.fillStyle = renderDetails.color;
-            this.canvas.context.fontStyle = renderDetails.size + "px " + renderDetails.font;
-            this.canvas.context.fillText(renderDetails.text, renderDetails.position.x, renderDetails.position.y);
-        }
-        if (renderDetails.filled === false || renderDetails.strokeWidth > 0 && renderDetails.strokeColor !== null && renderDetails.strokeColor !== "transparent") {
-            this.canvas.context.fontStyle = renderDetails.size + "px " + renderDetails.font;
-            this.canvas.context.lineWidth = renderDetails.strokeWidth;
-            this.canvas.context.strokeStyle = renderDetails.strokeColor;
-            this.canvas.context.strokeText(renderDetails.text, renderDetails.position.x, renderDetails.position.y);
-        }
-        this.canvas.context.fillStyle = actualColor;
-        this.canvas.context.font = actualFont;
-        this.canvas.context.textAlign = actualAlign;
-        this.canvas.context.textBaseline = actualBaseline;
-        this.canvas.context.direction = actualDirection;
-    };
-    /** Sets the anchor of an object. */
-    IsoDrawer.prototype.translate = function (object, renderDetails) {
-        this.context.translate(renderDetails.anchor.x, renderDetails.anchor.y);
-    };
-    /** Reset the anchor of an object. */
-    IsoDrawer.prototype.resetTranslation = function (object, renderDetails) {
-        this.context.translate(-renderDetails.anchor.x, -renderDetails.anchor.y);
-    };
-    /** Rotates an object. */
-    IsoDrawer.prototype.rotate = function (object, renderDetails) {
-        this.context.rotate(object.rotation * Math.PI / 180);
-    };
-    return IsoDrawer;
-})();
-var IsoEmitter = (function (_super) {
-    __extends(IsoEmitter, _super);
-    /** Creates a new particle emiter.*/
-    function IsoEmitter(Engine, ressource, config) {
-        _super.call(this, Engine);
-        /** The maximum particle count. */
-        this.particleCount = 100;
-        /** The lifttime of a particle.*/
-        this.lifetime = 1000;
-        /** Sets how many particles will spreaded.*/
-        this.spreadCount = 4;
-        this.oldTime = 0;
-        /** A simple seed number.*/
-        this.variance = 100;
-        /** Includes all the particles.*/
-        this.particles = new Array();
-        /** The speed of the particles.*/
-        this.particleSpeed = 1;
-        /** Height of the emitter.*/
-        this.height = 1;
-        /** Width of the emitter.*/
-        this.width = 1;
-        /** Sets if the emitter is emitting */
-        this.isEmitting = undefined;
-        /** The random library. */
-        this.rand = new MersenneTwister();
-        /** Sets the typ of this object.*/
-        this.type = "IsoEmitter";
-        this.ressource = ressource;
-    }
-    IsoEmitter.prototype.addParticle = function (particle) {
-        for (var i = 0; i < this.particles.length; i++) {
-            if (this.particles[i].life < 0) {
-                this.particles[i] = null;
-                this.particles[i] = particle;
-                return;
-            }
-        }
-        this.particles.push(particle);
-    };
-    IsoEmitter.prototype.update = function () {
-        if (this.isEmitting) {
-            this.emit();
-        }
-        this.updatePosition();
-        var a = this.Engine.animation.getActive(this);
-        for (var i = 0; i < this.addAnimation.length; i++) {
-            if (a[i] !== undefined)
-                a[i].update();
-        }
-    };
-    IsoEmitter.prototype.emit = function () {
-        if (this.isEmitting === undefined) {
-            this.isEmitting = true;
-        }
-        if (this.particles.length - 1 < this.particleCount) {
-            var count = this.spreadCount;
-            if (this.particles.length - 1 + this.spreadCount > this.particleCount) {
-                count = this.particleCount - this.particles.length - 1;
-            }
-            for (var i = 0; i < count; i++) {
-                this.addParticle(new IsoParticle(this.Engine, this.ressource, new IsoPoint(this.position.x, this.position.y), this.lifetime, this.random((this.rotation - this.variance), (this.rotation + this.variance)), this.scale, this.particleSpeed));
-            }
-        }
-    };
-    IsoEmitter.prototype.getLifetime = function () {
-        return this.lifetime;
-    };
-    IsoEmitter.prototype.getParticleCount = function () {
-        return this.particleCount;
-    };
-    IsoEmitter.prototype.getParticleSpeed = function () {
-        return this.particleSpeed;
-    };
-    IsoEmitter.prototype.getVariance = function () {
-        return this.variance;
-    };
-    IsoEmitter.prototype.setLifetime = function (lifetime) {
-        this.lifetime = lifetime;
-        return this;
-    };
-    IsoEmitter.prototype.setParticleCount = function (count) {
-        this.particleCount = count;
-        return this;
-    };
-    IsoEmitter.prototype.setParticleSpeed = function (speed) {
-        this.particleSpeed = speed;
-        return this;
-    };
-    IsoEmitter.prototype.setVariance = function (variance) {
-        this.variance = variance;
-        return this;
-    };
-    IsoEmitter.prototype.setSpreadCount = function (count) {
-        this.spreadCount = count;
-        return this;
-    };
-    IsoEmitter.prototype.freeParticle = function (particle) {
-        var f = false;
-        for (var i = 0; i < this.particles.length; i++) {
-            if (this.particles[i] === particle) {
-                f = true;
-            }
-            if (f === true) {
-                this.particles[i - 1] = this.particles[i];
-            }
-        }
-        this.particles.pop();
-        return f;
-    };
-    IsoEmitter.prototype.getRenderDetails = function () {
-        var fx = this.anchor.x / this.ressource.ressource.width * this.scale.factorX, fy = this.anchor.y / this.ressource.ressource.height * this.scale.factorY;
-        return {
-            position: this.getAbsolutePosition(),
-            tileSize: {
-                width: this.ressource.ressource.width,
-                height: this.ressource.ressource.height
-            },
-            renderSize: { width: 0, height: 0 },
-            anchor: new IsoPoint((this.position.x + (this.ressource.ressource.image.width * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (this.ressource.ressource.image.height * this.zoomLevel * fy * this.scale.factorY))),
-            image: this.ressource.get(),
-            offset: new IsoPoint(0, 0),
-            zoomLevel: this.zoomLevel,
-            type: this.type
-        };
-    };
-    IsoEmitter.prototype.random = function (min, max) {
-        this.rand = new MersenneTwister();
-        return this.rand.genrand_real1() * (max - min) + min;
-    };
-    return IsoEmitter;
-})(IsoMinimalObject);
-"use strict";
-var IsoEvent = (function () {
-    function IsoEvent(type) {
-        this.type = type;
-        return this;
-    }
-    IsoEvent.prototype.addData = function (data) {
-        this.data = data;
-        return this;
-    };
-    /**
-     * @todo Find a solid solution */
-    IsoEvent.prototype.trigger = function (target) {
-        var d = document;
-        if (d.createEventObject) {
-            // dispatch for IE
-            var evt = d.createEventObject();
-            if (target !== undefined) {
-                if (typeof target === "string") {
-                    var e = document.querySelector(target);
-                    e.fireEvent(this.type, event);
-                }
-                else {
-                    var e = target;
-                    e.fireEvent(this.type, event);
-                }
+    /** Returns the render data. */
+    IsoSprite.prototype.getRenderData = function () {
+        try {
+            var maskData = null;
+            if (this.texture === undefined || this.texture.length === 0) {
+                this.log("Can not return render data, because nothing to return. Texture is undefined or null.", IsoLogger.WARN);
             }
             else {
-                d.fireEvent(event);
-            }
-        }
-        else {
-            // dispatch for firefox + others
-            var evt2 = document.createEvent("HTMLEvents");
-            evt2.initEvent(this.type, true, true); // event type,bubbling,cancelable
-            if (target !== undefined) {
-                if (typeof target === "string") {
-                    document.querySelector(target).dispatchEvent(evt2);
+                if (this.getMask() !== undefined) {
+                    maskData = this.getMask().getTextureData();
                 }
-                else {
-                    target.dispatchEvent(evt2);
+                var textureData = new Array();
+                for (var i = 0; i < this.texture.length; i++) {
+                    textureData.push(this.texture[i].getTextureData());
                 }
+                return {
+                    maskData: maskData,
+                    textureData: textureData,
+                    position: this.position,
+                    anchor: this.anchor,
+                    rotation: this.rotation,
+                    size: new IsoSize(this.size.width * this.scale.fx, this.size.height * this.scale.fy)
+                };
             }
-            else {
-                document.dispatchEvent(evt2);
-            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
         }
     };
-    IsoEvent.prototype.__c = function (target) {
-        var event = new CustomEvent(this.type, { 'detail': this.data });
-        event.initCustomEvent(this.type, false, false, this.data);
-        if (target !== undefined) {
-            if (typeof target === "string") {
-                document.querySelector(target).dispatchEvent(event);
-            }
-            else {
-                target.dispatchEvent(event);
-            }
-        }
-        else {
-            document.dispatchEvent(event);
-        }
-    };
-    IsoEvent.prototype.__e = function (target) {
-        var event = new Event(this.type, this.data);
-        event.initEvent(this.type, false, false);
-        if (target !== undefined) {
-            if (typeof target === "string") {
-                document.querySelector(target).dispatchEvent(event);
-            }
-            else {
-                target.dispatchEvent(event);
-            }
-        }
-        else {
-            document.dispatchEvent(event);
-        }
-    };
-    return IsoEvent;
-})();
-"use strict";
-/// <reference path="IsoMinimalObject.ts" />
-var IsoGroup = (function (_super) {
-    __extends(IsoGroup, _super);
-    function IsoGroup() {
-        _super.apply(this, arguments);
-    }
-    IsoGroup.prototype.addItem = function (object) {
-        this.items.push(object);
-    };
-    return IsoGroup;
-})(IsoMinimalObject);
-"use strict";
-var IsoGui = (function () {
-    function IsoGui(Engine) {
-        this.Engine = Engine;
-    }
-    return IsoGui;
-})();
-///<reference path="IsoOn.ts" />
-"use strict";
+    return IsoSprite;
+})(IsoBaseEntity);
+///<reference path="../core/IsoObject.ts" />
 var IsoImage = (function (_super) {
     __extends(IsoImage, _super);
-    function IsoImage(src, local) {
-        if (local === void 0) { local = false; }
+    function IsoImage(src) {
         _super.call(this);
+        /** Indicates if the image was loaded. */
         this.isLoaded = false;
-        this.offset = new IsoPoint(0, 0);
-        this.type = IsoRessource.IMAGE;
+        /** The size of the image. */
+        this.size = new IsoSize(0, 0);
         if (name !== undefined && src !== undefined) {
             this.create(src);
         }
     }
-    /**
-     * Creates a new image.
-     */
+    Object.defineProperty(IsoImage.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoImage";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the element to an existing HTML element. */
+    IsoImage.prototype.setElement = function (image) {
+        this.element = image;
+        this.setSize(new IsoSize(image.width, image.height));
+        this.isLoaded = true;
+        return this;
+    };
+    /** Creates a new image. */
     IsoImage.prototype.create = function (src) {
+        this.src = src;
+        this.element = new Image();
+        return this;
+    };
+    /** Loads the image for further work. */
+    IsoImage.prototype.load = function () {
+        var _this = this;
+        this.element.addEventListener("load", function (event) { return _this._onLoad(event); }, true);
+        this.element["src"] = this.src;
+    };
+    /** Called when the image file was loaded. */
+    IsoImage.prototype._onLoad = function (event) {
+        this.size = new IsoSize(this.element.width, this.element.height);
+        this.isLoaded = true;
+        this.call("load");
+    };
+    /**  Returns the image. */
+    IsoImage.prototype.get = function () {
+        return this.element;
+    };
+    /** Gets the width of the image. */
+    IsoImage.prototype.getWidth = function () {
+        return this.element.width;
+    };
+    /** Gets the height of the image. */
+    IsoImage.prototype.getHeight = function () {
+        return this.element.height;
+    };
+    /** Returns the size. */
+    IsoImage.prototype.getSize = function () {
+        return this.size;
+    };
+    /** Sets the width of the image. */
+    IsoImage.prototype.setWidth = function (width) {
+        this.size.width = width;
+        return this;
+    };
+    /** Sets the height of the image. */
+    IsoImage.prototype.setHeight = function (height) {
+        this.size.height = height;
+        return this;
+    };
+    /** Sets the size of the image. */
+    IsoImage.prototype.setSize = function (size) {
+        this.size = size;
+        return this;
+    };
+    /** Resizes the video. */
+    IsoImage.prototype.resize = function () {
+        if (this.element !== undefined && this.size.width !== undefined && this.size.height !== undefined) {
+            this.element.width = this.size.width;
+            this.element.height = this.size.height;
+        }
+        return this;
+    };
+    return IsoImage;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoAudio = (function (_super) {
+    __extends(IsoAudio, _super);
+    function IsoAudio(src) {
+        _super.call(this);
+        /** Indicates if the audio was loaded. */
+        this.isLoaded = false;
+        /** Sets if the audio load completly or stream it. */
+        this.loadType = IsoAudio.LOAD;
+        if (name !== undefined && src !== undefined) {
+            this.create(src);
+        }
+    }
+    Object.defineProperty(IsoAudio.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoAudio";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Creates a new audio. */
+    IsoAudio.prototype.create = function (src) {
         this.src = src;
         return this;
     };
-    /**
-     * Loads the image for further work.
-     */
-    IsoImage.prototype.load = function () {
+    /** Loads the audio for further work. */
+    IsoAudio.prototype.load = function () {
         var _this = this;
-        this.image = new Image();
-        this.image.addEventListener("load", function (e) { return _this._onLoad(e); }, false);
-        this.image.src = this.src;
+        this.element = document.createElement("audio");
+        if (this.loadType === IsoAudio.STREAM)
+            this.element.addEventListener("canplay", function (e) { return _this._onLoad(e); }, false);
+        else if (this.loadType === IsoAudio.LOAD)
+            this.element.addEventListener("canplaythrough", function (e) { return _this._onLoad(e); }, false);
+        else {
+            this.log(new Error("An unknown loadType for the audio " + this.src[0] + "!"), IsoLogger.WARN);
+            this.log("Set the loadType to default.", IsoLogger.INFO);
+            this.element.addEventListener("canplaythrough", function (e) { return _this._onLoad(e); }, false);
+        }
+        for (var i = 0; i < this.src.length; i++) {
+            var fileParts = this.src[i].split("."), source = document.createElement("source");
+            source.src = this.src[i];
+            source.type = "audio/" + fileParts[fileParts.length - 1];
+            this.element.appendChild(source);
+        }
     };
-    /**
-     * Called when the image file was loaded.
-     */
-    IsoImage.prototype._onLoad = function (event) {
-        this.width = this.image.width;
-        this.height = this.image.height;
+    /** Called when the audio file was loaded. */
+    IsoAudio.prototype._onLoad = function (event) {
         this.isLoaded = true;
-        this.callOn("load");
+        this.call("load");
     };
-    /**
-     * Returns the image.
-     */
-    IsoImage.prototype.get = function () {
-        return this.image;
+    /**  Returns the audio. */
+    IsoAudio.prototype.get = function () {
+        return this.element;
     };
-    /**
-     * Deletes the image.
-     */
-    IsoImage.prototype.free = function () {
-        this.image = null;
-        delete (this);
+    /** Sets the loadType to "LOAD" the audio load completly. */
+    IsoAudio.LOAD = "LOAD";
+    /** Sets the loadType to "STREAM" the audio streamed. */
+    IsoAudio.STREAM = "STREAM";
+    return IsoAudio;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoResource = (function (_super) {
+    __extends(IsoResource, _super);
+    function IsoResource(name) {
+        _super.call(this);
+        this.setName(name);
+    }
+    Object.defineProperty(IsoResource.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoResource";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the name of a resource. */
+    IsoResource.prototype.setName = function (name) {
+        this.name = name;
+        return this;
     };
-    IsoImage.prototype.getWidth = function () {
-        return this.width;
+    /** Gets the name of the resource. */
+    IsoResource.prototype.getName = function () {
+        return this.name;
     };
-    IsoImage.prototype.getHeight = function () {
-        return this.height;
+    IsoResource.prototype.get = function () {
+        return undefined;
     };
-    IsoImage.prototype.getOffset = function () {
-        return this.offset;
+    return IsoResource;
+})(IsoObject);
+///<reference path="IsoResource.ts" />
+var IsoImageResource = (function (_super) {
+    __extends(IsoImageResource, _super);
+    function IsoImageResource(name, source) {
+        _super.call(this, name);
+        this.setSource(source);
+        return this;
+    }
+    Object.defineProperty(IsoImageResource.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoImageResource";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the source of a resource. */
+    IsoImageResource.prototype.setSource = function (source) {
+        this.source = source;
+        return this;
     };
-    IsoImage.prototype.setOffset = function (x, y) {
-        this.offset.set(x, y);
+    /** Gets the source. */
+    IsoImageResource.prototype.get = function () {
+        return this.source;
     };
-    return IsoImage;
-})(IsoOn);
+    return IsoImageResource;
+})(IsoResource);
+///<reference path="../core/IsoObject.ts" />
+var IsoTexture = (function (_super) {
+    __extends(IsoTexture, _super);
+    function IsoTexture(name) {
+        _super.call(this);
+        /** The alpha of the texture. */
+        this._alpha = 1;
+        this.__changed = false;
+        this.blendingMode = IsoBlendingModes.NORMAL;
+        this.animations = new IsoAnimationManager(this);
+        this.setName(name);
+        return this;
+    }
+    Object.defineProperty(IsoTexture.prototype, "animations", {
+        get: function () {
+            return this._animations;
+        },
+        set: function (value) {
+            this.__propertyChanged("animations", value);
+            this._animations = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTexture.prototype, "alpha", {
+        get: function () {
+            return this._alpha;
+        },
+        set: function (value) {
+            this.__propertyChanged("alpha", value);
+            this._alpha = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTexture.prototype, "blendingMode", {
+        get: function () {
+            return this._blendingMode;
+        },
+        set: function (value) {
+            this.__propertyChanged("blendingMode", value);
+            this._blendingMode = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTexture.prototype, "name", {
+        get: function () {
+            return this._name;
+        },
+        set: function (value) {
+            this.__propertyChanged("name", value);
+            this._name = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTexture.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoTexture";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the name of the texture. */
+    IsoTexture.prototype.setName = function (name) {
+        this.name = name;
+        return this;
+    };
+    /** Retruns the texture data. */
+    IsoTexture.prototype.getTextureData = function () {
+        return {
+            blendingMode: this.blendingMode,
+            alpha: this.alpha
+        };
+    };
+    /** Sets if a texture needs a redraw. */
+    IsoTexture.prototype.changed = function () {
+        this.__changed = true;
+    };
+    IsoTexture.prototype.unchanged = function () {
+        this.__changed = false;
+    };
+    return IsoTexture;
+})(IsoObject);
+///<reference path="IsoTexture.ts" />
+var IsoColorTexture = (function (_super) {
+    __extends(IsoColorTexture, _super);
+    function IsoColorTexture(name, color) {
+        _super.call(this, name);
+        this.set(color);
+    }
+    Object.defineProperty(IsoColorTexture.prototype, "color", {
+        get: function () {
+            return this._color;
+        },
+        set: function (value) {
+            this.__propertyChanged("color", value);
+            this._color = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoColorTexture.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoColorTexture";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the color of the texture. */
+    IsoColorTexture.prototype.set = function (color) {
+        this.color = color;
+        return this;
+    };
+    /** Resets the color of the texture. */
+    IsoColorTexture.prototype.resetColor = function () {
+        this.color = undefined;
+        return this;
+    };
+    /** Returns the color data. */
+    IsoColorTexture.prototype.getColorData = function () {
+        return {
+            r: this.color.r,
+            g: this.color.g,
+            b: this.color.b,
+            hex: this.color.getHex()
+        };
+    };
+    /** Returns the texture data. */
+    IsoColorTexture.prototype.getTextureData = function () {
+        return {
+            colorData: this.getColorData(),
+            blendingMode: this.blendingMode,
+            alpha: this.alpha
+        };
+    };
+    return IsoColorTexture;
+})(IsoTexture);
+///<reference path="IsoTexture.ts" />
+var IsoImageTexture = (function (_super) {
+    __extends(IsoImageTexture, _super);
+    function IsoImageTexture(name, src) {
+        _super.call(this, name);
+        this.set(src);
+    }
+    Object.defineProperty(IsoImageTexture.prototype, "src", {
+        get: function () {
+            return this._src;
+        },
+        set: function (value) {
+            this.__propertyChanged("src", value);
+            this._src = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoImageTexture.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoImageTexture";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the image of the texture. */
+    IsoImageTexture.prototype.set = function (src) {
+        this.src = src;
+        return this;
+    };
+    /** Resets the image of the texture. */
+    IsoImageTexture.prototype.reset = function () {
+        this.src = undefined;
+        return this;
+    };
+    /** Returns the imagedata. */
+    IsoImageTexture.prototype.getImageData = function () {
+        return {
+            x: 0,
+            y: 0,
+            width: this.src.get().size.width,
+            height: this.src.get().size.height,
+            image: this.src.get().get()
+        };
+    };
+    /** Returns the texture data. */
+    IsoImageTexture.prototype.getTextureData = function () {
+        return {
+            imageData: this.getImageData(),
+            blendingMode: this.blendingMode,
+            alpha: this.alpha
+        };
+    };
+    return IsoImageTexture;
+})(IsoTexture);
+/** Include the core. */
+///<reference path="core/IsoLogger.ts" />
+///<reference path="core/IsoEvent.ts" />
+///<reference path="core/IsoWatcher.ts" />
+/** Include 2d */
+///<reference path="2d/IsoPoint.ts" />
+///<reference path="2d/IsoVector2d.ts" />
+///<reference path="2d/IsoColor.ts" />
+///<reference path="2d/IsoBlendingModes.ts" />
+/** Include resources */
+///<reference path="resources/IsoImage.ts" />
+///<reference path="resources/IsoAudio.ts" />
+///<reference path="resources/IsoResource.ts" />
+///<reference path="resources/IsoImageResource.ts" />
+/** Include objects. */
+///<reference path="texture/IsoTexture.ts" />
+///<reference path="texture/IsoColorTexture.ts" />
+///<reference path="texture/IsoImageTexture.ts" />
+/** include animation. */
+///<reference path="animation/IsoEasing.ts" /> 
+;
 "use strict";
-var IsoInput = (function () {
-    function IsoInput(Engine) {
+///<reference path="include.ts" />
+/**
+ * IsoMetric is the main class. It includes all needed references and libs.
+ */
+var IsoMetric = (function (_super) {
+    __extends(IsoMetric, _super);
+    function IsoMetric(config) {
         var _this = this;
+        _super.call(this);
+        /** A counter for frames */
+        this.frameCount = 0;
+        /** The frames per second */
+        this.FPS = 0;
+        /** Optimal FPS. */
+        this.optimalFPS = 60;
+        /** The default canvas configuration. */
+        this.defaultWindowOptions = {
+            fullscreen: true,
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+        try {
+            this.log("Initialize IsoMetric.", IsoLogger.INFO);
+            IsoMetric.self = this;
+            this.config = config;
+            if (!this.config.has("windowOptions")) {
+                this.log("Could not find any options for the window. The window configuration is default, now.", IsoLogger.INFO);
+                this.config.setProperty("windowOptions", this.defaultWindowOptions);
+            }
+            this.canvas = new IsoCanvas(this.config.get("windowOptions").width, this.config.get("windowOptions").height, this.config.get("windowOptions")["fullscreen"], this.config.get("windowOptions")["autoResize"]);
+            this.drawer = new IsoDrawer();
+            this.input = new IsoInput();
+            this.canvas.load();
+            this.canvas.append(document.querySelector("body"));
+            this.resources = new IsoResourceManager();
+            this.layers = new IsoLayerManager();
+            this.physics = new IsoPhysicsManager();
+            this.frameCountInteral = setInterval(function () { return _this.setFPS(); }, 1000);
+            this.log("Finished the initialization of IsoMetric.", IsoLogger.INFO);
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    }
+    /** Reset and set the FPS */
+    IsoMetric.prototype.setFPS = function () {
+        this.FPS = this.frameCount;
+        this.frameCount = 0;
+    };
+    /** Starts the game- and drawing-loop. */
+    IsoMetric.prototype.startLoop = function () {
+        this.update();
+    };
+    /** Sets the FPS after the drawing-loop completed. */
+    IsoMetric.prototype.endLoop = function () {
+        var endLoop = new Date();
+        this.frameTime = (endLoop.getMilliseconds() - this.startLoopTime.getMilliseconds());
+        this.frameCount = this.frameCount + 1;
+    };
+    /** The game- and drawing-loop. */
+    IsoMetric.prototype.update = function () {
+        this.startLoopTime = new Date();
+        this.drawer.update(this.layers);
+    };
+    return IsoMetric;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoLayer = (function (_super) {
+    __extends(IsoLayer, _super);
+    function IsoLayer(name) {
+        var _this = this;
+        _super.call(this);
+        this._name = "";
+        this._entities = new Array();
+        /** Indicates if the layer drawn or not. */
+        this._hidden = false;
+        /** Indicates if the layer should deleted or not. */
+        this._isFree = false;
+        /** The index of the layer. */
+        this._index = 0;
+        this.setName(name);
+        this.hidden = false;
+        this.isFree = false;
+        this.watch("entities", function () { return _this.sort(); });
+    }
+    Object.defineProperty(IsoLayer.prototype, "name", {
+        get: function () {
+            return this._name;
+        },
+        set: function (value) {
+            this.__propertyChanged("name", value);
+            this._name = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoLayer.prototype, "entities", {
+        get: function () {
+            return this._entities;
+        },
+        set: function (value) {
+            this.__propertyChanged("entities", value);
+            this._entities = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoLayer.prototype, "hidden", {
+        get: function () {
+            return this._hidden;
+        },
+        set: function (value) {
+            this.__propertyChanged("hidden", value);
+            this._hidden = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoLayer.prototype, "isFree", {
+        get: function () {
+            return this._isFree;
+        },
+        set: function (value) {
+            this.__propertyChanged("isFree", value);
+            this._isFree = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoLayer.prototype, "index", {
+        get: function () {
+            return this._index;
+        },
+        set: function (value) {
+            this.__propertyChanged("index", value);
+            this._index = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoLayer.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoLayer";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Adds a new entity to the layer. */
+    IsoLayer.prototype.add = function (entity) {
+        try {
+            for (var i = 0; i < this.entities.length; i++) {
+                if (this.entities[i].isFree) {
+                    this.entities[i] = null;
+                    this.entities[i] = entity;
+                    return this;
+                }
+            }
+            this.entities.push(entity);
+            return this;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Get an entity by its name. */
+    IsoLayer.prototype.get = function (name) {
+        try {
+            for (var i = 0; i < this.entities.length; i++) {
+                if (this.entities[i].name === name) {
+                    return this.entities[i];
+                }
+            }
+            return undefined;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Sets the name of the layer. */
+    IsoLayer.prototype.setName = function (name) {
+        this.name = name;
+        return this;
+    };
+    /** Updates the layer. */
+    IsoLayer.prototype.update = function () {
+        try {
+            if (this.entities === undefined || this.entities.length === 0) {
+                this.log("Nothing to do, because there are no entities.", IsoLogger.WARN);
+            }
+            else {
+                for (var i = 0; i < this.entities.length; i++) {
+                    this.entities[i].update();
+                }
+            }
+            return this;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Get all entities of the layer. */
+    IsoLayer.prototype.getAll = function () {
+        return this.entities;
+    };
+    /** Deletes the layer from the memory. */
+    IsoLayer.prototype.free = function () {
+        this.hide();
+        this.isFree = true;
+    };
+    /** Hides the layer. */
+    IsoLayer.prototype.hide = function () {
+        this.hidden = true;
+    };
+    /** Shows the layer. */
+    IsoLayer.prototype.show = function () {
+        this.hidden = false;
+    };
+    /** Indicates wether a layer is hidden or not. */
+    IsoLayer.prototype.isHidden = function () {
+        return this.hidden;
+    };
+    /** Sorts the entities by there indizies. */
+    IsoLayer.prototype.sort = function () {
+        this.entities.sort(_sort);
+        function _sort(entityA, entityB) {
+            if (entityA.index > entityB.index) {
+                return 1;
+            }
+            else if (entityA.index < entityB.index) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        }
+    };
+    return IsoLayer;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoLayerManager = (function (_super) {
+    __extends(IsoLayerManager, _super);
+    function IsoLayerManager() {
+        _super.call(this);
+        this._layers = new Array();
+    }
+    Object.defineProperty(IsoLayerManager.prototype, "layers", {
+        get: function () {
+            return this._layers;
+        },
+        set: function (value) {
+            this.__propertyChanged("layers", value);
+            this._layers = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoLayerManager.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoLayerManager";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Adds a new layer to the layer manager. */
+    IsoLayerManager.prototype.add = function (layer) {
+        try {
+            for (var i = 0; i < this.layers.length; i++) {
+                if (this.layers[i].isFree === true) {
+                    this.layers[i] = null;
+                    this.layers[i] = layer;
+                    return layer;
+                }
+            }
+            this.layers.push(layer);
+            return layer;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Removes a layer. */
+    IsoLayerManager.prototype.remove = function (layer) {
+        try {
+            for (var i = 0; i < this.layers.length; i++) {
+                if (this.layers[i] === layer) {
+                    for (var l = i; l < this.layers.length - 1; l++) {
+                        this.layers[l] = this.layers[l + 1];
+                    }
+                    this.layers.pop();
+                }
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Returns a layer by its name. */
+    IsoLayerManager.prototype.get = function (name) {
+        try {
+            for (var i = 0; i < this.layers.length; i++) {
+                if (this.layers[i].name === name) {
+                    return this.layers[i];
+                }
+            }
+            this.log("Sorry, I can not find the layer with name: " + name, IsoLogger.WARN);
+            return undefined;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Sorts the layers by there indizies. */
+    IsoLayerManager.prototype.sort = function () {
+        this.layers.sort(_sort);
+        function _sort(layerA, layerB) {
+            if (layerA.index > layerB.index) {
+                return 1;
+            }
+            else if (layerA.index < layerB.index) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        }
+    };
+    /** Sort and updates all layers. */
+    IsoLayerManager.prototype.update = function () {
+        try {
+            if (this.layers === undefined || this.layers.length === 0) {
+                this.log("There is nothing to update, because there are no layers.", IsoLogger.WARN);
+            }
+            else {
+                this.sort();
+                for (var i = 0; i < this.layers.length; i++) {
+                    this.layers[i].update();
+                }
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    return IsoLayerManager;
+})(IsoObject);
+/// <reference path="../core/IsoObject.ts" />
+var IsoConfig = (function (_super) {
+    __extends(IsoConfig, _super);
+    function IsoConfig(config) {
+        _super.call(this);
+        /** Including the whole configuration. */
+        this._config = new Object;
+        if (config !== undefined) {
+            this.set(config);
+        }
+    }
+    Object.defineProperty(IsoConfig.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        set: function (value) {
+            this.__propertyChanged("config", value);
+            this._config = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoConfig.prototype.set = function (config) {
+        this.log("I set the configuration.", IsoLogger.INFO);
+        this.config = config;
+        return this;
+    };
+    IsoConfig.prototype.get = function (name) {
+        try {
+            if (this.config.hasOwnProperty(name)) {
+                return this.config[name];
+            }
+            else {
+                this.log("I could not find the configuration setting '" + name + "'. :(", IsoLogger.WARN);
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Checks the existing of a property. */
+    IsoConfig.prototype.has = function (name) {
+        if (this.config === undefined) {
+            this.log("The configuration is undefined. I created a new for you.", IsoLogger.WARN);
+            this.config = new Object;
+        }
+        return this.config.hasOwnProperty(name);
+    };
+    /** Sets a property to a specified value. */
+    IsoConfig.prototype.setProperty = function (name, value) {
+        this.config[name] = value;
+        return this;
+    };
+    return IsoConfig;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoDrawer = (function (_super) {
+    __extends(IsoDrawer, _super);
+    function IsoDrawer() {
+        _super.call(this);
+        this.Engine = IsoMetric.self;
+        this.log("Initialized the drawer.", IsoLogger.INFO);
+    }
+    /** Updates the whole scene. */
+    IsoDrawer.prototype.update = function (layers) {
+        this.Engine.canvas.clear();
+        try {
+            layers.update();
+            for (var i = 0; i < layers.layers.length; i++) {
+                var layer = layers.layers[i];
+                if (!layer.isHidden()) {
+                    this.prepareEntities(layer.getAll());
+                }
+            }
+            this.Engine.endLoop();
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Prepare a number of entities. */
+    IsoDrawer.prototype.prepareEntities = function (entities) {
+        try {
+            for (var i = 0; i < entities.length; i++) {
+                var entity = entities[i];
+                if (!entity.isHidden()) {
+                    this.drawEntity(entity);
+                }
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Draws a single entity. */
+    IsoDrawer.prototype.drawEntity = function (entity) {
+        try {
+            var renderData = entity.getRenderData();
+            if (renderData.maskData !== null) {
+                var texture = new IsoTextureProcessor(entity.name);
+                texture.addMask(new IsoImageTexture(entity.name, new IsoImageResource(entity.name, renderData.maskData.getTextureData().imageData.image)));
+                for (var i = 0; i < renderData.textureData.length; i++) {
+                    if (renderData.textureData[i].imageData !== undefined) {
+                        var _i = new IsoImage(entity.name);
+                        _i.setElement(renderData.textureData[i].imageData.image);
+                        texture.addTexture(new IsoImageTexture(entity.name, new IsoImageResource(entity.name, _i)));
+                    }
+                    else if (renderData.textureData[i].colorData !== undefined) {
+                        var _c = new IsoColor(renderData.textureData[i].colorData);
+                        texture.addTexture(new IsoColorTexture(entity.name, _c));
+                    }
+                }
+                renderData.textureData = new Array(texture.getTextureData());
+            }
+            this.draw(entity, renderData);
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    IsoDrawer.prototype.draw = function (entity, renderData) {
+        try {
+            var image = entity.chache.cache(renderData);
+            this.translate(new IsoPoint(renderData.position.x, renderData.position.y));
+            this.rotate(renderData.rotation);
+            this.resetTranslation(new IsoPoint(renderData.position.x, renderData.position.y));
+            if (entity instanceof IsoEmitter) {
+                this.drawEmitter(image, entity);
+            }
+            else {
+                this.drawImage(image, renderData);
+            }
+            this.Engine.canvas.context.setTransform(1, 0, 0, 1, 0, 0);
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    IsoDrawer.prototype.drawEmitter = function (image, entity) {
+        var data = entity.getRenderData();
+        if (entity.blendingMode !== IsoBlendingModes.NORMAL) {
+            this.Engine.canvas.context.globalCompositeOperation = entity.blendingMode;
+        }
+        for (var i = 0; i < entity.particles.length; i++) {
+            entity.particles[i].animations.update();
+            entity.particles[i].update();
+            var renderData = entity.particles[i].getRenderData();
+            this.Engine.canvas.context.globalAlpha = renderData.alpha;
+            this.Engine.canvas.context.drawImage(image.get(), 0, 0, Math.floor(data.size.width), Math.floor(data.size.height), renderData.position.x - (renderData.size.width * renderData.anchor.x), renderData.position.y - (renderData.size.height * renderData.anchor.y), renderData.size.width, renderData.size.height);
+        }
+        this.Engine.canvas.context.globalAlpha = 1;
+        this.Engine.canvas.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
+    };
+    IsoDrawer.prototype.drawImage = function (image, renderData) {
+        this.Engine.canvas.context.drawImage(image.get(), 0, 0, Math.floor(renderData.size.width), Math.floor(renderData.size.height), renderData.position.x - (renderData.size.width * renderData.anchor.x), renderData.position.y - (renderData.size.height * renderData.anchor.y), renderData.size.width, renderData.size.height);
+    };
+    /** Sets the anchor of an object. */
+    IsoDrawer.prototype.translate = function (anchor) {
+        this.Engine.canvas.context.translate(anchor.x, anchor.y);
+    };
+    /** Reset the anchor of an object. */
+    IsoDrawer.prototype.resetTranslation = function (anchor) {
+        this.Engine.canvas.context.translate(-anchor.x, -anchor.y);
+    };
+    /** Rotates an object. */
+    IsoDrawer.prototype.rotate = function (rotation) {
+        this.Engine.canvas.context.rotate(rotation * Math.PI / 180);
+    };
+    return IsoDrawer;
+})(IsoObject);
+/// <reference path="../core/IsoObject.ts" />
+var IsoInput = (function (_super) {
+    __extends(IsoInput, _super);
+    function IsoInput() {
+        var _this = this;
+        _super.call(this);
         this.isKeyEvent = false;
         this.isMouseEvent = false;
         this.isTouchEvent = false;
-        this.Engine = Engine;
-        document.addEventListener("IsoCanvasReady", function () { return _this.addEvents(); });
+        this.Engine = IsoMetric.self;
+        IsoMetric.self.canvas.on("load", function () { return _this.addEvents(); });
     }
     IsoInput.prototype.addEvents = function () {
         var _this = this;
-        var el = window;
+        var el = IsoMetric.self.canvas.element;
         el.onkeydown = function (event) { return _this.checkKeyboard(event); };
         el.onkeypress = function (event) { return _this.checkKeyboard(event); };
         el.onkeyup = function (event) { return _this.checkKeyboard(event); };
@@ -2552,6 +2395,7 @@ var IsoInput = (function () {
         el.onmousemove = function (event) { return _this.checkMouse(event); };
         el.onmouseup = function (event) { return _this.checkMouse(event); };
         el.onmousewheel = function (event) { return _this.checkMouse(event); };
+        this.log("Added the input events to the main canvas.", IsoLogger.INFO);
     };
     IsoInput.prototype.checkKeyboard = function (event) {
         this.oldEvent = event;
@@ -2560,7 +2404,7 @@ var IsoInput = (function () {
         this.keyEvent = event;
         this.keyCode = event.which;
         this.keyChar = String.fromCharCode(this.keyCode);
-        this.callCallback(event);
+        this.call(event.type, [event]);
     };
     IsoInput.prototype.checkMouse = function (event) {
         this.oldEvent = event;
@@ -2571,14 +2415,14 @@ var IsoInput = (function () {
         this.mouseX = event.clientX;
         this.mouseY = event.clientY;
         this.mouseWheelDelta = event.wheelDelta || -event.detail;
-        this.callCallback(event);
+        this.call(event.type, [event]);
     };
     IsoInput.prototype.checkTouch = function (event) {
         this.oldEvent = event;
         this.isTouchEvent = true;
         this.touches = event.touches;
         this.touchEventType = event.type;
-        this.callCallback(event);
+        this.call(event.type, [event]);
     };
     IsoInput.prototype.reset = function () {
         this.isKeyEvent = false;
@@ -2595,20 +2439,6 @@ var IsoInput = (function () {
         this.touches = undefined;
         this.touchEvent = undefined;
         this.touchEventType = "";
-    };
-    IsoInput.prototype.callCallback = function (event) {
-        if (this.onInput !== undefined) {
-            this.onInput.call(this, this.Engine, event);
-        }
-        if (event.type.replace("key", "") !== event.type && this.onKeyboard !== undefined) {
-            this.onKeyboard.call(this, this.Engine, event);
-        }
-        if (event.type.replace("mouse", "") !== event.type && this.onMouse !== undefined) {
-            this.onMouse.call(this, this.Engine, event);
-        }
-        if (event.type.replace("key", "") !== event.type && this.onTouch !== undefined) {
-            this.onTouch.call(this, this.Engine, event);
-        }
     };
     IsoInput.KEYDOWN = 40;
     IsoInput.KEYUP = 38;
@@ -2629,1193 +2459,1205 @@ var IsoInput = (function () {
     IsoInput.EVENT_MOUSEUP = "mouseup";
     IsoInput.EVENT_MOUSEWHEEL = "mousewheel";
     return IsoInput;
-})();
-///<reference path="IsoObject.ts" />
-///<reference path="IsoTileObject.ts" />
-///<reference path="IsoSprite.ts" />
-///<reference path="IsoTileMap.ts" />
-"use strict";
-var IsoLayer = (function () {
-    /** Creates a new layer. */
-    function IsoLayer(Engine, index, name) {
-        /** Includes all objects like IsoObject, IsoText, IsoSprite, IsoAnimatedSprite. */
-        this.objects = new Array();
-        this.texts = new Array();
-        /** Includes all billboards of  a layer. */
-        this.billboards = new Array(); // isoBillboards
-        /** Controls if the layer is hidden or not. */
-        this.hidden = false;
-        this.Engine = Engine;
-        this.index = index;
-        if (name !== undefined) {
-            this.setName(name);
-        }
-        return this;
+})(IsoObject);
+///<reference path="../entities/IsoSprite.ts" />
+var IsoEmitter = (function (_super) {
+    __extends(IsoEmitter, _super);
+    /** Creates a new particle emitter. */
+    function IsoEmitter(name, spread) {
+        if (spread === void 0) { spread = Math.PI / 32; }
+        _super.call(this, name);
+        this.speed = new IsoVector2D(1, 0);
+        this.blendingMode = IsoBlendingModes.NORMAL;
+        /** An array including all particles. */
+        this.particles = new Array();
+        /** The possible angle where particles spreaded to. */
+        this.spread = Math.PI / 50;
+        /** The maximal particle count. */
+        this.maxParticles = 100;
+        /** Indecates if the scale of the particles effected during the lifetime. */
+        this.effectScale = true;
+        /** Indecates if the alpha of the particles effected during the lifetime. */
+        this.effectAlpha = true;
+        /** The liftime of a particle. Notice, that the lifetime is also effected by the randomseed */
+        this.lifetime = 1000;
+        /** The emissionrate of the emitter. */
+        this.emissionRate = 10;
+        /** Indecates wether the emitter emits or not. */
+        this.isEmitting = false;
+        this.spread = spread;
     }
-    /** Adds a new object to the layer */
-    IsoLayer.prototype.addObject = function (name, image) {
-        var o = new IsoObject(this.Engine, image, name);
-        for (var i = 0; i < this.objects.length; i++) {
-            if (this.objects[i].free === true) {
-                this.objects[i] = null;
-                this.objects[i] = o;
-                return o;
+    /** Adds a new particles to the emitter. */
+    IsoEmitter.prototype.add = function (particle) {
+        try {
+            if (this.particles === undefined) {
+                this.log("The property particles of IsoEmitter should not be undefined. I created a new Array for you.", IsoLogger.WARN);
+                this.particles = new Array();
+            }
+            for (var i = 0; i < this.particles.length; i++) {
+                if (this.particles[i].isFree === true) {
+                    this.particles[i] = null;
+                    this.particles[i] = particle;
+                    return this;
+                }
+            }
+            if (this.particles.length < this.maxParticles) {
+                this.particles.push(particle);
             }
         }
-        this.objects.push(o);
-        return o;
-    };
-    /** Adds a new sprite to the layer. */
-    IsoLayer.prototype.addSprite = function (name, image, tileObjectInfo) {
-        var s = new IsoSprite(this.Engine, image, tileObjectInfo, name);
-        for (var i = 0; i < this.objects.length; i++) {
-            if (this.objects[i].free === true) {
-                this.objects[i] = null;
-                this.objects[i] = s;
-                return s;
-            }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
         }
-        this.objects.push(s);
-        return s;
     };
-    /** Adds a new text to the layer. */
-    IsoLayer.prototype.addText = function (name, text) {
-        var t = new IsoText(this.Engine, name, text);
-        for (var i = 0; i < this.texts.length; i++) {
-            if (this.texts[i].free === true) {
-                this.texts[i] = null;
-                this.texts[i] = t;
-                return t;
-            }
-        }
-        this.texts.push(t);
-        return t;
-    };
-    /** Adds a new billboard to the layer. */
-    IsoLayer.prototype.addBillboard = function (name, image) {
-        var b = new IsoBillboard(this.Engine, image, name);
-        for (var i = 0; i < this.billboards.length; i++) {
-            if (this.billboards[i].free === true) {
-                this.billboards[i] = null;
-                this.billboards[i] = b;
-                return b;
-            }
-        }
-        this.billboards.push(b);
-        return b;
-    };
-    /** Adds a new particle emitter. */
-    IsoLayer.prototype.addEmitter = function (name, ressource) {
-        var e = new IsoEmitter(this.Engine, ressource);
-        for (var i = 0; i < this.objects.length; i++) {
-            if (this.objects[i].free === true) {
-                this.objects[i] = null;
-                this.objects[i] = e;
-                return e;
-            }
-        }
-        this.objects.push(e);
-        return e;
-    };
-    /** Adds a new animated sprite to the layer. */
-    IsoLayer.prototype.addAnimatedSprite = function (name, image, tileObjectInfo) {
-        var s = new IsoAnimatedSprite(this.Engine, image, tileObjectInfo, name);
-        this.objects.push(s);
-        return s;
-    };
-    /** Adds a new tilemap to the layer. */
-    IsoLayer.prototype.addTileMap = function (name, image, tileWidth, tileHeight, map) {
-        this.tileMap = new IsoTileMap(this.Engine, name, tileWidth, tileHeight, image, map);
-        return this.tileMap;
-    };
-    /** Sets the name of the layer. */
-    IsoLayer.prototype.setName = function (name) {
-        this.name = name;
+    /** Sets the spread angle of the emitter. */
+    IsoEmitter.prototype.setSpread = function (spread) {
+        this.spread = spread / Math.PI;
         return this;
     };
-    /** Gets a billboard by its name. */
-    IsoLayer.prototype.getBillboard = function (name) {
-        for (var i = 0; i < this.billboards.length; i++) {
-            if (this.billboards[i].name === name) {
-                return this.billboards[i];
-            }
-        }
-        return undefined;
+    /** Gets the spread angle of the emitter. */
+    IsoEmitter.prototype.getSpread = function () {
+        return this.spread;
     };
-    /** Gets a object by its name. */
-    IsoLayer.prototype.getObject = function (name) {
-        for (var i = 0; i < this.objects.length; i++) {
-            if (this.objects[i].name === name) {
-                return this.objects[i];
-            }
-        }
-        return undefined;
+    /** Updates the emitter. */
+    IsoEmitter.prototype.update = function () {
+        this.updatePosition();
+        this.emitParticles();
     };
-    /** Equal to IsoLayer.getObject. */
-    IsoLayer.prototype.getSprite = function (name) {
-        return this.getObject(name);
+    /** Emits a particle. */
+    IsoEmitter.prototype.emitParticle = function () {
+        var angle = this.speed.getAngle() + (Math.random() * (this.spread - (-2 * this.spread)) + (-2 * this.spread));
+        var magnitude = this.speed.getMagnitude();
+        var render = this.getRenderData();
+        var position = new IsoVector2D(this.position.x, this.position.y);
+        var size = new IsoSize(render.size.width, render.size.height);
+        var scale = new IsoScale(this.scale.fx, this.scale.fy);
+        var v = new IsoVector2D(0, 0);
+        var renderData = this.getRenderData();
+        v.createFromAngle(angle, magnitude);
+        this.add(new IsoParticle(v, position, scale, size, this.alpha, this.lifetime, this.effectScale, this.effectAlpha));
     };
-    /** Equal to IsoLayer.getObject. */
-    IsoLayer.prototype.getAnimatedSprite = function (name) {
-        return this.getObject(name);
-    };
-    /** Equal to IsoLayer.getObject. */
-    IsoLayer.prototype.getText = function (name) {
-        for (var i = 0; i < this.texts.length; i++) {
-            if (this.texts[i].name === name) {
-                return this.texts[i];
-            }
-        }
-        return undefined;
-    };
-    /** Gets the tilemap of the layer. */
-    IsoLayer.prototype.getTileMap = function () {
-        return this.tileMap;
-    };
-    /** Zoom all objects, tilemap and billboards of the layer. */
-    IsoLayer.prototype.zoom = function (zoom) {
-        if (this.tileMap !== undefined) {
-            this.tileMap.zoom(zoom);
-        }
-        this.tileMap.update();
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].zoom(zoom);
-        }
-        for (var i = 0; i < this.billboards.length; i++) {
-            this.billboards[i].zoom(zoom);
-        }
-    };
-    /** Scrolls all objects, tilemap and billboards of the layer. */
-    IsoLayer.prototype.scroll = function (deltaX, deltaY) {
-        if (this.tileMap !== undefined) {
-            this.tileMap.scroll(deltaX, deltaY);
-        }
-    };
-    /** Rotates all objects, tilemap and billboards of the layer. */
-    IsoLayer.prototype.rotate = function (degrees) {
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].rotate(degrees);
-        }
-        for (var i = 0; i < this.billboards.length; i++) {
-            this.billboards[i].rotate(degrees);
-        }
-    };
-    /** Sets the zooming point of all objects, tilemap and billboards of the layer. */
-    IsoLayer.prototype.setZoomPoint = function (point) {
-        if (this.tileMap !== undefined) {
-            this.tileMap.setZoomPoint(point);
-        }
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].zoomPoint.set(point.x, point.y);
-        }
-        for (var i = 0; i < this.billboards.length; i++) {
-            this.billboards[i].zoomPoint.set(point.x, point.y);
-        }
-    };
-    /** Sets the speed of all objects, tilemap and billboards of the layer. */
-    IsoLayer.prototype.setSpeed = function (speed) {
-        if (this.tileMap !== undefined) {
-            this.tileMap.setSpeed(speed);
-        }
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].setSpeed(speed);
-        }
-        for (var i = 0; i < this.billboards.length; i++) {
-            this.billboards[i].setSpeed(speed);
-        }
-    };
-    /** Hides the layer. */
-    IsoLayer.prototype.hide = function () {
-        this.hidden = true;
+    /** Sets the emission rate. */
+    IsoEmitter.prototype.setEmissionRate = function (rate) {
+        this.emissionRate = rate;
         return this;
     };
-    /** Show the layer. */
-    IsoLayer.prototype.show = function () {
-        this.hidden = false;
+    /** Returns the emission rate. */
+    IsoEmitter.prototype.getEmissionRate = function () {
+        return this.emissionRate;
+    };
+    /** Start emitting. */
+    IsoEmitter.prototype.emit = function () {
+        this.isEmitting = true;
         return this;
     };
-    /** Return true if the layer is hidden. Else false. */
-    IsoLayer.prototype.isHidden = function () {
-        return this.hidden;
+    /** Stops emitting. */
+    IsoEmitter.prototype.stopEmitting = function () {
+        this.isEmitting = false;
+        return this;
     };
-    /** Removes an object or sprite from the layer. */
-    IsoLayer.prototype.freeObject = function (object) {
-        object.hidden = true;
-        object.free = true;
-    };
-    /** Removes an object from the layer. */
-    IsoLayer.prototype.freeText = function (text) {
-        text.free = true;
-        text.hidden = true;
-    };
-    /** Removes a billboard from the layer. */
-    IsoLayer.prototype.freeBillboard = function (billboard) {
-        billboard.free = true;
-        billboard.hidden = true;
-    };
-    /** Removes the tilemap form the layer.*/
-    IsoLayer.prototype.freeTileMap = function () {
-        if (this.tileMap !== undefined && this.tileMap !== null) {
-            this.tileMap = null;
-        }
-    };
-    return IsoLayer;
-})();
-///<reference path="IsoLayer.ts" />
-"use strict";
-var IsoLayers = (function () {
-    function IsoLayers(Engine) {
-        this.layers = new Array();
-        this.Engine = Engine;
-    }
-    IsoLayers.prototype.add = function (name, index) {
-        this.length++;
-        if (index === undefined) {
-            index = this.length - 1;
-        }
-        var l = new IsoLayer(this.Engine, index, name);
-        this.layers.push(l);
-        return l;
-    };
-    IsoLayers.prototype.get = function (name) {
-        for (var i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].name === name) {
-                return this.layers[i];
+    /** Emits particles */
+    IsoEmitter.prototype.emitParticles = function () {
+        if (this.isEmitting === true) {
+            for (var i = 0; i < this.emissionRate; i++) {
+                this.emitParticle();
             }
         }
     };
-    IsoLayers.prototype.sort = function () {
-        this.layers.sort(this._sort);
-    };
-    IsoLayers.prototype._sort = function (layerA, layerB) {
-        if (layerA.index > layerB.index) {
-            return 1;
-        }
-        else if (layerA.index < layerB.index) {
-            return -1;
+    return IsoEmitter;
+})(IsoSprite);
+///<reference path="../entities/IsoBaseEntity.ts" />
+var IsoParticle = (function (_super) {
+    __extends(IsoParticle, _super);
+    function IsoParticle(velocity, position, scale, size, alpha, lifetime, effectScale, effectAlpha) {
+        if (velocity === void 0) { velocity = new IsoVector2D(0, 0); }
+        if (position === void 0) { position = new IsoVector2D(0, 0); }
+        if (alpha === void 0) { alpha = 1; }
+        if (lifetime === void 0) { lifetime = 1000; }
+        if (effectScale === void 0) { effectScale = false; }
+        if (effectAlpha === void 0) { effectAlpha = false; }
+        _super.call(this, "particle");
+        this.scale = new IsoScale(1, 1);
+        this.position = position;
+        this.velocity = velocity;
+        this.lifetime = lifetime;
+        this.size = size;
+        this.startLife = new Date().getTime();
+        this.effectAlpha = effectAlpha;
+        this.effectScale = effectScale;
+        if (effectScale === true) {
+            this.animations.add("scaleX", {
+                property: "scale.fx",
+                startValue: 0.01,
+                endValue: scale.fx,
+                duration: lifetime
+            }).play();
+            this.animations.add("scaleY", {
+                property: "scale.fy",
+                startValue: 0.01,
+                endValue: scale.fy,
+                duration: lifetime
+            }).play();
         }
         else {
-            return 0;
+            this.size = size;
         }
-    };
-    IsoLayers.prototype.getByIndex = function (index) {
-        return this.layers[index];
-    };
-    return IsoLayers;
-})();
-var IsoMapPoint = (function () {
-    function IsoMapPoint(row, column) {
-        if (row !== undefined) {
-            this.row = row;
+        if (effectAlpha === true) {
+            this.alpha = 1;
+            this.animations.add("alpha", {
+                property: "alpha",
+                startValue: 1,
+                endValue: 0,
+                duration: lifetime
+            }).play();
         }
-        if (column !== undefined) {
-            this.column = column;
+        else {
+            this.alpha = alpha;
         }
     }
-    IsoMapPoint.prototype.set = function (row, column) {
-        this.row = row;
-        this.column = column;
+    IsoParticle.prototype.updatePosition = function () {
+        this.position.add(this.velocity);
+        return this;
     };
-    IsoMapPoint.prototype.get = function () {
+    IsoParticle.prototype.update = function () {
+        this.currentTime = new Date().getTime();
+        this.updatePosition();
+        this.currentTime = new Date().getTime();
+        if (this.currentTime - this.startLife > this.lifetime) {
+            this.free();
+        }
+        // After all.
+        this.oldTime = this.currentTime;
+    };
+    IsoParticle.prototype.getRenderData = function () {
         return {
-            row: this.row,
-            column: this.column
-        };
-    };
-    return IsoMapPoint;
-})();
-"use strict";
-/**
- * IsoMapVector2D represents a point on the map.
- */
-var IsoMapVector2D = (function (_super) {
-    __extends(IsoMapVector2D, _super);
-    /** Creates a new vector */
-    function IsoMapVector2D(row, column) {
-        _super.call(this, row, column);
-    }
-    /** Gets the distance between two points */
-    IsoMapVector2D.prototype.getDistance = function (vec) {
-        // c2 = a2 + b2 --> c = sqrt(a2 + b2) --> c = is distance
-        return Math.sqrt(((this.column - vec.column) * (this.column - vec.column)) + ((this.row - vec.row) * (this.row - vec.row)));
-    };
-    return IsoMapVector2D;
-})(IsoMapPoint);
-///<reference path="IsoImage.ts" />
-///<reference path="IsoOn.ts" />
-"use strict";
-;
-var IsoRessource = (function (_super) {
-    __extends(IsoRessource, _super);
-    function IsoRessource(name, ressource) {
-        _super.call(this);
-        this.loaded = false;
-        this.name = name;
-        this.ressource = ressource;
-        this.type = this.ressource.type;
-    }
-    IsoRessource.prototype.load = function () {
-        var _this = this;
-        this.ressource.on("load", function () { return _this.onload(); });
-        this.ressource.load();
-    };
-    IsoRessource.prototype.onload = function () {
-        this.loaded = true;
-        this.fire(IsoRessource.ISO_EVENT_RESSOURCE_LOADED, this);
-    };
-    IsoRessource.prototype.get = function () {
-        return this.ressource.get();
-    };
-    IsoRessource.ISO_EVENT_RESSOURCE_LOADED = "ISO_EVENT_RESSOURCE_LOADED";
-    IsoRessource.ISO_EVENT_RESSOURCE_PROGRESS = "ISO_EVENT_RESSOURCE_PROGRESS";
-    IsoRessource.ISO_EVENT_RESSOURCE_PROGRESS_ALL = "ISO_EVENT_RESSOURCE_PROGRESS_ALL";
-    IsoRessource.IMAGE = "image";
-    IsoRessource.AUDIO = "audio";
-    IsoRessource.SHAPE = "SHAPE";
-    return IsoRessource;
-})(IsoOn);
-///<reference path="IsoRessource.ts" />
-///<reference path="IsoOn.ts" />
-"use strict";
-var IsoRessourceManager = (function (_super) {
-    __extends(IsoRessourceManager, _super);
-    function IsoRessourceManager(Engine) {
-        var _this = this;
-        _super.call(this);
-        this.ressources = new Array();
-        this.numberAutoload = 0;
-        this.autoloaded = 0;
-        this.Engine = Engine;
-        this.onEvent(IsoRessource.ISO_EVENT_RESSOURCE_LOADED, function (event) { return _this._onProgress(event); });
-    }
-    IsoRessourceManager.prototype.add = function (name, ressource) {
-        this.ressources.push(new IsoRessource(name, ressource));
-        this.numberAutoload++;
-    };
-    IsoRessourceManager.prototype.onBeforeLoad = function (callback) {
-        this.__beforeLoad = callback;
-    };
-    IsoRessourceManager.prototype._onBeforeLoad = function () {
-        if (typeof this.__beforeLoad === "function") {
-            this.__beforeLoad.call(this);
-        }
-    };
-    IsoRessourceManager.prototype.get = function (name) {
-        for (var i = 0; i < this.ressources.length; i++) {
-            if (this.ressources[i].name === name) {
-                return this.ressources[i];
-            }
-        }
-    };
-    IsoRessourceManager.prototype.load = function () {
-        for (var i = 0; i < this.ressources.length; i++) {
-            this.ressources[i].load();
-        }
-        return this;
-    };
-    IsoRessourceManager.prototype.onProgress = function (callback) {
-        this.__onProgress = callback;
-    };
-    IsoRessourceManager.prototype._onProgress = function (event) {
-        this.autoloaded++;
-        var e = new IsoEvent(IsoRessource.ISO_EVENT_RESSOURCE_PROGRESS);
-        e.trigger();
-        if (typeof this.__onProgress === "function") {
-            this.__onProgress.call(this, event);
-        }
-        if (this.autoloaded === this.numberAutoload) {
-            this._onProgressAll();
-        }
-        return this;
-    };
-    IsoRessourceManager.prototype._then = function () {
-        if (typeof this.__then === "function") {
-            this.__then.call(this.Engine);
-        }
-    };
-    IsoRessourceManager.prototype.then = function (callback) {
-        this.__then = callback;
-        return this;
-    };
-    IsoRessourceManager.prototype._onProgressAll = function () {
-        var e = new IsoEvent(IsoRessource.ISO_EVENT_RESSOURCE_PROGRESS_ALL);
-        e.trigger();
-        if (typeof this.__onProgressAll === "function") {
-            this.__onProgressAll.call(this, event);
-        }
-        this._then();
-    };
-    IsoRessourceManager.prototype.onProgressAll = function (callback) {
-        this.__onProgressAll = callback;
-    };
-    return IsoRessourceManager;
-})(IsoOn);
-///<reference path="IsoConfig.ts" />
-///<reference path="IsoCanvas.ts" />
-///<reference path="IsoEvent.ts" />
-///<reference path="IsoMap.ts" />
-///<reference path="IsoRessourceManager.ts" />
-///<reference path="IsoLayers.ts" />
-///<reference path="IsoOn.ts" />
-///<reference path="IsoDrawer.ts" />
-"use strict";
-/**
- * The mainclass of IsoMetric and the starting point for the gameloop.
- * @class IsoMetric
- * @constructor
- *
- */
-var IsoMetric = (function (_super) {
-    __extends(IsoMetric, _super);
-    /** Creates a new instance of IsoMetric */
-    function IsoMetric(windowOptions) {
-        var _this = this;
-        _super.call(this);
-        /** A counter for frames */
-        this.frameCount = 0;
-        /** The frames per second */
-        this.FPS = 0;
-        /** The default canvas configuration. */
-        this.defaultWindowOptions = {
-            fullscreen: true,
-            width: window.innerWidth,
-            height: window.innerHeight
-        };
-        this.config = new IsoConfig(this);
-        this.canvas = new IsoCanvas(this);
-        this.layers = new IsoLayers(this);
-        this.input = new IsoInput(this);
-        this.animation = new IsoAnimationManager();
-        this.ressources = new IsoRessourceManager(this);
-        this.physics = new IsoPhysicsManager();
-        if (windowOptions === undefined) {
-            windowOptions = this.defaultWindowOptions;
-        }
-        this.config.set("windowOptions", windowOptions);
-        this.canvas.create();
-        this.drawer = new IsoDrawer(this);
-        this.frameCountInteral = setInterval(function () { return _this.setFPS(); }, 1000);
-    }
-    /** Reset and set the FPS */
-    IsoMetric.prototype.setFPS = function () {
-        this.FPS = this.frameCount;
-        this.frameCount = 0;
-    };
-    /** Starts the game- and drawing-loop. */
-    IsoMetric.prototype.startLoop = function () {
-        this.update();
-    };
-    /** Sets the FPS after the drawing-loop completed. */
-    IsoMetric.prototype.endLoop = function () {
-        var endLoop = new Date();
-        this.frameTime = (endLoop.getMilliseconds() - this.startLoopTime.getMilliseconds());
-        this.frameCount = this.frameCount + 1;
-    };
-    /** The game- and drawing-loop. */
-    IsoMetric.prototype.update = function () {
-        this.startLoopTime = new Date();
-        this.drawer.update();
-    };
-    return IsoMetric;
-})(IsoOn);
-"use strict";
-var IsoParticle = (function () {
-    function IsoParticle(Engine, ressource, position, life, angle, scale, speed) {
-        this.position = new IsoVector2D();
-        this.life = 0;
-        this.originalLife = 0;
-        this.velocity = new IsoVector2D();
-        this.color = { red: 0, green: 0, blue: 0 };
-        this.alpha = 1;
-        this.renderSize = { width: 0, height: 0 };
-        this.blendingMode = IsoBlendingModes.NORMAL;
-        this.Engine = Engine;
-        this.position.set(position.x, position.y);
-        this.originalLife = this.life = life;
-        var angleRadians = angle * Math.PI / 180;
-        this.velocity.set(speed * Math.cos(angleRadians), -speed * Math.sin(angleRadians));
-        this.originalScale = this.scale = scale;
-        this.alpha = 1;
-        this.ressource = ressource;
-    }
-    IsoParticle.prototype.update = function (dt) {
-        this.life -= dt;
-        if (this.life > 0) {
-            var ageRatio = this.life / this.originalLife;
-            this.renderSize.width = (this.ressource.ressource.width - (this.ressource.ressource.width * ageRatio)) * this.scale.factorY;
-            this.renderSize.height = (this.ressource.ressource.height - (this.ressource.ressource.height * ageRatio)) * this.scale.factorY;
-            this.alpha = ageRatio;
-            this.position.x += this.velocity.x * dt;
-            this.position.y += this.velocity.y * dt;
-        }
-    };
-    IsoParticle.prototype.getRenderDetails = function () {
-        return {
-            position: new IsoVector2D(this.position.x, this.position.y),
-            image: this.ressource.get(),
-            tileSize: {
-                width: this.ressource.ressource.getWidth(), height: this.ressource.ressource.getHeight()
-            },
+            position: this.position,
             alpha: this.alpha,
-            renderSize: this.renderSize,
-            offset: new IsoPoint(0, 0),
-            type: "IsoParticle",
-            zoomLevel: 0,
-            anchor: new IsoPoint(0.5, 0.5)
+            size: new IsoSize(this.size.width * this.scale.fx, this.size.height * this.scale.fy),
+            rotation: 0,
+            anchor: new IsoPoint(0, 0)
         };
     };
     return IsoParticle;
-})();
-"use strict";
-var IsoPoint = (function () {
-    function IsoPoint(x, y) {
-        if (x !== undefined) {
-            this.x = x;
-        }
-        if (y !== undefined) {
-            this.y = y;
-        }
+})(IsoBaseEntity);
+var IsoPhysics = (function (_super) {
+    __extends(IsoPhysics, _super);
+    function IsoPhysics() {
+        _super.call(this);
+        this.body = null;
     }
-    /** Sets or resets the point */
-    IsoPoint.prototype.set = function (x, y) {
-        this.x = x;
-        this.y = y;
+    IsoPhysics.prototype.addBody = function (options) {
+        try {
+            if (!Matter) {
+                this.log("I have problems with the physics. I can not find Matter.js. You need to bind in it by yourself. :(", IsoLogger.WARN);
+                this.log("You can find information about Matter.js here: https://github.com/liabru/matter-js", IsoLogger.INFO);
+                this.log("The library is located in the directory 'external/matterJs'.", IsoLogger.INFO);
+                return this;
+            }
+            switch (options.type) {
+                case "rectangle":
+                    this.body = Matter.Bodies.rectangle(options.x || this.entity.position.x, options.y || this.entity.position.y, options.width || this.entity.size.width, options.height || this.entity.size.height, options.options);
+                    break;
+                case "circle":
+                    this.body = Matter.Bodies.circle(options.x || this.entity.position.x, options.y || this.entity.position.y, options.radius, options.options, options.maxSides || undefined);
+                    break;
+                case "fromVertices":
+                    this.body = Matter.Bodies["fromVertices"](options.x || this.entity.position.x, options.y || this.entity.position.y, options.vertices, options.flagInternal || false, options.removeCollinear || 0.01, options.minimumArea || 10);
+                    break;
+                case "polygon":
+                    this.body = Matter.Bodies.polygon(options.x || this.entity.position.x, options.y || this.entity.position.y, options.sides, options.radius, options.options);
+                    break;
+                case "trapezoid":
+                    this.body = Matter.Bodies.trapezoid(options.x || this.entity.position.x, options.y || this.entity.position.y, options.width || this.entity.size.width, options.height || this.entity.size.height, options.slope, options.options);
+                    break;
+            }
+            Matter.World.add(IsoMetric.self.physics.physicsEngine.world, this.body);
+            return this;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
     };
-    /** Gets the point on the screen. */
-    IsoPoint.prototype.get = function () {
-        return this;
+    IsoPhysics.prototype.updateEntity = function () {
+        if (this.hasBody()) {
+            this.entity.rotation = this.body.angle / 180 * Math.PI;
+            this.entity.position = new IsoVector2D(this.body.position.x, this.body.position.y);
+        }
     };
-    return IsoPoint;
-})();
-"use strict";
+    IsoPhysics.prototype.hasBody = function () {
+        if (this.body !== null) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    return IsoPhysics;
+})(IsoObject);
+/// <reference path="../core/IsoObject.ts" />
+/// <reference path="../typings/matterJs.d.ts" />
 /**
- * An implementation of the MersenneTwister for TypeScript.
- * This library produces much better random numbers than Math.random().
+ * This class is a bridge to the javascript physics engine 'MatterJs'.
+ * Matter.js is licensed under The MIT License (MIT)
+ * Copyright (c) 2014 Liam Brummitt
+ * https://github.com/liabru/matter-js/
  */
-/**
- * Written for JavaScript by Sean McCullough (banksean@gmail.com).
- * Written for TypeScript by Benjamin Werner
- */
-/*
-  I've wrapped Makoto Matsumoto and Takuji Nishimura's code in a namespace
-  so it's better encapsulated. Now you can have multiple random number generators
-  and they won't stomp all over eachother's state.
-  
-  If you want to use this as a substitute for Math.random(), use the random()
-  method like so:
-  
-  var m = new MersenneTwister();
-  var randomNumber = m.random();
-  
-  You can also call the other genrand_{foo}() methods on the instance.
-  If you want to use a specific seed in order to get a repeatable random
-  sequence, pass an integer into the constructor:
-  var m = new MersenneTwister(123);
-  and that will always produce the same random sequence.
-  Sean McCullough (banksean@gmail.com)
-*/
-/*
-   A C-program for MT19937, with initialization improved 2002/1/26.
-   Coded by Takuji Nishimura and Makoto Matsumoto.
- 
-   Before using, initialize the state by using init_genrand(seed)
-   or init_by_array(init_key, key_length).
- 
-   Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-   All rights reserved.
- 
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions
-   are met:
- 
-     1. Redistributions of source code must retain the above copyright
-        notice, this list of conditions and the following disclaimer.
- 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
- 
-     3. The names of its contributors may not be used to endorse or promote
-        products derived from this software without specific prior written
-        permission.
- 
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
- 
-   Any feedback is very welcome.
-   http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
-   email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
-*/
-var MersenneTwister = (function () {
-    function MersenneTwister(seed) {
-        /* Period parameters */
-        this.N = 624;
-        this.M = 397;
-        /** constant vector a */
-        this.MATRIX_A = 0x9908b0df;
-        /** most significant w-r bits */
-        this.UPPER_MASK = 0x80000000;
-        /** least significant r bits */
-        this.LOWER_MASK = 0x7fffffff;
-        /** the array for the state vector */
-        this.mt = new Array(this.N);
-        /** mti==N+1 means mt[N] is not initialized */
-        this.mti = this.N + 1;
-        if (seed === undefined) {
-            seed = new Date().getTime();
-        }
-        this.init_genrand(seed);
+var IsoPhysicsManager = (function (_super) {
+    __extends(IsoPhysicsManager, _super);
+    function IsoPhysicsManager() {
+        _super.call(this);
+        this.physicsEngine = null;
+        this.turnedOn = false;
     }
-    MersenneTwister.prototype.init_genrand = function (s) {
-        this.mt[0] = s >>> 0;
-        for (this.mti = 1; this.mti < this.N; this.mti++) {
-            var s = this.mt[this.mti - 1] ^ (this.mt[this.mti - 1] >>> 30);
-            this.mt[this.mti] = (((((s & 0xffff0000) >>> 16) * 1812433253) << 16) + (s & 0x0000ffff) * 1812433253)
-                + this.mti;
-            /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
-            /* In the previous versions, MSBs of the seed affect   */
-            /* only MSBs of the array mt[].                        */
-            /* 2002/01/09 modified by Makoto Matsumoto             */
-            this.mt[this.mti] >>>= 0;
+    IsoPhysicsManager.prototype.create = function () {
+        try {
+            this.turnedOn = true;
+            this.physicsEngine = Matter.Engine.create();
+        }
+        catch (e) {
+            this.log("I have problems with the physics. I can not find Matter.js. You need to bind in it by yourself. :(", IsoLogger.WARN);
+            this.log("You can find information about Matter.js here: https://github.com/liabru/matter-js", IsoLogger.INFO);
+            this.log("The library is located in the directory 'external/matterJs'.", IsoLogger.INFO);
         }
     };
-    MersenneTwister.prototype.init_by_array = function (init_key, key_length) {
-        var i, j, k;
-        this.init_genrand(19650218);
-        i = 1;
-        j = 0;
-        k = (this.N > key_length ? this.N : key_length);
-        for (; k; k--) {
-            var s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30);
-            this.mt[i] = (this.mt[i] ^ (((((s & 0xffff0000) >>> 16) * 1664525) << 16) + ((s & 0x0000ffff) * 1664525)))
-                + init_key[j] + j; /* non linear */
-            this.mt[i] >>>= 0; /* for WORDSIZE > 32 machines */
-            i++;
-            j++;
-            if (i >= this.N) {
-                this.mt[0] = this.mt[this.N - 1];
-                i = 1;
-            }
-            if (j >= key_length)
-                j = 0;
-        }
-        for (k = this.N - 1; k; k--) {
-            var s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30);
-            this.mt[i] = (this.mt[i] ^ (((((s & 0xffff0000) >>> 16) * 1566083941) << 16) + (s & 0x0000ffff) * 1566083941))
-                - i; /* non linear */
-            this.mt[i] >>>= 0; /* for WORDSIZE > 32 machines */
-            i++;
-            if (i >= this.N) {
-                this.mt[0] = this.mt[this.N - 1];
-                i = 1;
-            }
-        }
-        this.mt[0] = 0x80000000; /* MSB is 1; assuring non-zero initial array */
+    IsoPhysicsManager.prototype.turnOn = function () {
+        this.turnedOn = true;
     };
-    MersenneTwister.prototype.genrand_int32 = function () {
-        var y;
-        var mag01 = new Array(0x0, this.MATRIX_A);
-        /* mag01[x] = x * MATRIX_A  for x=0,1 */
-        if (this.mti >= this.N) {
-            var kk;
-            if (this.mti == this.N + 1)
-                this.init_genrand(5489); /* a default initial seed is used */
-            for (kk = 0; kk < this.N - this.M; kk++) {
-                y = (this.mt[kk] & this.UPPER_MASK) | (this.mt[kk + 1] & this.LOWER_MASK);
-                this.mt[kk] = this.mt[kk + this.M] ^ (y >>> 1) ^ mag01[y & 0x1];
-            }
-            for (; kk < this.N - 1; kk++) {
-                y = (this.mt[kk] & this.UPPER_MASK) | (this.mt[kk + 1] & this.LOWER_MASK);
-                this.mt[kk] = this.mt[kk + (this.M - this.N)] ^ (y >>> 1) ^ mag01[y & 0x1];
-            }
-            y = (this.mt[this.N - 1] & this.UPPER_MASK) | (this.mt[0] & this.LOWER_MASK);
-            this.mt[this.N - 1] = this.mt[this.M - 1] ^ (y >>> 1) ^ mag01[y & 0x1];
-            this.mti = 0;
-        }
-        y = this.mt[this.mti++];
-        /* Tempering */
-        y ^= (y >>> 11);
-        y ^= (y << 7) & 0x9d2c5680;
-        y ^= (y << 15) & 0xefc60000;
-        y ^= (y >>> 18);
-        return y >>> 0;
+    IsoPhysicsManager.prototype.turnOff = function () {
+        this.turnedOn = false;
+        this.physicsEngine = null;
     };
-    MersenneTwister.prototype.genrand_int31 = function () {
-        return (this.genrand_int32() >>> 1);
+    IsoPhysicsManager.prototype.isTurnedOn = function () {
+        return this.turnedOn;
     };
-    /** Generates an number between 0 and 1. */
-    MersenneTwister.prototype.genrand_real1 = function () {
-        return this.genrand_int32() * (1.0 / 4294967295.0);
-        /* divided by 2^32-1 */
-    };
-    MersenneTwister.prototype.random = function () {
-        return this.genrand_int32() * (1.0 / 4294967296.0);
-        /* divided by 2^32 */
-    };
-    MersenneTwister.prototype.genrand_real3 = function () {
-        return (this.genrand_int32() + 0.5) * (1.0 / 4294967296.0);
-        /* divided by 2^32 */
-    };
-    MersenneTwister.prototype.genrand_res53 = function () {
-        var a = this.genrand_int32() >>> 5, b = this.genrand_int32() >>> 6;
-        return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
-    };
-    return MersenneTwister;
-})();
-"use strict";
-var IsoText = (function (_super) {
-    __extends(IsoText, _super);
-    /** Creates a new text object. */
-    function IsoText(Engine, name, text) {
-        _super.call(this, Engine);
-        /** Font of the text */
-        this.font = "sans serif";
-        /** The stroke width. */
-        this.strokeWidth = 0;
-        /** The font size of the text in pixel. Default is 10. */
-        this.size = 10;
-        /** The fill style. If true the text is filled, else its stroked. */
-        this.filled = true;
-        /** The direction of the text. Possible values are IsoText.INHERIT, IsoText.LEFTTORIGHT or IsoText.RIGHTTOLEFT. Default is IsoText.INHERIT. */
-        this.direction = IsoText.INHERIT;
-        /** The baseline of the text. Possible values are IsoText.TOP, IsoText.HANGING, IsoText.MIDDLE, IsoText.ALPHABETIC, IsoText.IDEOGRAPHIC and IsoText.BOTTOM. The default is IsoText.ALPHABETIC. */
-        this.baseline = IsoText.ALPHABETIC;
-        /** The allignment of the text. Possible values are IsoText.START, IsoText.END, IsoText.LEFT, IsoText.RIGHT or IsoText.CENTER. Default is IsoText.START. */
-        this.align = IsoText.START;
-        /** Type of the object. */
-        this.type = "IsoText";
-        this.name = name;
-        this.text = text;
+    return IsoPhysicsManager;
+})(IsoObject);
+///<reference path="IsoResource.ts" />
+var IsoAudioResource = (function (_super) {
+    __extends(IsoAudioResource, _super);
+    function IsoAudioResource(name, source) {
+        _super.call(this, name);
         return this;
     }
-    /** Sets the text. */
-    IsoText.prototype.setText = function (text) {
-        this.text = text;
+    Object.defineProperty(IsoAudioResource.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoAudioResource";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the source of a resource. */
+    IsoAudioResource.prototype.setSource = function (source) {
+        this.source = source;
         return this;
     };
-    /** Sets the font-size of the text. size can be a number in pixel or a string. */
-    IsoText.prototype.setSize = function (size) {
+    /** Gets the source. */
+    IsoAudioResource.prototype.get = function () {
+        return this.source;
+    };
+    return IsoAudioResource;
+})(IsoResource);
+///<reference path="../core/IsoObject.ts" />
+var IsoCanvas = (function (_super) {
+    __extends(IsoCanvas, _super);
+    function IsoCanvas(width, height, fullscreen, autoResize) {
+        if (fullscreen === void 0) { fullscreen = false; }
+        if (autoResize === void 0) { autoResize = true; }
+        _super.call(this);
+        /** The size of the canvas. */
+        this.size = new IsoSize(0, 0);
+        this.size = new IsoSize(width, height);
+        this.autoResize = autoResize;
+        this.fullscreen = fullscreen;
+    }
+    Object.defineProperty(IsoCanvas.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        set: function (value) {
+            this.__propertyChanged("element", value);
+            this._element = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCanvas.prototype, "context", {
+        get: function () {
+            return this._context;
+        },
+        set: function (value) {
+            this.__propertyChanged("context", value);
+            this._context = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCanvas.prototype, "autoResize", {
+        get: function () {
+            return this._autoResize;
+        },
+        set: function (value) {
+            this.__propertyChanged("autoResize", value);
+            this._autoResize = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCanvas.prototype, "fullscreen", {
+        get: function () {
+            return this._fullscreen;
+        },
+        set: function (value) {
+            this.__propertyChanged("fullscreen", value);
+            this._fullscreen = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCanvas.prototype, "type", {
+        get: function () {
+            return "IsoCanvas";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Creates a new canvas element. */
+    IsoCanvas.prototype.load = function () {
+        var _this = this;
+        this.element = document.createElement("canvas");
+        this.element.width = this.size.width;
+        this.element.height = this.size.height;
+        if (this.fullscreen === true) {
+            this.element.width = window.innerWidth;
+            this.element.height = window.innerHeight;
+        }
+        this.context = this.element.getContext("2d");
+        window.onresize = function () { return _this.resize(); };
+        this.fire("load", {}, this.element);
+        this.call("load", [this]);
+    };
+    /** Appends the canvas element to a given HTML element. */
+    IsoCanvas.prototype.append = function (element) {
+        element.appendChild(this.element);
+        return this;
+    };
+    /** Remove the canvas element from a given HTML element. */
+    IsoCanvas.prototype.remove = function (element) {
+        element.removeChild(this.element);
+        return this;
+    };
+    /** Resize the canvas in case of fullscreen and autoResize is true. */
+    IsoCanvas.prototype.resize = function () {
+        if (this.autoResize === true && this.fullscreen === true) {
+            this.element.width = window.innerWidth;
+            this.element.height = window.innerHeight;
+        }
+    };
+    /** Refreshes the canvas size. */
+    IsoCanvas.prototype.refresh = function () {
+        this.element.width = this.size.width;
+        this.element.height = this.size.height;
+    };
+    /** Clears the canvas. */
+    IsoCanvas.prototype.clear = function () {
+        try {
+            if (this.context !== undefined) {
+                this.context.clearRect(0, 0, this.element.width, this.element.height);
+            }
+            else {
+                this.log(new Error("I could not clear the canvas, because its context was undefined."), IsoLogger.WARN);
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /**  Returns the image. */
+    IsoCanvas.prototype.get = function () {
+        return this.element;
+    };
+    /** Gets the width of the image. */
+    IsoCanvas.prototype.getWidth = function () {
+        return this.size.width;
+    };
+    /** Gets the height of the image. */
+    IsoCanvas.prototype.getHeight = function () {
+        return this.size.height;
+    };
+    /** Returns the size. */
+    IsoCanvas.prototype.getSize = function () {
+        return this.size;
+    };
+    /** Sets the width of the image. */
+    IsoCanvas.prototype.setWidth = function (width) {
+        this.size.width = width;
+        return this;
+    };
+    /** Sets the height of the image. */
+    IsoCanvas.prototype.setHeight = function (height) {
+        this.size.height = height;
+        return this;
+    };
+    /** Sets the size of the image. */
+    IsoCanvas.prototype.setSize = function (size) {
         this.size = size;
         return this;
     };
-    /** Sets the value of the color red of the text. red is a value between 0 and 255. */
-    IsoText.prototype.setColorRed = function (red) {
-        this.colorRGB.red = red;
-        return this;
+    return IsoCanvas;
+})(IsoObject);
+/// <reference path="../core/IsoObject.ts" />
+var IsoResourceManager = (function (_super) {
+    __extends(IsoResourceManager, _super);
+    function IsoResourceManager() {
+        _super.apply(this, arguments);
+        this._resources = new Array();
+        this.loaded = 0;
+    }
+    Object.defineProperty(IsoResourceManager.prototype, "resources", {
+        get: function () {
+            return this._resources;
+        },
+        set: function (value) {
+            this.__propertyChanged("resource", value);
+            this._resources = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoResourceManager.prototype, "type", {
+        get: function () {
+            return "IsoResourceManager";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Adds a resource. */
+    IsoResourceManager.prototype.add = function (resource) {
+        try {
+            if (this.resources === undefined) {
+                this.resources = new Array();
+                this.log("Resources should not be undefined. I created a new array for you.", IsoLogger.WARN);
+            }
+            this.resources.push(resource);
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
     };
-    /** Sets the value of the color green of the text. green is a value between 0 and 255. */
-    IsoText.prototype.setColorGreen = function (green) {
-        this.colorRGB.green = green;
-        return this;
+    /** Removes a resource. */
+    IsoResourceManager.prototype.remove = function (resource) {
+        try {
+            for (var i = 0; i < this.resources.length; i++) {
+                if (this.resources[i] === resource) {
+                    for (var l = i; l < this.resources.length - 1; i++) {
+                        this.resources[l] = this.resources[l + 1];
+                    }
+                    this.resources.pop();
+                    return this;
+                }
+            }
+            this.log(new Error("I can not find the requested resource. I am so sorry!"), IsoLogger.WARN);
+            return this;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
     };
-    /** Sets the value of the color blue of the text. blue is a value between 0 and 255. */
-    IsoText.prototype.setColorBlue = function (blue) {
-        this.colorRGB.blue = blue;
-        return this;
+    /** Returns a resource by its name. */
+    IsoResourceManager.prototype.get = function (name) {
+        try {
+            for (var i = 0; i < this.resources.length; i++) {
+                if (this.resources[i].name === name) {
+                    return this.resources[i];
+                }
+            }
+            this.log(new Error("I can not find the requested resource '" + name + "'"), IsoLogger.WARN);
+            return undefined;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
     };
-    /** Sets the value of the background color red of the text. red is a value between 0 and 255. */
-    IsoText.prototype.setBackgroundColorRed = function (red) {
-        this.backgroundColorRGB.red = red;
-        return this;
-    };
-    /** Sets the value of the background color green of the text. green is a value between 0 and 255. */
-    IsoText.prototype.setBackgroundColorGreen = function (green) {
-        this.backgroundColorRGB.green = green;
-        return this;
-    };
-    /** Sets the value of the background color blue of the text. blue is a value between 0 and 255. */
-    IsoText.prototype.setBackgroundColorBlue = function (blue) {
-        this.backgroundColorRGB.blue = blue;
-        return this;
-    };
-    /** Sets the value of the stroke color red of the text. red is a value between 0 and 255. */
-    IsoText.prototype.setStrokeColorRed = function (red) {
-        this.strokeColorRGB.red = red;
-        return this;
-    };
-    /** Sets the value of the stroke color green of the text. green is a value between 0 and 255. */
-    IsoText.prototype.setStrokeColorGreen = function (green) {
-        this.strokeColorRGB.green = green;
-        return this;
-    };
-    /** Sets the value of the stroke color blue of the text. blue is a value between 0 and 255. */
-    IsoText.prototype.setStrokeColorBlue = function (blue) {
-        this.strokeColorRGB.blue = blue;
-        return this;
-    };
-    /** Sets the color of a text. color can be a hex value or an object of IsoColor. */
-    IsoText.prototype.setColor = function (color) {
-        if (typeof color === "string") {
-            this.color = color;
-            if (color === "transparent")
-                this.colorRGB = null;
-            else
-                this.colorRGB = this.hexToRGB(color);
+    /** Loads all resources. */
+    IsoResourceManager.prototype.load = function () {
+        var _this = this;
+        this.log("Lets start loading the resources.", IsoLogger.INFO);
+        if (this.resources === undefined || this.resources.length === 0) {
+            this.log("Nothing to load, because there are no resources.", IsoLogger.WARN);
         }
         else {
-            this.colorRGB = color;
-            this.color = this.rgbToHex(color.red, color.green, color.blue);
+            for (var i = 0; i < this.resources.length; i++) {
+                if (this.resources[i].type === "IsoImageResource" || this.resources[i].type === "IsoVideoResource") {
+                    this.resources[i].get().on("load", function () { return _this.process(); });
+                    this.resources[i].get().load();
+                }
+            }
         }
         return this;
     };
-    /** Sets te background color of the text. color can be a hex value or an object of IsoColor. */
-    IsoText.prototype.setBackgroundColor = function (color) {
-        if (typeof color === "string") {
-            this.backgroundColor = color;
-            if (color === "transparent")
-                this.backgroundColorRGB = null;
-            else
-                this.backgroundColorRGB = this.hexToRGB(color);
+    /** Checks the process of loading. */
+    IsoResourceManager.prototype.process = function () {
+        this.loaded++;
+        this.log("Loaded resource - " + this.loaded + " of " + this.resources.length, IsoLogger.INFO);
+        if (this.loaded === this.resources.length) {
+            this.log("Finished loading of all resources.", IsoLogger.INFO);
+            this.call("load");
         }
-        else {
-            this.backgroundColorRGB = color;
-            this.backgroundColor = this.rgbToHex(color.red, color.green, color.blue);
-        }
-        return this;
     };
-    /** Sets the stroke color of a text. color can be a hex value or an object of IsoColor. */
-    IsoText.prototype.setStrokeColor = function (color) {
-        if (typeof color === "string") {
-            this.strokeColor = color;
-            if (color === "transparent")
-                this.strokeColorRGB = null;
-            else
-                this.strokeColorRGB = this.hexToRGB(color);
+    /** Get the percent of the loading process. */
+    IsoResourceManager.prototype.getPercent = function () {
+        if (this.resources !== undefined && this.resources.length > 0) {
+            return this.resources.length / 100 * this.loaded;
         }
         else {
-            this.strokeColorRGB = color;
-            this.strokeColor = this.rgbToHex(color.red, color.green, color.blue);
+            this.log(new Error("Sorry. I can not get you the percentage, because there is nothing to load."), IsoLogger.WARN);
         }
+    };
+    return IsoResourceManager;
+})(IsoObject);
+///<reference path="../core/IsoObject.ts" />
+var IsoVideo = (function (_super) {
+    __extends(IsoVideo, _super);
+    function IsoVideo(src) {
+        _super.call(this);
+        /** Indicates if the video was loaded. */
+        this.isLoaded = false;
+        /**  The size of the video. */
+        this.size = new IsoSize(0, 0);
+        /** Sets if the video load completly or stream it. */
+        this.loadType = IsoVideo.LOAD;
+        if (src !== undefined) {
+            this.create(src);
+        }
+    }
+    Object.defineProperty(IsoVideo.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoVideo";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Creates a new video. */
+    IsoVideo.prototype.create = function (src) {
+        this.src = src;
+        this.element = document.createElement("video");
         return this;
     };
-    /** Sets the stroke width of the text. */
-    IsoText.prototype.setStrokeWidth = function (width) {
-        this.strokeWidth = width;
-        return this;
+    /** Loads the video for further work. */
+    IsoVideo.prototype.load = function () {
+        var _this = this;
+        try {
+            this.element.muted = true;
+            if (this.loadType === IsoVideo.STREAM)
+                this.element.oncanplay = function (e) { return _this._onLoad(e); };
+            else if (this.loadType === IsoVideo.LOAD)
+                this.element.oncanplaythrough = function (e) { return _this._onLoad(e); };
+            else {
+                this.log("An unknown loadType for the video " + this.src[0] + "!", IsoLogger.WARN);
+                this.log("Set the loadType to default.", IsoLogger.INFO);
+                this.element.oncanplaythrough = function (e) { return _this._onLoad(e); };
+            }
+            if (this.size.width !== undefined && this.size.height !== undefined) {
+                this.resize();
+            }
+            this.element.src = this.src[0];
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
     };
-    /** Sets the font of the text.*/
-    IsoText.prototype.setFont = function (font) {
-        this.font = font;
-        return this;
+    /** Called when the video file was loaded. */
+    IsoVideo.prototype._onLoad = function (event) {
+        try {
+            this.size.width = this.element.width;
+            this.size.height = this.element.height;
+            this.isLoaded = true;
+            this.call("load");
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
     };
-    /** Sets if the text is filled or not. */
-    IsoText.prototype.setFilled = function (fill) {
-        this.filled = fill;
-        return this;
+    /**  Returns the video. */
+    IsoVideo.prototype.get = function () {
+        return this.element;
     };
-    /** Sets the direction of the text. */
-    IsoText.prototype.setDirection = function (direction) {
-        this.direction = direction;
-        return this;
+    /** Gets the width of the video. */
+    IsoVideo.prototype.getWidth = function () {
+        return this.size.width;
     };
-    /** Sets the baseline of the text. */
-    IsoText.prototype.setBaseline = function (baseline) {
-        this.baseline = baseline;
-        return this;
+    /** Gets the height of the video. */
+    IsoVideo.prototype.getHeight = function () {
+        return this.size.height;
     };
-    /** Sets the allignment of the text. */
-    IsoText.prototype.setAlign = function (align) {
-        this.align = align;
-        return this;
-    };
-    /** Gets the allignment of the text. */
-    IsoText.prototype.getAlign = function () {
-        return this.align;
-    };
-    /** Gets the baseline of the text. */
-    IsoText.prototype.getBaseline = function () {
-        return this.baseline;
-    };
-    /** Gets the direction of the text. */
-    IsoText.prototype.getDirection = function () {
-        return this.direction;
-    };
-    /** Gets if the text is filled or not. */
-    IsoText.prototype.getFilled = function () {
-        return this.filled;
-    };
-    /** Returns the text.*/
-    IsoText.prototype.getText = function () {
-        return this.text;
-    };
-    /** Returns the size of the text. The returnd value can be a number or a string.*/
-    IsoText.prototype.getSize = function () {
+    /** Gets the size of the video. */
+    IsoVideo.prototype.getSize = function () {
         return this.size;
     };
-    /** Returns the color of the text as an IsoColor object.*/
-    IsoText.prototype.getColorRGB = function () {
-        return this.colorRGB;
+    /** Sets the width of the video. */
+    IsoVideo.prototype.setWidth = function (width) {
+        this.size.width = width;
+        return this;
     };
-    /** Returns the background color of the text as an IsoColor object.*/
-    IsoText.prototype.getBackgroundColorRGB = function () {
-        return this.backgroundColorRGB;
+    /** Sets the height of the video. */
+    IsoVideo.prototype.setHeight = function (height) {
+        this.size.height = height;
+        return this;
     };
-    /** Returns the stroke color of the text as an IsoColor object.*/
-    IsoText.prototype.getStrokeColorRGB = function () {
-        return this.strokeColorRGB;
+    /** Sets the size of the video. */
+    IsoVideo.prototype.setSize = function (size) {
+        this.size = size;
+        return this;
     };
-    /** Retruns the font.*/
-    IsoText.prototype.getFont = function () {
-        return this.font;
-    };
-    /** Gets the stroke width of the text. */
-    IsoText.prototype.getStrokeWidth = function () {
-        return this.strokeWidth;
-    };
-    /**
-     * Converts a hex value to a RGB-color and return it.
-     * Code by Time Down @ stackoverflow.com
-     * @see http://www.stackoverflow.com/user/96100/tim-down
-     */
-    IsoText.prototype.hexToRGB = function (hex) {
-        var shortFormRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shortFormRegex, function (m, r, g, b) {
-            return r + r + g + g + b + b;
-        });
-        var rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return rgb ? {
-            red: parseInt(rgb[1], 16),
-            green: parseInt(rgb[2], 16),
-            blue: parseInt(rgb[3], 16)
-        } : undefined;
-    };
-    /**
-     * Converts a RGB-color to a hex value and return it.
-     * Code by Time Down @ stackoverflow.com
-     * @see http://www.stackoverflow.com/user/96100/tim-down
-     */
-    IsoText.prototype.rgbToHex = function (r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    };
-    IsoText.prototype.ptToPx = function (size) {
-        size = size.replace(/([0-9]+)pt/g, function (m, g) {
-            return Math.round(parseInt(g, 10) * (96 / 72)) + "px";
-        });
-        return size;
-    };
-    /** Gets the position on the screen. */
-    IsoText.prototype.getAbsolutePosition = function () {
-        var x = 0, y = 0;
-        x = ((this.position.x + this.offset.x + this.scrollPosition.x) * this.zoomLevel) + (this.zoomPoint.x * this.zoomLevel - this.zoomPoint.x);
-        y = ((this.position.y + this.offset.y + this.scrollPosition.y) * this.zoomLevel) + (this.zoomPoint.y * this.zoomLevel - this.zoomPoint.y);
-        return new IsoVector2D(x, y);
-    };
-    /** Gets the original dimension of a text in pixel. @todo convert %, pt, em to px */
-    IsoText.prototype.getOriginalDimension = function () {
-        // Gets the font for reseting later
-        var fontSize = this.Engine.canvas.context.font;
-        var baseline = this.Engine.canvas.context.textBaseline;
-        var align = this.Engine.canvas.context.textAlign;
-        var direction = this.Engine.canvas.context.direction;
-        // Configure the use font to get the right size.
-        this.Engine.canvas.context.font = this.size + "px " + this.font;
-        this.Engine.canvas.context.textBaseline = this.baseline;
-        this.Engine.canvas.context.textAlign = this.align;
-        this.Engine.canvas.context.direction = this.direction;
-        var width = 0;
-        var height = 0;
-        if (this.text !== undefined) {
-            var m = this.Engine.canvas.context.measureText(this.text);
-            width = m.width;
-            height = this.size;
+    /** Resizes the video. */
+    IsoVideo.prototype.resize = function () {
+        try {
+            if (this.element !== undefined && this.size.width !== undefined && this.size.height !== undefined) {
+                this.element.width = this.size.width;
+                this.element.height = this.size.height;
+            }
         }
-        // Reset the font 
-        this.Engine.canvas.context.font = fontSize;
-        this.Engine.canvas.context.textBaseline = baseline;
-        this.Engine.canvas.context.align = align;
-        this.Engine.canvas.context.direction = direction;
-        return {
-            width: width,
-            height: height
-        };
-    };
-    /** Gets the dimension of the object on the screen. */
-    IsoText.prototype.getAbsoluteDimension = function () {
-        var dimension = this.getOriginalDimension();
-        return {
-            width: dimension.width * this.zoomLevel * this.scale.factorX,
-            height: dimension.height * this.zoomLevel * this.scale.factorY
-        };
-    };
-    /** Gets all important information for rendering an object. */
-    IsoText.prototype.getRenderDetails = function () {
-        var dimension = this.getOriginalDimension();
-        var fx = this.anchor.x / dimension.width * this.scale.factorX, fy = this.anchor.y / dimension.height * this.scale.factorY;
-        var backgroundColor = null;
-        var color = null;
-        var strokeColor = null;
-        if (this.colorRGB !== undefined && this.colorRGB !== null) {
-            color = this.rgbToHex(this.colorRGB.red, this.colorRGB.green, this.colorRGB.blue);
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
         }
-        if (this.backgroundColorRGB !== undefined && this.backgroundColorRGB !== null) {
-            backgroundColor = this.rgbToHex(this.backgroundColorRGB.red, this.backgroundColorRGB.green, this.backgroundColorRGB.blue);
-        }
-        if (this.strokeColorRGB !== undefined && this.strokeColorRGB !== null) {
-            strokeColor = this.rgbToHex(this.strokeColorRGB.red, this.strokeColorRGB.green, this.strokeColorRGB.blue);
-        }
-        return {
-            position: this.getAbsolutePosition(),
-            renderSize: this.getAbsoluteDimension(),
-            anchor: new IsoPoint((this.position.x + (dimension.width * this.scale.factorX * this.zoomLevel * fx * this.scale.factorX)), (this.position.y + (dimension.height * this.scale.factorY * this.zoomLevel * fy * this.scale.factorY))),
-            text: this.text,
-            offset: this.offset.get(),
-            zoomLevel: this.zoomLevel,
-            color: color,
-            backgroundColor: backgroundColor,
-            strokeColor: strokeColor,
-            strokeWidth: this.strokeWidth,
-            align: this.align,
-            filled: this.filled,
-            baseline: this.baseline,
-            direction: this.direction,
-            size: this.size,
-            font: this.font,
-            type: "IsoText"
-        };
+        return this;
     };
-    IsoText.INHERIT = "inherit";
-    IsoText.LEFTTORIGHT = "ltr";
-    IsoText.RIGHTTOLEFT = "rtl";
-    IsoText.TOP = "top";
-    IsoText.HANGING = "hanging";
-    IsoText.MIDDLE = "middle";
-    IsoText.ALPHABETIC = "alphabetic";
-    IsoText.IDEOGRAPHIC = "ideograpic";
-    IsoText.BOTTOM = "bottom";
-    IsoText.LEFT = "left";
-    IsoText.RIGHT = "right";
-    IsoText.START = "start";
-    IsoText.END = "end";
-    IsoText.CENTER = "center";
-    return IsoText;
-})(IsoMinimalObject);
-"use strict";
-var IsoPhysicsManager = (function () {
-    function IsoPhysicsManager() {
-        /** Includes all registered rigid bodies */
-        this.rigidBodies = new Array();
-        /** Includes all registred mass bodies */
-        this.massBodies = new Array();
-        /** The global gravity */
-        this.gravity = 0.2;
+    /** Sets the loadType to "LOAD" the video load completly. */
+    IsoVideo.LOAD = "LOAD";
+    /** Sets the loadType to "STREAM" the video streamed. */
+    IsoVideo.STREAM = "STREAM";
+    return IsoVideo;
+})(IsoObject);
+///<reference path="IsoResource.ts" />
+var IsoVideoResource = (function (_super) {
+    __extends(IsoVideoResource, _super);
+    function IsoVideoResource(name, source) {
+        _super.call(this, name);
+        this.setSource(source);
+        return this;
     }
-    /** Registers a new mass body */
-    IsoPhysicsManager.prototype.addMassBody = function (object) {
-        this.massBodies.push(object);
+    Object.defineProperty(IsoVideoResource.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoVideoResource";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the source of a resource. */
+    IsoVideoResource.prototype.setSource = function (source) {
+        this.source = source;
+        return this;
     };
-    /** Registers a new rigid body */
-    IsoPhysicsManager.prototype.addRigidBody = function (object) {
-        this.rigidBodies.push(object);
+    /** Gets the source. */
+    IsoVideoResource.prototype.get = function () {
+        return this.source;
     };
-    /** Removes a rigid body */
-    IsoPhysicsManager.prototype.removeRigidBody = function (object) {
-        var __i;
-        for (var i = 0; i < this.rigidBodies.length; i++) {
-            if (this.rigidBodies[i] === object) {
-                __i = i;
-            }
-            if (__i !== undefined) {
-                if (this.rigidBodies[i + 1] !== undefined) {
-                    this.rigidBodies[i] = this.rigidBodies[i + 1];
+    /** Gets the HTMLElement. */
+    IsoVideoResource.prototype.getElement = function () {
+        return this.source.get();
+    };
+    return IsoVideoResource;
+})(IsoResource);
+///<reference path="IsoTexture.ts" />
+var IsoStripeTexture = (function (_super) {
+    __extends(IsoStripeTexture, _super);
+    function IsoStripeTexture(name, src, tileSize) {
+        _super.call(this, name, src);
+        /** The tilesize. */
+        this._tileSize = new IsoSize(0, 0);
+        this.tileSize = tileSize;
+        this.tile = 1;
+    }
+    Object.defineProperty(IsoStripeTexture.prototype, "tile", {
+        get: function () {
+            return this._tile;
+        },
+        set: function (value) {
+            this.__propertyChanged("tile", value);
+            this._tile = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoStripeTexture.prototype, "tileOffset", {
+        get: function () {
+            return this._tileOffset;
+        },
+        set: function (value) {
+            this.__propertyChanged("tileOffset", value);
+            this._tileOffset = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoStripeTexture.prototype, "tileSize", {
+        get: function () {
+            return this._tileSize;
+        },
+        set: function (value) {
+            this.__propertyChanged("tileSize", value);
+            this._tileSize = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoStripeTexture.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoStripeTexture";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the image of the texture. */
+    IsoStripeTexture.prototype.set = function (src) {
+        this.src = src;
+        return this;
+    };
+    /** Returns the current tile. */
+    IsoStripeTexture.prototype.getTile = function () {
+        return this.tile;
+    };
+    /** Returns the tile offset */
+    IsoStripeTexture.prototype.getTileOffset = function () {
+        return this.tileOffset;
+    };
+    /** Returns the absolute tile, which means the tile number plus the tile offset. */
+    IsoStripeTexture.prototype.getAbsoluteTile = function () {
+        return this.tileOffset + this.tile;
+    };
+    /** Resets the image of the texture. */
+    IsoStripeTexture.prototype.reset = function () {
+        this.src = undefined;
+        return this;
+    };
+    /** Retruns the imagedata. */
+    IsoStripeTexture.prototype.getImageData = function () {
+        var ox = (this.tile % (this.src.source.size.width / this.tileSize.width)) * this.tileSize.width;
+        var oy = Math.floor(this.tile / this.src.source.size.width / this.tileSize.width) * this.tileSize.height;
+        return {
+            x: ox,
+            y: oy,
+            width: this.tileSize.width,
+            height: this.tileSize.height,
+            image: this.src.get().get()
+        };
+    };
+    /** Returns the texture data. */
+    IsoStripeTexture.prototype.getTextureData = function () {
+        return {
+            imageData: this.getImageData(),
+            blendingMode: this.blendingMode,
+            alpha: this.alpha
+        };
+    };
+    return IsoStripeTexture;
+})(IsoImageTexture);
+/// <reference path="../core/IsoObject" />
+var IsoTextureCache = (function (_super) {
+    __extends(IsoTextureCache, _super);
+    function IsoTextureCache() {
+        _super.apply(this, arguments);
+    }
+    Object.defineProperty(IsoTextureCache.prototype, "renderData", {
+        get: function () {
+            return this._renderData;
+        },
+        set: function (value) {
+            this.__propertyChanged("renderData", value);
+            this._renderData = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTextureCache.prototype, "type", {
+        get: function () {
+            return "IsoTextureCache";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    IsoTextureCache.prototype.needRedraw = function (renderData) {
+        if (this.renderData === undefined) {
+            this.renderData = renderData;
+            return true;
+        }
+        else {
+            var playVideo = false;
+            for (var i = 0; i < renderData.textureData.length; i++) {
+                if (renderData.textureData[i].imageData.image["paused"] !== undefined && renderData.textureData[i].imageData.image["paused"] === false) {
+                    playVideo = true;
                 }
+            }
+            if (JSON.stringify(renderData.maskData) != JSON.stringify(this.renderData.maskData) || JSON.stringify(renderData.textureData) != JSON.stringify(this.renderData.textureData) || playVideo === true) {
+                return true;
+            }
+            else {
+                return false;
             }
         }
     };
-    /** Removes a mass body */
-    IsoPhysicsManager.prototype.removeMassBody = function (object) {
-        var __i;
-        for (var i = 0; i < this.massBodies.length; i++) {
-            if (this.massBodies[i] === object) {
-                __i = i;
-            }
-            if (__i !== undefined) {
-                if (this.massBodies[i + 1] !== undefined) {
-                    this.massBodies[i] = this.massBodies[i + 1];
+    IsoTextureCache.prototype.cache = function (renderData) {
+        if (this.needRedraw(renderData)) {
+            this.canvas = null;
+            this.canvas = this.render(renderData);
+            this.renderData = renderData;
+        }
+        return this.canvas;
+    };
+    IsoTextureCache.prototype.render = function (renderData) {
+        try {
+            var canvas = new IsoCanvas(renderData.size.width, renderData.size.height, false, false);
+            canvas.load();
+            canvas.clear();
+            for (var i = 0; i < renderData.textureData.length; i++) {
+                var t = renderData.textureData[i];
+                if (t.blendingMode !== IsoBlendingModes.NORMAL) {
+                    canvas.context.globalCompositeOperation = t.blendingMode;
+                }
+                canvas.context.globalAlpha = t.alpha;
+                if (t.imageData !== undefined) {
+                    canvas.context.drawImage(t.imageData.image, t.imageData.x, t.imageData.y, t.imageData.width, t.imageData.height, 0, 0, renderData.size.width, renderData.size.height);
+                }
+                else if (t.colorData !== undefined) {
+                    canvas.context.fillStyle = t.colorData.hex;
+                    canvas.context.fillRect(0, 0, renderData.size.width, renderData.size.height);
+                }
+                if (t.blendingMode !== IsoBlendingModes.NORMAL) {
+                    canvas.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
                 }
             }
+            return canvas;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
         }
     };
-    /** Sets the global gravity */
-    IsoPhysicsManager.prototype.setGravity = function (g) {
-        this.gravity = g;
+    IsoTextureCache.prototype.getImageData = function () {
+        try {
+            return this.canvas.context.getImageData(0, 0, this.canvas.element.width, this.canvas.element.height);
+        }
+        catch (e) {
+            this.log("Can not return the image data :(. Maybe the script runs locally?!", IsoLogger.WARN);
+            return null;
+        }
     };
-    /**
-    * Updates the physics.
-    * @todo find a much better solution
-    * @todo implement more physics
-    */
-    IsoPhysicsManager.prototype.update = function () {
-        for (var i = 0; i < this.massBodies.length; i++) {
-            if (this.massBodies[i] !== undefined) {
-                this.massBodies[i].velocity.y += this.gravity * 2;
-                var collides = false;
-                for (var j = 0; j < this.rigidBodies.length; j++) {
-                    if (this.rigidBodies[j] !== undefined && this.massBodies[i].collide(this.rigidBodies[j])) {
-                        this.massBodies[i].velocity.y = 0;
-                        if ((this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) > this.rigidBodies[j].rigidBody.y) {
-                            if ((this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) - this.rigidBodies[j].rigidBody.y < 5) {
-                                this.massBodies[i].position.y -= (this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) - this.rigidBodies[j].rigidBody.y;
-                            }
-                            else if ((this.massBodies[i].rigidBody.y + this.massBodies[i].rigidBody.height) - this.rigidBodies[j].rigidBody.y >= 5) {
-                                if ((this.massBodies[i].rigidBody.x < this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width) &&
-                                    (this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width > this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width)) {
-                                    this.massBodies[i].position.x += (this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width) - this.massBodies[i].rigidBody.x;
-                                }
-                                else if ((this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width > this.rigidBodies[j].rigidBody.x) &&
-                                    (this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width < this.rigidBodies[j].rigidBody.x + this.rigidBodies[j].rigidBody.width)) {
-                                    this.massBodies[i].position.x += this.rigidBodies[j].rigidBody.x - (this.massBodies[i].rigidBody.x + this.massBodies[i].rigidBody.width);
-                                }
-                            }
-                        }
+    return IsoTextureCache;
+})(IsoObject);
+///<reference path="IsoTexture.ts" />
+var IsoTextureProcessor = (function (_super) {
+    __extends(IsoTextureProcessor, _super);
+    function IsoTextureProcessor(name) {
+        _super.call(this, name);
+        this.mask = new Array();
+        this.textures = new Array();
+    }
+    Object.defineProperty(IsoTextureProcessor.prototype, "mask", {
+        get: function () {
+            return this._mask;
+        },
+        set: function (value) {
+            this.__propertyChanged("mask", value);
+            this._mask = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTextureProcessor.prototype, "textures", {
+        get: function () {
+            return this._textures;
+        },
+        set: function (value) {
+            this.__propertyChanged("textures", value);
+            this._textures = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTextureProcessor.prototype, "src", {
+        get: function () {
+            return this._src;
+        },
+        set: function (value) {
+            this.__propertyChanged("src", value);
+            this._src = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoTextureProcessor.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoTextureProcessor";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Adds a new mask to the texture. */
+    IsoTextureProcessor.prototype.addMask = function (mask) {
+        try {
+            if (this.mask === undefined) {
+                this.log(new Error("Mask was undefined but should not. I created a new array for you."), IsoLogger.WARN);
+            }
+            this.mask.push(mask);
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Adds a new textue to the texture. */
+    IsoTextureProcessor.prototype.addTexture = function (texture) {
+        try {
+            if (this.textures === undefined) {
+                this.log(new Error("Textures was undefined but should not. I created a new array for you."), IsoLogger.WARN);
+            }
+            this.textures.push(texture);
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Removes a mask from the texture. */
+    IsoTextureProcessor.prototype.removeMask = function (mask) {
+        try {
+            if (this.mask === undefined) {
+                this.log(new Error("Mask was undefined but should not. I created a new array for you."), IsoLogger.WARN);
+                this.mask = new Array();
+            }
+            for (var i = 0; i < this.mask.length; i++) {
+                if (this.mask[i] === mask) {
+                    this.mask[i] = null;
+                    for (var l = 0; l < this.mask.length - 1; l++) {
+                        this.mask[l] = this.mask[l + 1];
                     }
+                    this.mask.pop();
+                    return this;
+                }
+            }
+            this.log(new Error("I could not find the mask, you wanted to remove."), IsoLogger.WARN);
+            return this;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Removes a texture from the texture. */
+    IsoTextureProcessor.prototype.removeTexture = function (texture) {
+        try {
+            if (this.textures === undefined) {
+                this.log(new Error("Textures was undefined but should not. I created a new array for you."), IsoLogger.WARN);
+                this.textures = new Array();
+            }
+            for (var i = 0; i < this.textures.length; i++) {
+                if (this.textures[i] === texture) {
+                    this.textures[i] = null;
+                    for (var l = 0; l < this.textures.length - 1; l++) {
+                        this.textures[l] = this.textures[l + 1];
+                    }
+                    this.textures.pop();
+                    return this;
+                }
+            }
+            this.log(new Error("I could not find the texture, you wanted to remove."), IsoLogger.WARN);
+            return this;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+    };
+    /** Proceed the new texture and save the result as the texture source.*/
+    IsoTextureProcessor.prototype.render = function () {
+        var maskData = new Array();
+        var widthM = 0, heightM = 0, widthT = 0, heightT = 0, width = 0, height = 0;
+        var textureData = new Array();
+        for (var i = 0; i < this.mask.length; i++) {
+            maskData[i] = this.mask[i].getImageData();
+            if (maskData[i].width > widthM) {
+                widthM = maskData[i].width;
+            }
+            if (maskData[i].height > heightM) {
+                heightM = maskData[i].height;
+            }
+        }
+        for (var i = 0; i < this.textures.length; i++) {
+            textureData[i] = this.textures[i].getTextureData();
+            if (textureData[i].imageData.width > widthT) {
+                widthT = textureData[i].imageData.width;
+            }
+            if (textureData[i].imageData.height > heightT) {
+                heightT = textureData[i].imageData.height;
+            }
+        }
+        // Render the texture to a new canvas.
+        // Render at first the mask, if a mask is given.
+        var canvasMask = new IsoCanvas(widthM, heightM);
+        canvasMask.load();
+        if (maskData.length > 0) {
+            for (var i = 0; i < maskData.length; i++) {
+                var m = maskData[i];
+                canvasMask.context.drawImage(m.image, 0, 0, m.width, m.height);
+            }
+        }
+        // Render the texture if a texture is given.
+        var canvasTex = new IsoCanvas(widthT, heightT);
+        canvasTex.load();
+        if (textureData.length > 0) {
+            for (var i = 0; i < textureData.length; i++) {
+                var t = textureData[i];
+                if (t.blendingMode !== IsoBlendingModes.NORMAL) {
+                    canvasTex.context.globalCompositeOperation = t.blendingMode;
+                }
+                canvasTex.context.globalAlpha = t.alpha;
+                if (t.imageData !== undefined) {
+                    canvasTex.context.drawImage(t.imageData.image, 0, t.imageData.width, t.imageData.height);
+                }
+                if (t.colorData !== undefined) {
+                    canvasTex.context.fillStyle = t.colorData.hex;
+                    canvasTex.context.fillRect(0, 0, canvasTex.size.width, canvasTex.size.height);
+                }
+                if (t.blendingMode !== IsoBlendingModes.NORMAL) {
+                    canvasTex.context.globalCompositeOperation = IsoBlendingModes.NORMAL;
                 }
             }
         }
+        // And put it all together.
+        if (widthM > 0) {
+            width = widthM;
+        }
+        else {
+            width = widthT;
+        }
+        if (heightM > 0) {
+            height = heightM;
+        }
+        else {
+            height = heightT;
+        }
+        var canvas = new IsoCanvas(width, height);
+        canvas.load();
+        if (maskData.length > 0) {
+            canvas.context.drawImage(canvasMask.element, 0, 0, canvasMask.size.width, canvasMask.size.height);
+        }
+        if (textureData.length > 0) {
+            if (maskData.length > 0) {
+                canvas.context.globalCompositeOperation = IsoBlendingModes.SOURCE_IN;
+            }
+            canvas.context.drawImage(canvasTex.element, 0, 0, canvasTex.size.width, canvasTex.size.height);
+        }
+        this.src = new IsoImageResource(this.name, canvas);
     };
-    return IsoPhysicsManager;
-})();
-"use strict";
-/**
- * IsoVector2D represents a point on the screen.
- */
-var IsoVector2D = (function (_super) {
-    __extends(IsoVector2D, _super);
-    /** Creates a new vector */
-    function IsoVector2D(x, y) {
-        _super.call(this, x, y);
+    return IsoTextureProcessor;
+})(IsoTexture);
+///<reference path="IsoTexture.ts" />
+var IsoVideoTexture = (function (_super) {
+    __extends(IsoVideoTexture, _super);
+    function IsoVideoTexture(name, src) {
+        _super.call(this, name);
+        this.set(src);
     }
-    /** Gets the distance between two points */
-    IsoVector2D.prototype.getDistance = function (vec) {
-        // c2 = a2 + b2 --> c = sqrt(a2 + b2) --> c = is distance
-        return Math.sqrt(((this.x - vec.x) * (this.x - vec.x)) + ((this.y - vec.y) * (this.y - vec.y)));
+    Object.defineProperty(IsoVideoTexture.prototype, "src", {
+        get: function () {
+            return this._src;
+        },
+        set: function (value) {
+            this.__propertyChanged("src", value);
+            this._src = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Sets the image of the texture. */
+    IsoVideoTexture.prototype.set = function (src) {
+        this.src = src;
+        return this;
     };
-    /** Gets the length of a vector. */
-    IsoVector2D.prototype.getMagnitude = function () {
-        return Math.sqrt((this.x * this.x) + (this.y * this.y));
+    Object.defineProperty(IsoVideoTexture.prototype, "type", {
+        /** Type of the object for identification. */
+        get: function () {
+            return "IsoVideoTexture";
+        },
+        set: function (value) { },
+        enumerable: true,
+        configurable: true
+    });
+    /** Resets the image of the texture. */
+    IsoVideoTexture.prototype.reset = function () {
+        this.src = null;
+        return this;
     };
-    /** Gets the angle of a vector. */
-    IsoVector2D.prototype.getAngle = function () {
-        return Math.atan2(this.y, this.x);
+    /** Plays or resumes the video. */
+    IsoVideoTexture.prototype.play = function () {
+        try {
+            this.src.getElement().play();
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+        return this;
     };
-    /** Sets the vector from an angle and a length.*/
-    IsoVector2D.prototype.createFromAngle = function (angle, length) {
-        this.x = length * Math.cos(angle);
-        this.y = length * Math.sin(angle);
+    /** Stops the video. */
+    IsoVideoTexture.prototype.stop = function () {
+        try {
+            this.src.getElement().pause();
+            this.src.getElement().currentTime = 0;
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+        return this;
     };
-    IsoVector2D.prototype.add = function (vector) {
-        this.x += vector.x;
-        this.y += vector.y;
+    /** Pause the video. */
+    IsoVideoTexture.prototype.pause = function () {
+        try {
+            this.src.getElement().pause();
+        }
+        catch (e) {
+            this.log(e, IsoLogger.ERROR);
+        }
+        return this;
     };
-    return IsoVector2D;
-})(IsoPoint);
-//# sourceMappingURL=isometric.js.map
+    /** Sets the current time in seconds of the video. */
+    IsoVideoTexture.prototype.setCurrentTime = function (time) {
+        try {
+            if (this.src.getElement().duration > time) {
+                this.src.getElement().currentTime = time;
+            }
+            else {
+                this.log(new Error("Can not set the time of IsoVideoTexture '" + this.name + "'. The request time is bigger than the duration."), IsoLogger.WARN);
+            }
+        }
+        catch (e) {
+            this.log(e, IsoLogger.WARN);
+        }
+        return this;
+    };
+    /** Returns the imagedata. */
+    IsoVideoTexture.prototype.getImageData = function () {
+        return {
+            x: 0,
+            y: 0,
+            width: this.src.get().size.width,
+            height: this.src.get().size.height,
+            image: this.src.get().get()
+        };
+    };
+    /** Returns the texture data. */
+    IsoVideoTexture.prototype.getTextureData = function () {
+        return {
+            imageData: this.getImageData(),
+            blendingMode: this.blendingMode,
+            alpha: this.alpha
+        };
+    };
+    return IsoVideoTexture;
+})(IsoTexture);
+//# sourceMappingURL=IsoMetric.js.map

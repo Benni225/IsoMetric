@@ -8,7 +8,7 @@ window.onload = () => {
 
     // Load the resource.
     app.resources.add(new IsoImageResource("birdResource", new IsoImage("../../images/bird/bird.png")));
-    app.resources.add(new IsoVideoResource("videoResource", new IsoVideo(["../../images/video/doku.mp4"])));
+    app.resources.add(new IsoVideoResource("videoResource", new IsoVideo(["../../images/video/sintel_trailer-480p.mp4"])));
     app.resources.get("videoResource").source["loadType"] = IsoVideo.STREAM;
     app.resources.on("load", () => init());
     app.resources.load();
